@@ -10,6 +10,11 @@ export interface Irrigation { id: number; crop_id: number; amount: number; irrig
 export type FertilizationUnit = "kg/ha" | "L/ha";
 export interface Fertilization { id: number; crop_id: number; producto: string; dosis: number; unidad: FertilizationUnit; fecha_aplicacion: string; notas?: string; costo?: number; created_at: string; updated_at: string; }
 
+export type PestType = "plaga" | "enfermedad";
+export type PestSeverity = "baja" | "media" | "alta";
+export type PestStatus = "activo" | "controlado" | "erradicado";
+export interface Pest { id: number; crop_id: number; tipo: PestType; nombre: string; severidad: PestSeverity; fecha_deteccion: string; tratamiento?: string; estado: PestStatus; notas?: string; created_at: string; updated_at: string; }
+
 export interface ApiResponse<T> { data?: T; error?: string; }
 export interface LoginPayload { email: string; password: string; }
 export interface RegisterPayload { email: string; password: string; }
