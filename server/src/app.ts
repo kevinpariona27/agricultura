@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import parcelRoutes from "./routes/parcels.js";
 import cropRoutes from "./routes/crops.js";
+import irrigationRoutes from "./routes/irrigations.js";
 import { errorHandler } from "./middleware/error.js";
 
 export function createApp() {
@@ -18,6 +19,7 @@ export function createApp() {
   app.use("/api/auth", authRoutes);
   app.use("/api/parcels", parcelRoutes);
   app.use("/api/crops", cropRoutes);
+  app.use("/api/irrigations", irrigationRoutes);
 
   // 404 catch-all
   app.use((_req, res) => {
