@@ -35,6 +35,21 @@ export interface Crop {
   updated_at: string;
 }
 
+export type FertilizationUnit = "kg/ha" | "L/ha";
+
+export interface Fertilization {
+  id: number;
+  crop_id: number;
+  producto: string;
+  dosis: number;
+  unidad: FertilizationUnit;
+  fecha_aplicacion: string;
+  notas?: string;
+  costo?: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
