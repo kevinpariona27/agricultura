@@ -1,0 +1,9 @@
+{
+  "name": "gestion-agricola",
+  "private": true,
+  "workspaces": ["server", "client", "shared"],
+  "scripts": {
+    "setup": "npm install",
+    "dev": "echo 'Use npm run dev from individual workspaces'"
+  }
+}
