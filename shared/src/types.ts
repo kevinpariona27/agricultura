@@ -14,6 +14,27 @@ export interface Parcel {
   updated_at: string;
 }
 
+export type CropStatus =
+  | "planificado"
+  | "en_crecimiento"
+  | "floracion"
+  | "en_cosecha"
+  | "cosechado"
+  | "cancelado";
+
+export interface Crop {
+  id: number;
+  parcel_id: number;
+  variety: string;
+  planting_date: string;
+  status: CropStatus;
+  estimated_harvest_date?: string;
+  planting_density?: number;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
