@@ -20,6 +20,18 @@ export function Sidebar() {
         >
           Parcelas
         </NavLink>
+        <NavLink
+          to="/crops"
+          className={({ isActive }) =>
+            `rounded px-3 py-2 text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-green-700 text-white"
+                : "text-green-100 hover:bg-green-700 hover:text-white"
+            }`
+          }
+        >
+          Cultivos
+        </NavLink>
       </nav>
 
       <div className="px-3 pb-4">

@@ -6,6 +6,9 @@ import { RegisterPage } from "./features/auth/RegisterPage.js";
 import { ParcelListPage } from "./features/parcels/ParcelListPage.js";
 import { ParcelDetailPage } from "./features/parcels/ParcelDetailPage.js";
 import { ParcelFormPage } from "./features/parcels/ParcelFormPage.js";
+import { CropListPage } from "./features/crops/CropListPage.js";
+import { CropDetailPage } from "./features/crops/CropDetailPage.js";
+import { CropFormPage } from "./features/crops/CropFormPage.js";
 
 export default function App() {
   return (
@@ -22,6 +25,10 @@ export default function App() {
             <Route path="/parcels/new" element={<ParcelFormPage />} />
             <Route path="/parcels/:id" element={<ParcelDetailPage />} />
             <Route path="/parcels/:id/edit" element={<ParcelFormPage />} />
+            <Route path="/crops" element={<CropListPage />} />
+            <Route path="/crops/new" element={<CropFormPage />} />
+            <Route path="/crops/:id" element={<CropDetailPage />} />
+            <Route path="/crops/:id/edit" element={<CropFormPage />} />
           </Route>
         </Route>
 
