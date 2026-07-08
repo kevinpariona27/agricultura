@@ -21,7 +21,7 @@ export function createApp() {
   app.use("/api/auth", authRoutes);
   app.use("/api/parcels", parcelRoutes);
   app.use("/api/crops", cropRoutes);
-  app.use("/api/irrigations", irrigationRoutes);
+app.use("/api/irrigations", irrigationRoutes);
   app.use("/api/fertilizations", fertilizationRoutes);
   app.use("/api/pests", pestRoutes);
 
