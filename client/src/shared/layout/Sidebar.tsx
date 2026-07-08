@@ -9,6 +9,18 @@ export function Sidebar() {
 
       <nav className="flex flex-1 flex-col gap-1 px-3">
         <NavLink
+          to="/dashboard"
+          className={({ isActive }) =>
+            `rounded px-3 py-2 text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-green-700 text-white"
+                : "text-green-100 hover:bg-green-700 hover:text-white"
+            }`
+          }
+        >
+          Dashboard
+        </NavLink>
+        <NavLink
           to="/parcels"
           className={({ isActive }) =>
             `rounded px-3 py-2 text-sm font-medium transition-colors ${
@@ -43,6 +55,54 @@ export function Sidebar() {
           }
         >
           Riegos
+        </NavLink>
+        <NavLink
+          to="/harvests"
+          className={({ isActive }) =>
+            `rounded px-3 py-2 text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-green-700 text-white"
+                : "text-green-100 hover:bg-green-700 hover:text-white"
+            }`
+          }
+        >
+          Cosechas
+        </NavLink>
+        <NavLink
+          to="/inventory"
+          className={({ isActive }) =>
+            `rounded px-3 py-2 text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-green-700 text-white"
+                : "text-green-100 hover:bg-green-700 hover:text-white"
+            }`
+          }
+        >
+          Inventario
+        </NavLink>
+        <NavLink
+          to="/reports"
+          className={({ isActive }) =>
+            `rounded px-3 py-2 text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-green-700 text-white"
+                : "text-green-100 hover:bg-green-700 hover:text-white"
+            }`
+          }
+        >
+          Reportes
+        </NavLink>
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            `rounded px-3 py-2 text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-green-700 text-white"
+                : "text-green-100 hover:bg-green-700 hover:text-white"
+            }`
+          }
+        >
+          Perfil
         </NavLink>
       </nav>
 

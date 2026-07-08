@@ -3,6 +3,8 @@ import { AuthGuard } from "./shared/components/AuthGuard.js";
 import { AppLayout } from "./shared/layout/AppLayout.js";
 import { LoginPage } from "./features/auth/LoginPage.js";
 import { RegisterPage } from "./features/auth/RegisterPage.js";
+import { DashboardPage } from "./features/dashboard/DashboardPage.js";
+import { ReportsPage } from "./features/reports/ReportsPage.js";
 import { ParcelListPage } from "./features/parcels/ParcelListPage.js";
 import { ParcelDetailPage } from "./features/parcels/ParcelDetailPage.js";
 import { ParcelFormPage } from "./features/parcels/ParcelFormPage.js";
@@ -12,6 +14,13 @@ import { CropFormPage } from "./features/crops/CropFormPage.js";
 import { IrrigationListPage } from "./features/irrigations/IrrigationListPage.js";
 import { IrrigationDetailPage } from "./features/irrigations/IrrigationDetailPage.js";
 import { IrrigationFormPage } from "./features/irrigations/IrrigationFormPage.js";
+import { HarvestListPage } from "./features/harvests/HarvestListPage.js";
+import { HarvestDetailPage } from "./features/harvests/HarvestDetailPage.js";
+import { HarvestFormPage } from "./features/harvests/HarvestFormPage.js";
+import { InventoryListPage } from "./features/inventory/InventoryListPage.js";
+import { InventoryDetailPage } from "./features/inventory/InventoryDetailPage.js";
+import { InventoryFormPage } from "./features/inventory/InventoryFormPage.js";
+import { ProfilePage } from "./features/users/ProfilePage.js";
 
 export default function App() {
   return (
@@ -24,6 +33,8 @@ export default function App() {
         {/* Protected routes */}
         <Route element={<AuthGuard />}>
           <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
             <Route path="/parcels" element={<ParcelListPage />} />
             <Route path="/parcels/new" element={<ParcelFormPage />} />
             <Route path="/parcels/:id" element={<ParcelDetailPage />} />
@@ -36,11 +47,20 @@ export default function App() {
             <Route path="/irrigations/new" element={<IrrigationFormPage />} />
             <Route path="/irrigations/:id" element={<IrrigationDetailPage />} />
             <Route path="/irrigations/:id/edit" element={<IrrigationFormPage />} />
+            <Route path="/harvests" element={<HarvestListPage />} />
+            <Route path="/harvests/new" element={<HarvestFormPage />} />
+            <Route path="/harvests/:id" element={<HarvestDetailPage />} />
+            <Route path="/harvests/:id/edit" element={<HarvestFormPage />} />
+            <Route path="/inventory" element={<InventoryListPage />} />
+            <Route path="/inventory/new" element={<InventoryFormPage />} />
+            <Route path="/inventory/:id" element={<InventoryDetailPage />} />
+            <Route path="/inventory/:id/edit" element={<InventoryFormPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
 
         {/* Default redirect */}
-        <Route path="*" element={<Navigate to="/parcels" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );

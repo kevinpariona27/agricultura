@@ -6,6 +6,9 @@ import cropRoutes from "./routes/crops.js";
 import irrigationRoutes from "./routes/irrigations.js";
 import fertilizationRoutes from "./routes/fertilizations.js";
 import pestRoutes from "./routes/pests.js";
+import harvestRoutes from "./routes/harvests.js";
+import inventoryRoutes from "./routes/inventory.js";
+import userRoutes from "./routes/users.js";
 import { errorHandler } from "./middleware/error.js";
 
 export function createApp() {
@@ -19,6 +22,9 @@ export function createApp() {
 app.use("/api/irrigations", irrigationRoutes);
   app.use("/api/fertilizations", fertilizationRoutes);
   app.use("/api/pests", pestRoutes);
+  app.use("/api/harvests", harvestRoutes);
+  app.use("/api/inventory", inventoryRoutes);
+  app.use("/api/users", userRoutes);
   app.use((_req, res) => { res.status(404).json({ error: "Not found" }); });
   app.use(errorHandler);
   return app;

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Pest } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
+import { Badge } from "../../../shared/components/Badge";
 
 const TIPO_LABELS: Record<string, string> = {
   plaga: "Plaga",
@@ -204,24 +205,22 @@ export function PestTable({
                     {pest.nombre}
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                    <Badge
+                      label={SEVERITY_LABELS[pest.severidad] ?? pest.severidad}
+                      color={
                         SEVERITY_COLORS[pest.severidad] ??
                         "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {SEVERITY_LABELS[pest.severidad] ?? pest.severidad}
-                    </span>
+                      }
+                    />
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                    <Badge
+                      label={ESTADO_LABELS[pest.estado] ?? pest.estado}
+                      color={
                         ESTADO_COLORS[pest.estado] ??
                         "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {ESTADO_LABELS[pest.estado] ?? pest.estado}
-                    </span>
+                      }
+                    />
                   </td>
                 </tr>
               ))}
