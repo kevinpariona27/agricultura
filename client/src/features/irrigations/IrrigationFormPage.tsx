@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useIrrigationsStore } from "../../stores/irrigations.js";
+import { useIrrigationsStore } from "../../stores/irrigations";
 import {
   IrrigationForm,
   type IrrigationFormData,
-} from "./components/IrrigationForm.js";
+} from "./components/IrrigationForm";
 
 export function IrrigationFormPage() {
   const { id } = useParams<{ id: string }>();

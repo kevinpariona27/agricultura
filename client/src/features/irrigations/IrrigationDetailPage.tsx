@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useIrrigationsStore } from "../../stores/irrigations.js";
-import { useCropsStore } from "../../stores/crops.js";
-import { DeleteDialog } from "../../shared/components/DeleteDialog.js";
-import { IRRIGATION_METHOD_LABELS } from "./components/IrrigationForm.js";
+import { useIrrigationsStore } from "../../stores/irrigations";
+import { useCropsStore } from "../../stores/crops";
+import { DeleteDialog } from "../../shared/components/DeleteDialog";
+import { IRRIGATION_METHOD_LABELS } from "./components/IrrigationForm";
 
 export function IrrigationDetailPage() {
   const { id } = useParams<{ id: string }>();

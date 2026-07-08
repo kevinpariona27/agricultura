@@ -64,20 +64,4 @@ export interface RegisterPayload {
   password: string;
 }
 
-export type IrrigationMethod =
-  | "aspersion"
-  | "goteo"
-  | "inundacion"
-  | "manual";
 
-export interface Irrigation {
-  id: number;
-  crop_id: number;
-  amount: number;
-  irrigation_date: string;
-  method: IrrigationMethod;
-  duration?: number;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-}

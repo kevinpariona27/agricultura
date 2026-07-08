@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useIrrigationsStore } from "../../stores/irrigations.js";
-import { useCropsStore } from "../../stores/crops.js";
-import { IrrigationTable } from "./components/IrrigationTable.js";
+import { useIrrigationsStore } from "../../stores/irrigations";
+import { useCropsStore } from "../../stores/crops";
+import { IrrigationTable } from "./components/IrrigationTable";
 import {
   IRRIGATION_METHOD_OPTIONS,
-} from "./components/IrrigationForm.js";
+} from "./components/IrrigationForm";
 
 export function IrrigationListPage() {
   const navigate = useNavigate();
