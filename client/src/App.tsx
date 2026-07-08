@@ -9,6 +9,9 @@ import { ParcelFormPage } from "./features/parcels/ParcelFormPage.js";
 import { CropListPage } from "./features/crops/CropListPage.js";
 import { CropDetailPage } from "./features/crops/CropDetailPage.js";
 import { CropFormPage } from "./features/crops/CropFormPage.js";
+import { IrrigationListPage } from "./features/irrigations/IrrigationListPage.js";
+import { IrrigationDetailPage } from "./features/irrigations/IrrigationDetailPage.js";
+import { IrrigationFormPage } from "./features/irrigations/IrrigationFormPage.js";
 
 export default function App() {
   return (
@@ -29,6 +32,10 @@ export default function App() {
             <Route path="/crops/new" element={<CropFormPage />} />
             <Route path="/crops/:id" element={<CropDetailPage />} />
             <Route path="/crops/:id/edit" element={<CropFormPage />} />
+            <Route path="/irrigations" element={<IrrigationListPage />} />
+            <Route path="/irrigations/new" element={<IrrigationFormPage />} />
+            <Route path="/irrigations/:id" element={<IrrigationDetailPage />} />
+            <Route path="/irrigations/:id/edit" element={<IrrigationFormPage />} />
           </Route>
         </Route>
 
