@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useParcelsStore } from "../../stores/parcels.js";
-import { DeleteDialog } from "./components/DeleteDialog.js";
+import { DeleteDialog } from "../../shared/components/DeleteDialog.js";
 
 export function ParcelDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -115,6 +115,8 @@ export function ParcelDetailPage() {
         onConfirm={handleDelete}
         onCancel={() => setShowDelete(false)}
         loading={deleting}
+        title="¿Eliminar este lote?"
+        description="Esta acción no se puede deshacer."
       />
     </div>
   );
