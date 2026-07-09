@@ -36,10 +36,10 @@ Estimated total: 650–800 lines. Test: `cd client && npx vitest run`.
 
 ## Phase 2: Client Commons
 
-- [ ] 2.1 Add `uploadFile(path, FormData)` to `client/src/api/client.ts` — no JSON Content-Type
-- [ ] 2.2 Create `client/src/shared/components/ImageDisplay.tsx` — `<img>` or `ImageOff` fallback; size prop; testid/role/aria-label
-- [ ] 2.3 Create `client/src/shared/components/ImageUpload.tsx` — input+drop zone; idle/uploading/error/success; `ObjectURL` preview; testid
-- [ ] 2.4 Update `client/vite.config.ts` — proxy `/uploads` → `http://localhost:3001`
+- [x] 2.1 Add `uploadFile(path, FormData)` to `client/src/api/client.ts` — no JSON Content-Type
+- [x] 2.2 Create `client/src/shared/components/ImageDisplay.tsx` — `<img>` or `ImageOff` fallback; size prop; testid/role/aria-label
+- [x] 2.3 Create `client/src/shared/components/ImageUpload.tsx` — input+drop zone; idle/uploading/error/success; `ObjectURL` preview; testid
+- [x] 2.4 Update `client/vite.config.ts` — proxy `/uploads` → `http://localhost:3001`
 
 ## Phase 3: Entity Pages
 

@@ -65,3 +65,44 @@ export function put<T>(path: string, body: unknown): Promise<T> {
 export function del<T>(path: string): Promise<T> {
   return request<T>(path, { method: "DELETE" });
 }
+
+export async function uploadFile<T>(
+  entity: string,
+  id: number,
+  file: File
+): Promise<T> {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const res = await fetch(`${BASE_URL}/upload/${entity}/${id}`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new ApiError(data.error ?? "Upload failed", res.status, data);
+  }
+
+  return data as T;
+}
+
+export async function removeImage<T>(
+  entity: string,
+  id: number
+): Promise<T> {
+  const res = await fetch(`${BASE_URL}/upload/${entity}/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new ApiError(data.error ?? "Remove image failed", res.status, data);
+  }
+
+  return data as T;
+}
