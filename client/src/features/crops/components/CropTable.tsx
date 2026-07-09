@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { Crop } from "@agri/shared";
 import { useParcelsStore } from "../../../stores/parcels.js";
 import { Badge } from "../../../shared/components/Badge";
+import { ImageDisplay } from "../../../shared/components/ImageDisplay";
 import { CROP_STATUS_LABELS, CROP_STATUS_OPTIONS } from "./CropForm.js";
 
 interface CropTableProps {
@@ -152,6 +153,7 @@ export function CropTable({
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
+                <th className="w-10 px-3 py-2.5 font-medium"></th>
                 <th className="px-3 py-2.5 font-medium">Variedad</th>
                 <th className="px-3 py-2.5 font-medium">Parcela</th>
                 <th className="px-3 py-2.5 font-medium">Estado</th>
@@ -171,6 +173,13 @@ export function CropTable({
                   onClick={() => navigate(`/crops/${crop.id}`)}
                   className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
+                  <td className="px-3 py-2">
+                    <ImageDisplay
+                      src={crop.image_url ?? null}
+                      alt={crop.variety}
+                      size="sm"
+                    />
+                  </td>
                   <td className="px-3 py-2 font-medium text-gray-900">
                     {crop.variety}
                   </td>

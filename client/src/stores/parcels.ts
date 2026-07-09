@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { Parcel } from "@agri/shared";
-import { get, post, put, del } from "../api/client.js";
+import { get, post, put, del, uploadFile, removeImage } from "../api/client.js";
 
 interface ParcelsState {
   parcels: Parcel[];
@@ -12,6 +12,8 @@ interface ParcelsState {
   create: (data: CreateParcelData) => Promise<Parcel>;
   update: (id: number, data: Partial<CreateParcelData>) => Promise<Parcel>;
   remove: (id: number) => Promise<void>;
+  uploadImage: (id: number, file: File) => Promise<Parcel>;
+  removeImage: (id: number) => Promise<Parcel>;
   clearError: () => void;
 }
 
@@ -94,6 +96,38 @@ export const useParcelsStore = create<ParcelsState>((set) => ({
       }));
     } catch (err) {
       set({ error: "Error al eliminar el lote", loading: false });
+      throw err;
+    }
+  },
+
+  uploadImage: async (id: number, file: File) => {
+    set({ loading: true, error: null });
+    try {
+      const parcel = await uploadFile<Parcel>("parcels", id, file);
+      set((state) => ({
+        parcels: state.parcels.map((p) => (p.id === id ? parcel : p)),
+        current: state.current?.id === id ? parcel : state.current,
+        loading: false,
+      }));
+      return parcel;
+    } catch (err) {
+      set({ error: "Error al subir la imagen del lote", loading: false });
+      throw err;
+    }
+  },
+
+  removeImage: async (id: number) => {
+    set({ loading: true, error: null });
+    try {
+      const parcel = await removeImage<Parcel>("parcels", id);
+      set((state) => ({
+        parcels: state.parcels.map((p) => (p.id === id ? parcel : p)),
+        current: state.current?.id === id ? parcel : state.current,
+        loading: false,
+      }));
+      return parcel;
+    } catch (err) {
+      set({ error: "Error al eliminar la imagen del lote", loading: false });
       throw err;
     }
   },

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { Crop, CropStatus } from "@agri/shared";
-import { get, post, put, del } from "../api/client.js";
+import { get, post, put, del, uploadFile, removeImage } from "../api/client.js";
 
 export interface CropFilters {
   parcel_id?: number;
@@ -18,6 +18,8 @@ interface CropsState {
   create: (data: CreateCropData) => Promise<Crop>;
   update: (id: number, data: Partial<CreateCropData>) => Promise<Crop>;
   remove: (id: number) => Promise<void>;
+  uploadImage: (id: number, file: File) => Promise<Crop>;
+  removeImage: (id: number) => Promise<Crop>;
   clearError: () => void;
 }
 
@@ -105,6 +107,38 @@ export const useCropsStore = create<CropsState>((set) => ({
     } catch {
       set({ error: "Error al eliminar el cultivo", loading: false });
       throw new Error("Error al eliminar el cultivo");
+    }
+  },
+
+  uploadImage: async (id: number, file: File) => {
+    set({ loading: true, error: null });
+    try {
+      const crop = await uploadFile<Crop>("crops", id, file);
+      set((state) => ({
+        crops: state.crops.map((c) => (c.id === id ? crop : c)),
+        current: state.current?.id === id ? crop : state.current,
+        loading: false,
+      }));
+      return crop;
+    } catch {
+      set({ error: "Error al subir la imagen del cultivo", loading: false });
+      throw new Error("Error al subir la imagen del cultivo");
+    }
+  },
+
+  removeImage: async (id: number) => {
+    set({ loading: true, error: null });
+    try {
+      const crop = await removeImage<Crop>("crops", id);
+      set((state) => ({
+        crops: state.crops.map((c) => (c.id === id ? crop : c)),
+        current: state.current?.id === id ? crop : state.current,
+        loading: false,
+      }));
+      return crop;
+    } catch {
+      set({ error: "Error al eliminar la imagen del cultivo", loading: false });
+      throw new Error("Error al eliminar la imagen del cultivo");
     }
   },
 

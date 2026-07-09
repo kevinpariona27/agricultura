@@ -45,14 +45,14 @@ Estimated total: 650–800 lines. Test: `cd client && npx vitest run`.
 
 ### Parcels + Crops
 
-- [ ] 3.1 `client/src/stores/parcels.ts` — `uploadImage`+`removeImage`
-- [ ] 3.2 `client/src/stores/crops.ts` — same
-- [ ] 3.3 `ParcelDetailPage.tsx` — `<ImageDisplay>`; keep testid/role
-- [ ] 3.4 `ParcelFormPage.tsx` — `<ImageUpload>` (edit only)
-- [ ] 3.5 `ParcelTable.tsx` — thumbnail column
-- [ ] 3.6 `CropDetailPage.tsx` — `<ImageDisplay>`
-- [ ] 3.7 `CropFormPage.tsx` — `<ImageUpload>` (edit only)
-- [ ] 3.8 `CropTable.tsx` — thumbnail column
+- [x] 3.1 `client/src/stores/parcels.ts` — `uploadImage`+`removeImage`
+- [x] 3.2 `client/src/stores/crops.ts` — same
+- [x] 3.3 `ParcelDetailPage.tsx` — `<ImageDisplay>`; keep testid/role
+- [x] 3.4 `ParcelFormPage.tsx` — `<ImageUpload>` (edit only)
+- [x] 3.5 `ParcelTable.tsx` — thumbnail column
+- [x] 3.6 `CropDetailPage.tsx` — `<ImageDisplay>`
+- [x] 3.7 `CropFormPage.tsx` — `<ImageUpload>` (edit only)
+- [x] 3.8 `CropTable.tsx` — thumbnail column
 
 ### Pests + Inventory + Dashboard
 

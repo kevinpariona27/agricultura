@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Sprout } from "lucide-react";
 import { useCropsStore } from "../../stores/crops.js";
 import { useParcelsStore } from "../../stores/parcels.js";
 import { DeleteDialog } from "../../shared/components/DeleteDialog.js";
+import { ImageDisplay } from "../../shared/components/ImageDisplay.js";
 import { CROP_STATUS_LABELS } from "./components/CropForm.js";
 
 export function CropDetailPage() {
@@ -134,6 +136,15 @@ export function CropDetailPage() {
       </div>
 
       <div className="rounded-xl border border-gray-100 bg-white">
+        <div className="flex justify-center py-6">
+          <ImageDisplay
+            src={current.image_url ?? null}
+            alt={current.variety}
+            size="lg"
+            rounded
+            fallbackIcon={Sprout}
+          />
+        </div>
         <dl className="divide-y divide-gray-100">
           {fields.map(({ label, value }) => (
             <div

@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useParcelsStore } from "../../stores/parcels.js";
 import { ParcelForm, type ParcelFormData } from "./components/ParcelForm.js";
+import { ImageUpload } from "../../shared/components/ImageUpload.js";
 
 export function ParcelFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
-  const { current, loading, error, fetchOne, create, update, clearError } =
+  const { current, loading, error, fetchOne, create, update, uploadImage, removeImage, clearError } =
     useParcelsStore();
 
   useEffect(() => {
@@ -79,6 +80,17 @@ export function ParcelFormPage() {
         submitLabel={isEdit ? "Guardar cambios" : "Crear parcela"}
         loading={loading}
       />
+
+      {isEdit && id && (
+        <div className="mt-6">
+          <ImageUpload
+            currentImage={current?.image_url ?? null}
+            onUpload={(file) => uploadImage(Number(id), file)}
+            onRemove={() => removeImage(Number(id))}
+            entityLabel="Foto del lote"
+          />
+        </div>
+      )}
     </div>
   );
 }

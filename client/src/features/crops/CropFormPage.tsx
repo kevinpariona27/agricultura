@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCropsStore } from "../../stores/crops.js";
 import { CropForm, type CropFormData } from "./components/CropForm.js";
+import { ImageUpload } from "../../shared/components/ImageUpload.js";
 
 export function CropFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
-  const { current, loading, error, fetchOne, create, update, clearError } =
+  const { current, loading, error, fetchOne, create, update, uploadImage, removeImage, clearError } =
     useCropsStore();
 
   useEffect(() => {
@@ -82,6 +83,17 @@ export function CropFormPage() {
         submitLabel={isEdit ? "Guardar cambios" : "Crear cultivo"}
         loading={loading}
       />
+
+      {isEdit && id && (
+        <div className="mt-6">
+          <ImageUpload
+            currentImage={current?.image_url ?? null}
+            onUpload={(file) => uploadImage(Number(id), file)}
+            onRemove={() => removeImage(Number(id))}
+            entityLabel="Foto del cultivo"
+          />
+        </div>
+      )}
     </div>
   );
 }

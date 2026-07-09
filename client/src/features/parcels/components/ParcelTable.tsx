@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Parcel } from "@agri/shared";
 import { Badge } from "../../../shared/components/Badge";
+import { ImageDisplay } from "../../../shared/components/ImageDisplay";
 import { SOIL_TYPES } from "./ParcelForm.js";
 
 interface ParcelTableProps {
@@ -89,6 +90,7 @@ export function ParcelTable({ parcels, onSearch, onFilter }: ParcelTableProps) {
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
+                <th className="w-10 px-3 py-2.5 font-medium"></th>
                 <th className="px-3 py-2.5 font-medium">Nombre</th>
                 <th className="px-3 py-2.5 font-medium">Área (ha)</th>
                 <th className="px-3 py-2.5 font-medium">Ubicación</th>
@@ -108,6 +110,13 @@ export function ParcelTable({ parcels, onSearch, onFilter }: ParcelTableProps) {
                   onClick={() => navigate(`/parcels/${parcel.id}`)}
                   className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
+                  <td className="px-3 py-2">
+                    <ImageDisplay
+                      src={parcel.image_url ?? null}
+                      alt={parcel.name}
+                      size="sm"
+                    />
+                  </td>
                   <td className="px-3 py-2 font-medium text-gray-900">
                     {parcel.name}
                   </td>

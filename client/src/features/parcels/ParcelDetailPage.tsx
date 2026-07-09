@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { MapPin } from "lucide-react";
 import { useParcelsStore } from "../../stores/parcels.js";
 import { DeleteDialog } from "../../shared/components/DeleteDialog.js";
+import { ImageDisplay } from "../../shared/components/ImageDisplay.js";
 
 export function ParcelDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -95,6 +97,15 @@ export function ParcelDetailPage() {
       </div>
 
       <div className="rounded-xl border border-gray-100 bg-white">
+        <div className="flex justify-center py-6">
+          <ImageDisplay
+            src={current.image_url ?? null}
+            alt={current.name}
+            size="lg"
+            rounded
+            fallbackIcon={MapPin}
+          />
+        </div>
         <dl className="divide-y divide-gray-100">
           {fields.map(({ label, value }) => (
             <div
