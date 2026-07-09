@@ -56,15 +56,15 @@ Estimated total: 650–800 lines. Test: `cd client && npx vitest run`.
 
 ### Pests + Inventory + Dashboard
 
-- [ ] 4.1 `client/src/stores/pests.ts` — `uploadImage`+`removeImage`
-- [ ] 4.2 `client/src/stores/inventory.ts` — same
-- [ ] 4.3 `PestDetailPage.tsx` — `<ImageDisplay>`
-- [ ] 4.4 `PestFormPage.tsx` — `<ImageUpload>` (edit only)
-- [ ] 4.5 `PestTable.tsx` — thumbnail
-- [ ] 4.6 `InventoryDetailPage.tsx` — `<ImageDisplay>`
-- [ ] 4.7 `InventoryFormPage.tsx` — `<ImageUpload>` (edit only)
-- [ ] 4.8 `InventoryTable.tsx` — thumbnail
-- [ ] 4.9 `DashboardPage.tsx` — thumbnail in expiring-items table
+- [x] 4.1 `client/src/stores/pests.ts` — `uploadImage`+`removeImage`
+- [x] 4.2 `client/src/stores/inventory.ts` — same
+- [x] 4.3 `PestDetailPage.tsx` — `<ImageDisplay>`
+- [x] 4.4 `PestFormPage.tsx` — `<ImageUpload>` (edit only)
+- [x] 4.5 `PestTable.tsx` — thumbnail
+- [x] 4.6 `InventoryDetailPage.tsx` — `<ImageDisplay>`
+- [x] 4.7 `InventoryFormPage.tsx` — `<ImageUpload>` (edit only)
+- [x] 4.8 `InventoryTable.tsx` — thumbnail
+- [x] 4.9 `DashboardPage.tsx` — thumbnail in expiring-items table
 
 ## Phase 4: User Avatar
 

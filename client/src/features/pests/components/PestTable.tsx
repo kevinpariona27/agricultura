@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { Pest } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
 import { Badge } from "../../../shared/components/Badge";
+import { ImageDisplay } from "../../../shared/components/ImageDisplay";
 
 const TIPO_LABELS: Record<string, string> = {
   plaga: "Plaga",
@@ -191,6 +192,7 @@ export function PestTable({
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
+                <th className="w-10 px-3 py-2.5 font-medium"></th>
                 <th className="px-3 py-2.5 font-medium">Cultivo</th>
                 <th className="px-3 py-2.5 font-medium">Tipo</th>
                 <th className="px-3 py-2.5 font-medium">Nombre</th>
@@ -211,6 +213,13 @@ export function PestTable({
                   onClick={() => navigate(`/pests/${pest.id}`)}
                   className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
+                  <td className="px-3 py-2">
+                    <ImageDisplay
+                      src={pest.image_url ?? null}
+                      alt={pest.nombre}
+                      size="sm"
+                    />
+                  </td>
                   <td className="px-3 py-2 font-medium text-gray-900">
                     {cropName(pest.crop_id)}
                   </td>

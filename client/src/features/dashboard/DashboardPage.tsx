@@ -6,6 +6,7 @@ import { usePestsStore } from "../../stores/pests";
 import { useHarvestsStore } from "../../stores/harvests";
 import { useInventoryStore } from "../../stores/inventory";
 import { StatCard } from "../../shared/components/StatCard";
+import { ImageDisplay } from "../../shared/components/ImageDisplay";
 import { DonutChart } from "./components/DonutChart";
 import { EvolutionBarChart } from "./components/EvolutionBarChart";
 
@@ -76,7 +77,8 @@ export function DashboardPage() {
           icon="🌾"
           value={parcels.length}
           label="Parcelas"
-          color="green"
+          color="emerald"
+          accent={true}
         />
         <StatCard
           icon="🌱"
@@ -146,6 +148,7 @@ export function DashboardPage() {
             <table className="w-full text-left text-sm">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
+                  <th className="w-10 px-3 py-3 font-medium"></th>
                   <th className="px-4 py-3 font-medium">Insumo</th>
                   <th className="px-4 py-3 font-medium">Categoría</th>
                   <th className="px-4 py-3 font-medium">Cantidad</th>
@@ -155,6 +158,13 @@ export function DashboardPage() {
               <tbody className="divide-y divide-gray-100">
                 {expiringItems.map((item) => (
                   <tr key={item.id}>
+                    <td className="px-3 py-3">
+                      <ImageDisplay
+                        src={item.image_url ?? null}
+                        alt={item.nombre}
+                        size="sm"
+                      />
+                    </td>
                     <td className="px-4 py-3 font-medium text-gray-900">
                       {item.nombre}
                     </td>
@@ -189,6 +199,7 @@ export function DashboardPage() {
             <table className="w-full text-left text-sm">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
+                  <th className="w-10 px-3 py-3 font-medium"></th>
                   <th className="px-4 py-3 font-medium">Insumo</th>
                   <th className="px-4 py-3 font-medium">Cantidad</th>
                   <th className="px-4 py-3 font-medium">Unidad</th>
@@ -197,6 +208,13 @@ export function DashboardPage() {
               <tbody className="divide-y divide-gray-100">
                 {lowStockItems.map((item) => (
                   <tr key={item.id}>
+                    <td className="px-3 py-3">
+                      <ImageDisplay
+                        src={item.image_url ?? null}
+                        alt={item.nombre}
+                        size="sm"
+                      />
+                    </td>
                     <td className="px-4 py-3 font-medium text-gray-900">
                       {item.nombre}
                     </td>

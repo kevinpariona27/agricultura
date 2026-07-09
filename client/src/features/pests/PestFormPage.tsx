@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePestsStore } from "../../stores/pests";
 import { PestForm, type PestFormData } from "./components/PestForm";
+import { ImageUpload } from "../../shared/components/ImageUpload";
 
 export function PestFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
-  const { current, loading, error, fetchOne, create, update, clearError } =
+  const { current, loading, error, fetchOne, create, update, uploadImage, removeImage, clearError } =
     usePestsStore();
 
   useEffect(() => {
@@ -83,6 +84,17 @@ export function PestFormPage() {
         submitLabel={isEdit ? "Guardar cambios" : "Crear plaga"}
         loading={loading}
       />
+
+      {isEdit && id && (
+        <div className="mt-6">
+          <ImageUpload
+            currentImage={current?.image_url ?? null}
+            onUpload={(file) => uploadImage(Number(id), file)}
+            onRemove={() => removeImage(Number(id))}
+            entityLabel="Foto de la plaga"
+          />
+        </div>
+      )}
     </div>
   );
 }

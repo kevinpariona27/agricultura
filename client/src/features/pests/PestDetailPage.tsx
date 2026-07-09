@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Bug } from "lucide-react";
 import { usePestsStore } from "../../stores/pests";
 import { useCropsStore } from "../../stores/crops";
 import { DeleteDialog } from "../../shared/components/DeleteDialog";
+import { ImageDisplay } from "../../shared/components/ImageDisplay";
 
 const TIPO_LABELS: Record<string, string> = {
   plaga: "Plaga",
@@ -139,6 +141,15 @@ export function PestDetailPage() {
       </div>
 
       <div className="rounded-xl border border-gray-100 bg-white">
+        <div className="flex justify-center py-6">
+          <ImageDisplay
+            src={current.image_url ?? null}
+            alt={current.nombre}
+            size="lg"
+            rounded
+            fallbackIcon={Bug}
+          />
+        </div>
         <dl className="divide-y divide-gray-100">
           {fields.map(({ label, value }) => (
             <div

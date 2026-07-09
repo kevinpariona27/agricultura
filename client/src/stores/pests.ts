@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { Pest } from "@agri/shared";
-import { get, post, put, del } from "../api/client";
+import { get, post, put, del, uploadFile, removeImage } from "../api/client";
 
 export interface PestFilters {
   crop_id?: number;
@@ -30,6 +30,8 @@ interface PestsState {
   create: (data: CreatePestData) => Promise<Pest>;
   update: (id: number, data: Partial<CreatePestData>) => Promise<Pest>;
   remove: (id: number) => Promise<void>;
+  uploadImage: (id: number, file: File) => Promise<Pest>;
+  removeImage: (id: number) => Promise<Pest>;
   clearError: () => void;
 }
 
@@ -108,6 +110,38 @@ export const usePestsStore = create<PestsState>((set) => ({
     } catch {
       set({ error: "Error al eliminar la plaga", loading: false });
       throw new Error("Error al eliminar la plaga");
+    }
+  },
+
+  uploadImage: async (id: number, file: File) => {
+    set({ loading: true, error: null });
+    try {
+      const pest = await uploadFile<Pest>("pests", id, file);
+      set((state) => ({
+        pests: state.pests.map((p) => (p.id === id ? pest : p)),
+        current: state.current?.id === id ? pest : state.current,
+        loading: false,
+      }));
+      return pest;
+    } catch {
+      set({ error: "Error al subir la imagen de la plaga", loading: false });
+      throw new Error("Error al subir la imagen de la plaga");
+    }
+  },
+
+  removeImage: async (id: number) => {
+    set({ loading: true, error: null });
+    try {
+      const pest = await removeImage<Pest>("pests", id);
+      set((state) => ({
+        pests: state.pests.map((p) => (p.id === id ? pest : p)),
+        current: state.current?.id === id ? pest : state.current,
+        loading: false,
+      }));
+      return pest;
+    } catch {
+      set({ error: "Error al eliminar la imagen de la plaga", loading: false });
+      throw new Error("Error al eliminar la imagen de la plaga");
     }
   },
 

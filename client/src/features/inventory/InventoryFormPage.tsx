@@ -5,12 +5,13 @@ import {
   InventoryForm,
   type InventoryFormData,
 } from "./components/InventoryForm";
+import { ImageUpload } from "../../shared/components/ImageUpload";
 
 export function InventoryFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
-  const { current, loading, error, fetchOne, create, update, clearError } =
+  const { current, loading, error, fetchOne, create, update, uploadImage, removeImage, clearError } =
     useInventoryStore();
 
   useEffect(() => {
@@ -86,6 +87,17 @@ export function InventoryFormPage() {
         submitLabel={isEdit ? "Guardar cambios" : "Crear ítem"}
         loading={loading}
       />
+
+      {isEdit && id && (
+        <div className="mt-6">
+          <ImageUpload
+            currentImage={current?.image_url ?? null}
+            onUpload={(file) => uploadImage(Number(id), file)}
+            onRemove={() => removeImage(Number(id))}
+            entityLabel="Foto del producto"
+          />
+        </div>
+      )}
     </div>
   );
 }
