@@ -8,7 +8,7 @@ const serverRoot = resolve(__dirname, "..", "..");
 const config: Knex.Config = {
   client: "better-sqlite3",
   connection: {
-    filename: resolve(serverRoot, "data.db"),
+    filename: process.env.DB_PATH || resolve(serverRoot, "data.db"),
   },
   useNullAsDefault: true,
   migrations: {

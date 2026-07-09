@@ -29,7 +29,7 @@ export function createApp() {
   ensureUploadsDir();
 
   const app = express();
-  app.use(cors({ origin: "http://localhost:5173" }));
+  app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
   app.use(express.json());
 
   // Serve uploaded files as static assets
