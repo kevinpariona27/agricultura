@@ -38,7 +38,7 @@ export function ProfilePage() {
 
   if (loading && !profile) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Cargando...
       </div>
     );
@@ -46,7 +46,7 @@ export function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Perfil</h1>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-900">Perfil</h1>
 
       {successMsg && (
         <div className="mb-4 rounded bg-green-50 px-4 py-2 text-sm text-green-700">

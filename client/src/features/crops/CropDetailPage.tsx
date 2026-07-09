@@ -37,7 +37,7 @@ export function CropDetailPage() {
 
   if (loading && !current) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Cargando...
       </div>
     );
@@ -53,7 +53,7 @@ export function CropDetailPage() {
 
   if (!current) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Cultivo no encontrado.
       </div>
     );
@@ -116,7 +116,7 @@ export function CropDetailPage() {
       </button>
 
       <div className="mb-6 flex items-start justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">{current.variety}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{current.variety}</h1>
         <div className="flex gap-2">
           <button
             onClick={() => navigate(`/crops/${current.id}/edit`)}
@@ -133,7 +133,7 @@ export function CropDetailPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white">
+      <div className="rounded-xl border border-gray-100 bg-white">
         <dl className="divide-y divide-gray-100">
           {fields.map(({ label, value }) => (
             <div

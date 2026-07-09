@@ -118,7 +118,7 @@ export function ReportsPage() {
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Cargando...
       </div>
     );
@@ -126,7 +126,7 @@ export function ReportsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Reportes</h1>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-900">Reportes</h1>
 
       {/* Summary stats */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -152,15 +152,15 @@ export function ReportsPage() {
 
       {/* Harvest summary */}
       <div className="mb-8">
-        <h2 className="mb-3 text-lg font-semibold text-gray-800">
+        <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
           Resumen de cosechas por cultivo
         </h2>
         {harvestSummary.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 py-8 text-center text-sm text-gray-500">
+          <div className="rounded-xl border border-dashed border-gray-200 py-8 text-center text-sm text-gray-500">
             No hay cosechas registradas.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border border-gray-200">
+          <div className="overflow-hidden rounded-xl border border-gray-100">
             <table className="w-full text-left text-sm">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
@@ -195,7 +195,7 @@ export function ReportsPage() {
 
       {/* Inventory status */}
       <div className="mb-8">
-        <h2 className="mb-3 text-lg font-semibold text-gray-800">
+        <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
           Estado del inventario
         </h2>
 
@@ -206,11 +206,11 @@ export function ReportsPage() {
               Stock bajo (≤ 5 unidades)
             </h3>
             {lowStockItems.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-gray-300 py-6 text-center text-sm text-gray-500">
+              <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm text-gray-500">
                 No hay insumos con stock bajo.
               </div>
             ) : (
-              <div className="overflow-hidden rounded-lg border border-gray-200">
+              <div className="overflow-hidden rounded-xl border border-gray-100">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-gray-50 text-gray-600">
                     <tr>
@@ -243,11 +243,11 @@ export function ReportsPage() {
               Próximos vencimientos (30 días)
             </h3>
             {expiringItems.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-gray-300 py-6 text-center text-sm text-gray-500">
+              <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm text-gray-500">
                 No hay insumos próximos a vencer.
               </div>
             ) : (
-              <div className="overflow-hidden rounded-lg border border-gray-200">
+              <div className="overflow-hidden rounded-xl border border-gray-100">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-gray-50 text-gray-600">
                     <tr>
@@ -280,7 +280,7 @@ export function ReportsPage() {
 
       {/* Pest history */}
       <div>
-        <h2 className="mb-3 text-lg font-semibold text-gray-800">
+        <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
           Historial de plagas
         </h2>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -290,11 +290,11 @@ export function ReportsPage() {
               Distribución por tipo
             </h3>
             {pestDistribution.byTipo.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-gray-300 py-6 text-center text-sm text-gray-500">
+              <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm text-gray-500">
                 No hay plagas registradas.
               </div>
             ) : (
-              <div className="overflow-hidden rounded-lg border border-gray-200">
+              <div className="overflow-hidden rounded-xl border border-gray-100">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-gray-50 text-gray-600">
                     <tr>
@@ -325,11 +325,11 @@ export function ReportsPage() {
               Distribución por severidad
             </h3>
             {pestDistribution.bySeveridad.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-gray-300 py-6 text-center text-sm text-gray-500">
+              <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm text-gray-500">
                 No hay plagas registradas.
               </div>
             ) : (
-              <div className="overflow-hidden rounded-lg border border-gray-200">
+              <div className="overflow-hidden rounded-xl border border-gray-100">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-gray-50 text-gray-600">
                     <tr>

@@ -40,14 +40,14 @@ export function HarvestListPage() {
   );
 
   const selectClass =
-    "rounded border border-gray-300 px-2 py-1.5 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500";
+    "rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500";
   const dateClass =
-    "rounded border border-gray-300 px-2 py-1.5 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500";
+    "rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500";
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Cosechas</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Cosechas</h1>
         <button
           onClick={() => navigate("/harvests/new")}
           className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
@@ -128,7 +128,7 @@ export function HarvestListPage() {
       </div>
 
       {loading && harvests.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
           Cargando...
         </div>
       ) : (

@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import type { Inventory } from "@agri/shared";
 
 const CATEGORIA_LABELS: Record<string, string> = {
@@ -21,6 +22,15 @@ interface InventoryTableProps {
   onCategoriaFilter: (categoria: string) => void;
 }
 
+const container = {
+  animate: { transition: { staggerChildren: 0.05 } },
+};
+
+const rowVariant = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+};
+
 export function InventoryTable({
   items,
   onSearch,
@@ -42,7 +52,7 @@ export function InventoryTable({
             type="text"
             onChange={(e) => onSearch(e.target.value)}
             placeholder="Buscar ítem..."
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           />
         </div>
 
@@ -56,7 +66,7 @@ export function InventoryTable({
           <select
             id="categoria-filter"
             onChange={(e) => onCategoriaFilter(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             <option value="">Todas</option>
             <option value="fertilizante">Fertilizante</option>
@@ -70,41 +80,47 @@ export function InventoryTable({
 
       {/* Table */}
       {items.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
           No se encontraron ítems de inventario.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-gray-200">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 font-medium">Nombre</th>
-                <th className="px-4 py-3 font-medium">Categoría</th>
-                <th className="px-4 py-3 font-medium">Cantidad</th>
-                <th className="px-4 py-3 font-medium">Unidad</th>
+                <th className="px-3 py-2.5 font-medium">Nombre</th>
+                <th className="px-3 py-2.5 font-medium">Categoría</th>
+                <th className="px-3 py-2.5 font-medium">Cantidad</th>
+                <th className="px-3 py-2.5 font-medium">Unidad</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <motion.tbody
+              variants={container}
+              initial="initial"
+              animate="animate"
+              className="divide-y divide-gray-100"
+            >
               {items.map((item) => (
-                <tr
+                <motion.tr
                   key={item.id}
-                  className="cursor-pointer transition-colors hover:bg-green-50"
+                  variants={rowVariant}
+                  className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-3 py-2 font-medium text-gray-900">
                     {item.nombre}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {CATEGORIA_LABELS[item.categoria] ?? item.categoria}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {item.cantidad}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {UNIDAD_LABELS[item.unidad] ?? item.unidad}
                   </td>
-                </tr>
+                </motion.tr>
               ))}
-            </tbody>
+            </motion.tbody>
           </table>
         </div>
       )}

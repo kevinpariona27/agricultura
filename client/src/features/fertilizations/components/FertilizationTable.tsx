@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import type { Fertilization } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
 
@@ -13,6 +14,15 @@ interface FertilizationTableProps {
   onSearch: (search: string) => void;
   onCropFilter: (crop_id: string) => void;
 }
+
+const container = {
+  animate: { transition: { staggerChildren: 0.05 } },
+};
+
+const item = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+};
 
 export function FertilizationTable({
   fertilizations,
@@ -68,7 +78,7 @@ export function FertilizationTable({
             value={searchValue}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Buscar fertilización..."
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           />
         </div>
 
@@ -83,7 +93,7 @@ export function FertilizationTable({
             id="crop-filter"
             value={cropFilter}
             onChange={(e) => handleCropFilter(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             <option value="">Todos</option>
             {crops.map((c) => (
@@ -97,45 +107,51 @@ export function FertilizationTable({
 
       {/* Table */}
       {fertilizations.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
           No se encontraron fertilizaciones.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-gray-200">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 font-medium">Cultivo</th>
-                <th className="px-4 py-3 font-medium">Producto</th>
-                <th className="px-4 py-3 font-medium">Dosis</th>
-                <th className="px-4 py-3 font-medium">Fecha</th>
+                <th className="px-3 py-2.5 font-medium">Cultivo</th>
+                <th className="px-3 py-2.5 font-medium">Producto</th>
+                <th className="px-3 py-2.5 font-medium">Dosis</th>
+                <th className="px-3 py-2.5 font-medium">Fecha</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <motion.tbody
+              variants={container}
+              initial="initial"
+              animate="animate"
+              className="divide-y divide-gray-100"
+            >
               {fertilizations.map((fert) => (
-                <tr
+                <motion.tr
                   key={fert.id}
+                  variants={item}
                   onClick={() => navigate(`/fertilizations/${fert.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-green-50"
+                  className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-3 py-2 font-medium text-gray-900">
                     {cropName(fert.crop_id)}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {fert.producto}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {fert.dosis}{" "}
                     <span className="text-gray-400">
                       {UNIT_LABELS[fert.unidad] ?? fert.unidad}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {formatDate(fert.fecha_aplicacion)}
                   </td>
-                </tr>
+                </motion.tr>
               ))}
-            </tbody>
+            </motion.tbody>
           </table>
         </div>
       )}

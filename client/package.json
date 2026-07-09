@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@agri/shared": "*",
+    "framer-motion": "^12.42.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.0",
+    "recharts": "^3.9.2",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

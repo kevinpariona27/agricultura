@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 interface StatCardProps {
   icon: string;
   value: number;
@@ -42,8 +44,10 @@ export function StatCard({ icon, value, label, color }: StatCardProps) {
   const c = COLOR_MAP[color] ?? COLOR_MAP.blue;
 
   return (
-    <div
-      className={`rounded-lg border border-gray-200 ${c.bg} border-l-4 ${c.border} p-5 shadow-sm transition-shadow hover:shadow-md`}
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      transition={{ duration: 0.15 }}
+      className={`rounded-xl border border-gray-100 ${c.bg} border-l-4 ${c.border} p-6 shadow-sm cursor-pointer`}
     >
       <div className="flex items-center justify-between">
         <div>
@@ -52,6 +56,6 @@ export function StatCard({ icon, value, label, color }: StatCardProps) {
         </div>
         <span className="text-3xl">{icon}</span>
       </div>
-    </div>
+    </motion.div>
   );
 }

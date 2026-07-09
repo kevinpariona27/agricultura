@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import type { Pest } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
 import { Badge } from "../../../shared/components/Badge";
@@ -40,6 +41,15 @@ interface PestTableProps {
   onTipoFilter: (tipo: string) => void;
   onEstadoFilter: (estado: string) => void;
 }
+
+const container = {
+  animate: { transition: { staggerChildren: 0.05 } },
+};
+
+const item = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+};
 
 export function PestTable({
   pests,
@@ -105,7 +115,7 @@ export function PestTable({
             value={searchValue}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Buscar plaga..."
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           />
         </div>
 
@@ -120,7 +130,7 @@ export function PestTable({
             id="crop-filter"
             value={cropFilter}
             onChange={(e) => handleCropFilter(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             <option value="">Todos</option>
             {crops.map((c) => (
@@ -142,7 +152,7 @@ export function PestTable({
             id="tipo-filter"
             value={tipoFilter}
             onChange={(e) => handleTipoFilter(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             <option value="">Todos</option>
             <option value="plaga">Plaga</option>
@@ -161,7 +171,7 @@ export function PestTable({
             id="estado-filter"
             value={estadoFilter}
             onChange={(e) => handleEstadoFilter(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             <option value="">Todos</option>
             <option value="activo">Activo</option>
@@ -173,38 +183,44 @@ export function PestTable({
 
       {/* Table */}
       {pests.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
           No se encontraron plagas.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-gray-200">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 font-medium">Cultivo</th>
-                <th className="px-4 py-3 font-medium">Tipo</th>
-                <th className="px-4 py-3 font-medium">Nombre</th>
-                <th className="px-4 py-3 font-medium">Severidad</th>
-                <th className="px-4 py-3 font-medium">Estado</th>
+                <th className="px-3 py-2.5 font-medium">Cultivo</th>
+                <th className="px-3 py-2.5 font-medium">Tipo</th>
+                <th className="px-3 py-2.5 font-medium">Nombre</th>
+                <th className="px-3 py-2.5 font-medium">Severidad</th>
+                <th className="px-3 py-2.5 font-medium">Estado</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <motion.tbody
+              variants={container}
+              initial="initial"
+              animate="animate"
+              className="divide-y divide-gray-100"
+            >
               {pests.map((pest) => (
-                <tr
+                <motion.tr
                   key={pest.id}
+                  variants={item}
                   onClick={() => navigate(`/pests/${pest.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-green-50"
+                  className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-3 py-2 font-medium text-gray-900">
                     {cropName(pest.crop_id)}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {TIPO_LABELS[pest.tipo] ?? pest.tipo}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {pest.nombre}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2">
                     <Badge
                       label={SEVERITY_LABELS[pest.severidad] ?? pest.severidad}
                       color={
@@ -213,7 +229,7 @@ export function PestTable({
                       }
                     />
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 py-2">
                     <Badge
                       label={ESTADO_LABELS[pest.estado] ?? pest.estado}
                       color={
@@ -222,9 +238,9 @@ export function PestTable({
                       }
                     />
                   </td>
-                </tr>
+                </motion.tr>
               ))}
-            </tbody>
+            </motion.tbody>
           </table>
         </div>
       )}

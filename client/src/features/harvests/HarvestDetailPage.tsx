@@ -37,7 +37,7 @@ export function HarvestDetailPage() {
 
   if (loading && !current) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Cargando...
       </div>
     );
@@ -53,7 +53,7 @@ export function HarvestDetailPage() {
 
   if (!current) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Cosecha no encontrada.
       </div>
     );
@@ -103,7 +103,7 @@ export function HarvestDetailPage() {
       </button>
 
       <div className="mb-6 flex items-start justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
           Cosecha del{" "}
           {new Date(current.fecha_cosecha).toLocaleDateString("es-AR")}
         </h1>
@@ -123,7 +123,7 @@ export function HarvestDetailPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white">
+      <div className="rounded-xl border border-gray-100 bg-white">
         <dl className="divide-y divide-gray-100">
           {fields.map(({ label, value }) => (
             <div

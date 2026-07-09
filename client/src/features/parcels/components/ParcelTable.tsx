@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import type { Parcel } from "@agri/shared";
+import { Badge } from "../../../shared/components/Badge";
 import { SOIL_TYPES } from "./ParcelForm.js";
 
 interface ParcelTableProps {
@@ -8,6 +10,15 @@ interface ParcelTableProps {
   onSearch: (search: string) => void;
   onFilter: (soil_type: string) => void;
 }
+
+const container = {
+  animate: { transition: { staggerChildren: 0.05 } },
+};
+
+const item = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+};
 
 export function ParcelTable({ parcels, onSearch, onFilter }: ParcelTableProps) {
   const navigate = useNavigate();
@@ -41,7 +52,7 @@ export function ParcelTable({ parcels, onSearch, onFilter }: ParcelTableProps) {
             value={searchValue}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Buscar lote..."
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           />
         </div>
 
@@ -56,7 +67,7 @@ export function ParcelTable({ parcels, onSearch, onFilter }: ParcelTableProps) {
             id="filter"
             value={filterValue}
             onChange={(e) => handleFilter(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             <option value="">Todos</option>
             {SOIL_TYPES.map((type) => (
@@ -70,40 +81,47 @@ export function ParcelTable({ parcels, onSearch, onFilter }: ParcelTableProps) {
 
       {/* Table */}
       {parcels.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
           No se encontraron lotes.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-gray-200">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 font-medium">Nombre</th>
-                <th className="px-4 py-3 font-medium">Área (ha)</th>
-                <th className="px-4 py-3 font-medium">Ubicación</th>
-                <th className="px-4 py-3 font-medium">Tipo de suelo</th>
+                <th className="px-3 py-2.5 font-medium">Nombre</th>
+                <th className="px-3 py-2.5 font-medium">Área (ha)</th>
+                <th className="px-3 py-2.5 font-medium">Ubicación</th>
+                <th className="px-3 py-2.5 font-medium">Tipo de suelo</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <motion.tbody
+              variants={container}
+              initial="initial"
+              animate="animate"
+              className="divide-y divide-gray-100"
+            >
               {parcels.map((parcel) => (
-                <tr
+                <motion.tr
                   key={parcel.id}
+                  variants={item}
                   onClick={() => navigate(`/parcels/${parcel.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-green-50"
+                  className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-3 py-2 font-medium text-gray-900">
                     {parcel.name}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{parcel.area}</td>
-                  <td className="px-4 py-3 text-gray-600">{parcel.location}</td>
-                  <td className="px-4 py-3">
-                    <span className="inline-block rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                      {parcel.soil_type}
-                    </span>
+                  <td className="px-3 py-2 text-gray-600">{parcel.area}</td>
+                  <td className="px-3 py-2 text-gray-600">{parcel.location}</td>
+                  <td className="px-3 py-2">
+                    <Badge
+                      label={parcel.soil_type}
+                      variant="success"
+                    />
                   </td>
-                </tr>
+                </motion.tr>
               ))}
-            </tbody>
+            </motion.tbody>
           </table>
         </div>
       )}

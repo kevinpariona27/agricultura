@@ -6,6 +6,8 @@ import { usePestsStore } from "../../stores/pests";
 import { useHarvestsStore } from "../../stores/harvests";
 import { useInventoryStore } from "../../stores/inventory";
 import { StatCard } from "../../shared/components/StatCard";
+import { DonutChart } from "./components/DonutChart";
+import { EvolutionBarChart } from "./components/EvolutionBarChart";
 
 export function DashboardPage() {
   const { parcels, fetchAll: fetchParcels, loading: loadingParcels } =
@@ -35,7 +37,6 @@ export function DashboardPage() {
 
   const expiringItems = useMemo(() => {
     if (!items.length) return [];
-    const now = new Date();
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
     return items
@@ -57,7 +58,7 @@ export function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Cargando...
       </div>
     );
@@ -65,7 +66,9 @@ export function DashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Dashboard</h1>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-900">
+        Dashboard
+      </h1>
 
       {/* Stats grid */}
       <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -107,17 +110,39 @@ export function DashboardPage() {
         />
       </div>
 
+      {/* Charts grid */}
+      <div
+        className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3"
+        data-testid="dashboard-charts"
+      >
+        {/* Donut chart — crop distribution */}
+        <div className="rounded-xl border border-gray-100 bg-white p-6 lg:col-span-1">
+          <h2 className="mb-4 text-base font-semibold text-gray-800">
+            Distribución de Cultivos
+          </h2>
+          <DonutChart />
+        </div>
+
+        {/* Bar chart — irrigation / harvest evolution */}
+        <div className="rounded-xl border border-gray-100 bg-white p-6 lg:col-span-2">
+          <h2 className="mb-4 text-base font-semibold text-gray-800">
+            Evolución Riegos / Cosechas
+          </h2>
+          <EvolutionBarChart />
+        </div>
+      </div>
+
       {/* Próximos vencimientos */}
       <div className="mb-6">
-        <h2 className="mb-3 text-lg font-semibold text-gray-800">
+        <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
           Próximos vencimientos
         </h2>
         {expiringItems.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 py-8 text-center text-sm text-gray-500">
+          <div className="rounded-xl border border-dashed border-gray-200 py-8 text-center text-sm text-gray-500">
             No hay insumos próximos a vencer.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-lg border border-gray-200">
+          <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
             <table className="w-full text-left text-sm">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
@@ -157,10 +182,10 @@ export function DashboardPage() {
       {/* Stock bajo */}
       {lowStockItems.length > 0 && (
         <div>
-          <h2 className="mb-3 text-lg font-semibold text-gray-800">
+          <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
             Stock bajo (≤ 5 unidades)
           </h2>
-          <div className="overflow-hidden rounded-lg border border-gray-200">
+          <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
             <table className="w-full text-left text-sm">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>

@@ -32,7 +32,7 @@ export function IrrigationFormPage() {
 
   if (isEdit && loading && !current) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Cargando...
       </div>
     );
@@ -48,7 +48,7 @@ export function IrrigationFormPage() {
 
   if (isEdit && !current) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
         Riego no encontrado.
       </div>
     );
@@ -74,7 +74,7 @@ export function IrrigationFormPage() {
         ← Volver a la lista
       </button>
 
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-900">
         {isEdit ? "Editar riego" : "Nuevo riego"}
       </h1>
 

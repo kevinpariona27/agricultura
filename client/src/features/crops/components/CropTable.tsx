@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import type { Crop } from "@agri/shared";
 import { useParcelsStore } from "../../../stores/parcels.js";
+import { Badge } from "../../../shared/components/Badge";
 import { CROP_STATUS_LABELS, CROP_STATUS_OPTIONS } from "./CropForm.js";
 
 interface CropTableProps {
@@ -10,6 +12,23 @@ interface CropTableProps {
   onParcelFilter: (parcel_id: string) => void;
   onStatusFilter: (status: string) => void;
 }
+
+const CROP_STATUS_COLORS: Record<string, string> = {
+  planificado: "bg-blue-100 text-blue-800",
+  en_crecimiento: "bg-emerald-100 text-emerald-800",
+  floracion: "bg-amber-100 text-amber-800",
+  cosechado: "bg-green-100 text-green-800",
+  cancelado: "bg-red-100 text-red-800",
+};
+
+const container = {
+  animate: { transition: { staggerChildren: 0.05 } },
+};
+
+const item = {
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+};
 
 export function CropTable({
   crops,
@@ -74,7 +93,7 @@ export function CropTable({
             value={searchValue}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Buscar cultivo..."
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           />
         </div>
 
@@ -89,7 +108,7 @@ export function CropTable({
             id="parcel-filter"
             value={parcelFilter}
             onChange={(e) => handleParcelFilter(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             <option value="">Todas</option>
             {parcels.map((p) => (
@@ -111,7 +130,7 @@ export function CropTable({
             id="status-filter"
             value={statusFilter}
             onChange={(e) => handleStatusFilter(e.target.value)}
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
           >
             <option value="">Todos</option>
             {CROP_STATUS_OPTIONS.map(({ value, label }) => (
@@ -125,44 +144,54 @@ export function CropTable({
 
       {/* Table */}
       {crops.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
           No se encontraron cultivos.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-gray-200">
+        <div className="overflow-hidden rounded-xl border border-gray-100">
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="px-4 py-3 font-medium">Variedad</th>
-                <th className="px-4 py-3 font-medium">Parcela</th>
-                <th className="px-4 py-3 font-medium">Estado</th>
-                <th className="px-4 py-3 font-medium">Fecha siembra</th>
+                <th className="px-3 py-2.5 font-medium">Variedad</th>
+                <th className="px-3 py-2.5 font-medium">Parcela</th>
+                <th className="px-3 py-2.5 font-medium">Estado</th>
+                <th className="px-3 py-2.5 font-medium">Fecha siembra</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <motion.tbody
+              variants={container}
+              initial="initial"
+              animate="animate"
+              className="divide-y divide-gray-100"
+            >
               {crops.map((crop) => (
-                <tr
+                <motion.tr
                   key={crop.id}
+                  variants={item}
                   onClick={() => navigate(`/crops/${crop.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-green-50"
+                  className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-3 py-2 font-medium text-gray-900">
                     {crop.variety}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {parcelName(crop.parcel_id)}
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-block rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                      {formatStatus(crop.status)}
-                    </span>
+                  <td className="px-3 py-2">
+                    <Badge
+                      label={formatStatus(crop.status)}
+                      color={
+                        CROP_STATUS_COLORS[crop.status] ??
+                        "bg-gray-100 text-gray-800"
+                      }
+                    />
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-3 py-2 text-gray-600">
                     {new Date(crop.planting_date).toLocaleDateString("es-AR")}
                   </td>
-                </tr>
+                </motion.tr>
               ))}
-            </tbody>
+            </motion.tbody>
           </table>
         </div>
       )}

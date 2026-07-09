@@ -50,7 +50,7 @@ export function PestListPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
           Plagas y Enfermedades
         </h1>
         <button
@@ -68,7 +68,7 @@ export function PestListPage() {
       )}
 
       {loading && pests.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 py-12 text-center text-gray-500">
+        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
           Cargando...
         </div>
       ) : (
