@@ -5,3 +5,7 @@ dist/
 *.db-journal
 .vite/
 server/uploads/*
+
+# SQLite WAL files
+*.db-shm
+*.db-wal

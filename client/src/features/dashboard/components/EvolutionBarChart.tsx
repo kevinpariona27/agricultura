@@ -9,8 +9,10 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { BarChart3 } from "lucide-react";
 import { useIrrigationsStore } from "../../../stores/irrigations";
 import { useHarvestsStore } from "../../../stores/harvests";
+import { EmptyState } from "../../../shared/components/EmptyState";
 
 const MESES = [
   "",
@@ -76,11 +78,7 @@ export function EvolutionBarChart() {
   }
 
   if (!data.length) {
-    return (
-      <div className="flex h-64 items-center justify-center text-gray-400">
-        No hay datos de evolución
-      </div>
-    );
+    return <EmptyState IconComponent={BarChart3} message="Sin datos de evolución" />;
   }
 
   return (

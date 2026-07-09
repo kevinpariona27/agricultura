@@ -134,19 +134,16 @@ export function ReportsPage() {
           icon="🌽"
           value={harvests.length}
           label="Cosechas totales"
-          color="amber"
         />
         <StatCard
           icon="📦"
           value={items.length}
           label="Insumos registrados"
-          color="purple"
         />
         <StatCard
           icon="🐛"
           value={pests.length}
           label="Plagas registradas"
-          color="red"
         />
       </div>
 

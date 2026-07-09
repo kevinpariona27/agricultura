@@ -7,8 +7,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { PieChart as PieChartIcon } from "lucide-react";
 import { useCropsStore } from "../../../stores/crops";
 import { CROP_STATUS_LABELS } from "../../crops/components/CropForm";
+import { EmptyState } from "../../../shared/components/EmptyState";
 
 const STATUS_COLORS: Record<string, string> = {
   planificado: "#059669",
@@ -47,11 +49,7 @@ export function DonutChart() {
   }
 
   if (!data.length) {
-    return (
-      <div className="flex h-64 items-center justify-center text-gray-400">
-        No hay datos de cultivos
-      </div>
-    );
+    return <EmptyState IconComponent={PieChartIcon} message="Sin datos de cultivos" />;
   }
 
   return (

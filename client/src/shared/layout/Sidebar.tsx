@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { FileText } from "lucide-react";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard" },
@@ -37,6 +38,10 @@ export function Sidebar() {
       </nav>
 
       <div className="mt-auto border-t border-slate-700 bg-slate-800/50 px-6 py-4">
+        <button className="mb-3 flex w-full items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2.5 font-medium text-gray-900 transition-colors hover:bg-emerald-300">
+          <FileText className="h-5 w-5" />
+          Nuevo Reporte
+        </button>
         <button
           onClick={() => {
             localStorage.removeItem("token");

@@ -1,5 +1,6 @@
 interface EmptyStateProps {
   icon?: string;
+  IconComponent?: React.ComponentType<{ className?: string }>;
   message: string;
   action?: {
     label: string;
@@ -7,10 +8,16 @@ interface EmptyStateProps {
   };
 }
 
-export function EmptyState({ icon, message, action }: EmptyStateProps) {
+export function EmptyState({ icon, IconComponent, message, action }: EmptyStateProps) {
   return (
     <div className="rounded-xl border border-dashed border-gray-200 p-8 text-center text-gray-500">
-      {icon && <p className="mb-3 text-4xl">{icon}</p>}
+      {IconComponent ? (
+        <div className="mb-3 flex justify-center">
+          <IconComponent className="h-12 w-12 text-zinc-700" />
+        </div>
+      ) : icon ? (
+        <p className="mb-3 text-4xl">{icon}</p>
+      ) : null}
       <p className="text-sm">{message}</p>
       {action && (
         <button
