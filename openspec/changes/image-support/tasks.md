@@ -68,6 +68,6 @@ Estimated total: 650–800 lines. Test: `cd client && npx vitest run`.
 
 ## Phase 4: User Avatar
 
-- [ ] 5.1 `client/src/stores/user.ts` — `uploadAvatar`+`removeAvatar`
-- [ ] 5.2 `ProfilePage.tsx` — avatar `<ImageDisplay>` + `<ImageUpload>`
-- [ ] 5.3 `Header.tsx` — 32×32 avatar `<ImageDisplay>`; keep `role="banner"`
+- [x] 5.1 `client/src/stores/user.ts` — `uploadAvatar`+`removeAvatar`
+- [x] 5.2 `ProfilePage.tsx` — avatar `<ImageDisplay>` + `<ImageUpload>`
+- [x] 5.3 `Header.tsx` — 32×32 avatar `<ImageDisplay>`; keep `role="banner"`

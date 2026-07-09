@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { User } from "lucide-react";
 import { useUserStore } from "../../stores/user";
+import { ImageDisplay } from "../../shared/components/ImageDisplay";
+import { ImageUpload } from "../../shared/components/ImageUpload";
 import type { UserRole } from "@agri/shared";
 
 export function ProfilePage() {
-  const { profile, loading, error, fetchProfile, updateProfile, clearError } =
+  const { profile, loading, error, fetchProfile, updateProfile, clearError, uploadAvatar, removeAvatar } =
     useUserStore();
   const [nombre, setNombre] = useState("");
   const [rol, setRol] = useState<UserRole>("operador");
@@ -47,6 +50,24 @@ export function ProfilePage() {
   return (
     <div className="mx-auto max-w-lg">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-900">Perfil</h1>
+
+      {profile && (
+        <div className="mb-6 flex flex-col items-center gap-4">
+          <ImageDisplay
+            src={profile.avatar_url ?? null}
+            alt={`Avatar de ${profile.nombre ?? profile.email}`}
+            size="lg"
+            fallbackIcon={User}
+            rounded={true}
+          />
+          <ImageUpload
+            currentImage={profile.avatar_url ?? null}
+            onUpload={uploadAvatar}
+            onRemove={removeAvatar}
+            entityLabel="Foto de perfil"
+          />
+        </div>
+      )}
 
       {successMsg && (
         <div className="mb-4 rounded bg-green-50 px-4 py-2 text-sm text-green-700">
