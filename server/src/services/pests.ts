@@ -1,4 +1,10 @@
+import { unlink } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import db from "../db/connection.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const uploadsDir = resolve(__dirname, "..", "..", "uploads");
 
 export interface PestRow {
   id: number;
@@ -10,6 +16,7 @@ export interface PestRow {
   tratamiento?: string;
   estado: string;
   notas?: string;
+  image_url?: string | null;
   user_id: number;
   created_at: string;
   updated_at: string;
@@ -145,11 +152,21 @@ export async function remove(
     .join("parcels", "crops.parcel_id", "parcels.id")
     .where("parcels.user_id", userId)
     .where("pests.id", id)
-    .select("pests.id")
+    .select("pests.*")
     .first();
 
   if (!owned) {
     return false;
+  }
+
+  // Clean up image file on disk
+  if (owned.image_url) {
+    const filePath = resolve(uploadsDir, owned.image_url);
+    unlink(filePath, (err) => {
+      if (err && (err as NodeJS.ErrnoException).code !== "ENOENT") {
+        console.error(`Failed to delete image for pest ${id}:`, err.message);
+      }
+    });
   }
 
   const deleted = await db("pests").where({ id }).del();

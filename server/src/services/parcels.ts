@@ -1,4 +1,10 @@
+import { unlink } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import db from "../db/connection.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const uploadsDir = resolve(__dirname, "..", "..", "uploads");
 
 interface ParcelRow {
   id: number;
@@ -7,6 +13,7 @@ interface ParcelRow {
   area: number;
   location: string;
   soil_type: string;
+  image_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -86,6 +93,21 @@ export async function remove(
   id: number,
   userId: number
 ): Promise<boolean> {
+  // Fetch image_url before deleting the row
+  const parcel = await db("parcels").where({ id, user_id: userId }).first();
+
+  if (!parcel) return false;
+
+  // Clean up image file on disk
+  if (parcel.image_url) {
+    const filePath = resolve(uploadsDir, parcel.image_url);
+    unlink(filePath, (err) => {
+      if (err && (err as NodeJS.ErrnoException).code !== "ENOENT") {
+        console.error(`Failed to delete image for parcel ${id}:`, err.message);
+      }
+    });
+  }
+
   const deleted = await db("parcels").where({ id, user_id: userId }).del();
   return deleted > 0;
 }

@@ -1,4 +1,10 @@
+import { unlink } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import db from "../db/connection.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const uploadsDir = resolve(__dirname, "..", "..", "uploads");
 
 export interface CropRow {
   id: number;
@@ -8,6 +14,7 @@ export interface CropRow {
   status: string;
   estimated_harvest_date?: string;
   planting_density?: number;
+  image_url?: string | null;
   notes?: string;
   created_at: string;
   updated_at: string;
@@ -135,6 +142,7 @@ export async function update(
 /**
  * Delete a crop, scoped to the authenticated user via JOIN.
  * Returns true if a row was deleted.
+ * Also cleans up any associated image file on disk.
  */
 export async function remove(
   id: number,
@@ -144,6 +152,16 @@ export async function remove(
   const owned = await getById(id, userId);
   if (!owned) {
     return false;
+  }
+
+  // Clean up image file on disk
+  if (owned.image_url) {
+    const filePath = resolve(uploadsDir, owned.image_url);
+    unlink(filePath, (err) => {
+      if (err && (err as NodeJS.ErrnoException).code !== "ENOENT") {
+        console.error(`Failed to delete image for crop ${id}:`, err.message);
+      }
+    });
   }
 
   const deleted = await db("crops").where({ id }).del();

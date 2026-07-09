@@ -6,6 +6,7 @@ export interface UserRow {
   password_hash: string;
   nombre?: string | null;
   rol: string;
+  avatar_url?: string | null;
   created_at: string;
   updated_at?: string | null;
 }
@@ -15,6 +16,7 @@ export interface UserProfileResponse {
   email: string;
   nombre?: string | null;
   rol: string;
+  avatar_url?: string | null;
   fecha_registro: string;
   updated_at?: string | null;
 }
@@ -25,6 +27,7 @@ function toProfile(row: UserRow): UserProfileResponse {
     email: row.email,
     nombre: row.nombre ?? null,
     rol: row.rol ?? "operador",
+    avatar_url: row.avatar_url ?? null,
     fecha_registro: row.created_at,
     updated_at: row.updated_at ?? null,
   };
