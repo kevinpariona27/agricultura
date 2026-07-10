@@ -1,10 +1,19 @@
 import Database from 'better-sqlite3';
+import bcrypt from 'bcrypt';
 
 const db = new Database(process.env.DB_PATH || './data.db');
 
 // Enable WAL for speed
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = OFF');
+
+// Skip if already seeded (idempotent)
+const existingCount = db.prepare('SELECT count(*) as c FROM parcels').get() as { c: number };
+if (existingCount.c > 0) {
+  console.log('Data already exists — skipping seed.');
+  db.close();
+  process.exit(0);
+}
 
 // Clean existing data (keep users)
 console.log('Cleaning existing data...');
@@ -34,17 +43,26 @@ function insert(table: string, rows: Record<string, unknown>[]) {
 
 console.log('\nSeeding...');
 
+// Resolve user — prefer admin@agroexec.com, create if missing
+let uid = (db.prepare("SELECT id FROM users WHERE email = 'admin@agroexec.com'").get() as { id: number } | undefined)?.id;
+if (!uid) {
+  const hash = bcrypt.hashSync('admin123456', 10);
+  const result = db.prepare("INSERT INTO users (email, password_hash) VALUES ('admin@agroexec.com', ?)").run(hash);
+  uid = Number(result.lastInsertRowid);
+  console.log(`  Created admin user (id=${uid})`);
+}
+
 // ============================================================
 // PARCELS — 7 parcels
 // ============================================================
 const parcels = [
-  { user_id: 1, name: 'Lote Norte', area: 12.5, location: 'Sector Norte, coordenadas 34°S', soil_type: 'franco-arenoso', created_at: '2025-08-15 08:00:00', updated_at: '2025-08-15 08:00:00' },
-  { user_id: 1, name: 'Lote Sur', area: 18.2, location: 'Sector Sur, lindero al arroyo', soil_type: 'franco-limoso', created_at: '2025-08-15 08:00:00', updated_at: '2025-08-15 08:00:00' },
-  { user_id: 1, name: 'Lote Este', area: 9.8, location: 'Sector Este, zona alta', soil_type: 'franco', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
-  { user_id: 1, name: 'Lote Oeste', area: 15.0, location: 'Sector Oeste, terreno ondulado', soil_type: 'arenoso', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
-  { user_id: 1, name: 'Lote Central', area: 7.4, location: 'Centro del campo, cerca del casco', soil_type: 'franco-arcilloso', created_at: '2025-10-01 07:00:00', updated_at: '2025-10-01 07:00:00' },
-  { user_id: 1, name: 'Lote La Esquina', area: 4.5, location: 'Esquina SE, media sombra', soil_type: 'franco', created_at: '2025-11-01 09:00:00', updated_at: '2025-11-01 09:00:00' },
-  { user_id: 1, name: 'Lote Invernadero', area: 1.8, location: 'Cerca del casco, bajo cubierta', soil_type: 'tierra-negra', created_at: '2026-01-01 08:00:00', updated_at: '2026-01-01 08:00:00' },
+  { user_id: uid, name: 'Lote Norte', area: 12.5, location: 'Sector Norte, coordenadas 34°S', soil_type: 'franco-arenoso', created_at: '2025-08-15 08:00:00', updated_at: '2025-08-15 08:00:00' },
+  { user_id: uid, name: 'Lote Sur', area: 18.2, location: 'Sector Sur, lindero al arroyo', soil_type: 'franco-limoso', created_at: '2025-08-15 08:00:00', updated_at: '2025-08-15 08:00:00' },
+  { user_id: uid, name: 'Lote Este', area: 9.8, location: 'Sector Este, zona alta', soil_type: 'franco', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
+  { user_id: uid, name: 'Lote Oeste', area: 15.0, location: 'Sector Oeste, terreno ondulado', soil_type: 'arenoso', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
+  { user_id: uid, name: 'Lote Central', area: 7.4, location: 'Centro del campo, cerca del casco', soil_type: 'franco-arcilloso', created_at: '2025-10-01 07:00:00', updated_at: '2025-10-01 07:00:00' },
+  { user_id: uid, name: 'Lote La Esquina', area: 4.5, location: 'Esquina SE, media sombra', soil_type: 'franco', created_at: '2025-11-01 09:00:00', updated_at: '2025-11-01 09:00:00' },
+  { user_id: uid, name: 'Lote Invernadero', area: 1.8, location: 'Cerca del casco, bajo cubierta', soil_type: 'tierra-negra', created_at: '2026-01-01 08:00:00', updated_at: '2026-01-01 08:00:00' },
 ];
 insert('parcels', parcels);
 
@@ -149,15 +167,15 @@ insert('fertilizations', fertilizations);
 // PESTS
 // ============================================================
 const pests = [
-  { crop_id: 1, tipo: 'insecto', nombre: 'Gusano cogollero (Spodoptera frugiperda)', severidad: 'media', fecha_deteccion: '2025-12-10', tratamiento: 'Clorpirifós 48% 1L/ha', estado: 'controlado', notas: 'Aplicación foliar. Umbral superado en V6.', user_id: 1, created_at: '2025-12-10 10:00:00', updated_at: '2025-12-15 10:00:00' },
-  { crop_id: 1, tipo: 'enfermedad', nombre: 'Roya común (Puccinia sorghi)', severidad: 'baja', fecha_deteccion: '2026-02-01', tratamiento: 'Azoxistrobina + Ciproconazol 300cc/ha', estado: 'controlado', notas: 'Detección temprana.', user_id: 1, created_at: '2026-02-01 10:00:00', updated_at: '2026-02-05 10:00:00' },
-  { crop_id: 2, tipo: 'maleza', nombre: 'Yuyo colorado (Amaranthus palmeri)', severidad: 'alta', fecha_deteccion: '2026-09-15', tratamiento: 'Atrazina + S-metolacloro 4L/ha', estado: 'activo', notas: 'Resistencia confirmada a glifosato.', user_id: 1, created_at: '2026-09-15 09:00:00', updated_at: now() },
-  { crop_id: 3, tipo: 'insecto', nombre: 'Chinche verde (Nezara viridula)', severidad: 'media', fecha_deteccion: '2026-02-01', tratamiento: 'Tiametoxam + Lambda-cialotrina 150cc/ha', estado: 'controlado', notas: 'Monitoreo semanal. Aplicación en R4.', user_id: 1, created_at: '2026-02-01 11:00:00', updated_at: '2026-02-10 11:00:00' },
-  { crop_id: 3, tipo: 'enfermedad', nombre: 'Mancha marrón (Septoria glycines)', severidad: 'baja', fecha_deteccion: '2026-01-15', tratamiento: null, estado: 'monitoreo', notas: 'Incidencia baja. Sin control químico.', user_id: 1, created_at: '2026-01-15 11:00:00', updated_at: '2026-01-15 11:00:00' },
-  { crop_id: 5, tipo: 'enfermedad', nombre: 'Fusariosis de la espiga (Fusarium graminearum)', severidad: 'alta', fecha_deteccion: '2026-08-25', tratamiento: 'Metconazol 800cc/ha', estado: 'activo', notas: 'Condiciones de alta humedad. Aplicación en espigazón.', user_id: 1, created_at: '2026-08-25 08:00:00', updated_at: now() },
-  { crop_id: 9, tipo: 'insecto', nombre: 'Pulgón de la espiga (Rhopalosiphum padi)', severidad: 'baja', fecha_deteccion: '2026-08-01', tratamiento: null, estado: 'monitoreo', notas: 'Control biológico activo (mariquitas).', user_id: 1, created_at: '2026-08-01 10:00:00', updated_at: now() },
-  { crop_id: 13, tipo: 'insecto', nombre: 'Mosca blanca (Bemisia tabaci)', severidad: 'media', fecha_deteccion: '2026-02-20', tratamiento: 'Jabón potásico + Aceite de neem 2%', estado: 'controlado', notas: 'Trampas cromáticas amarillas en invernadero.', user_id: 1, created_at: '2026-02-20 09:00:00', updated_at: '2026-03-01 09:00:00' },
-  { crop_id: 14, tipo: 'enfermedad', nombre: 'Mildiu (Bremia lactucae)', severidad: 'baja', fecha_deteccion: '2026-09-01', tratamiento: 'Fosetil-Al 2g/L', estado: 'activo', notas: 'Ventilación forzada preventiva.', user_id: 1, created_at: '2026-09-01 08:00:00', updated_at: now() },
+  { crop_id: 1, tipo: 'insecto', nombre: 'Gusano cogollero (Spodoptera frugiperda)', severidad: 'media', fecha_deteccion: '2025-12-10', tratamiento: 'Clorpirifós 48% 1L/ha', estado: 'controlado', notas: 'Aplicación foliar. Umbral superado en V6.', user_id: uid, created_at: '2025-12-10 10:00:00', updated_at: '2025-12-15 10:00:00' },
+  { crop_id: 1, tipo: 'enfermedad', nombre: 'Roya común (Puccinia sorghi)', severidad: 'baja', fecha_deteccion: '2026-02-01', tratamiento: 'Azoxistrobina + Ciproconazol 300cc/ha', estado: 'controlado', notas: 'Detección temprana.', user_id: uid, created_at: '2026-02-01 10:00:00', updated_at: '2026-02-05 10:00:00' },
+  { crop_id: 2, tipo: 'maleza', nombre: 'Yuyo colorado (Amaranthus palmeri)', severidad: 'alta', fecha_deteccion: '2026-09-15', tratamiento: 'Atrazina + S-metolacloro 4L/ha', estado: 'activo', notas: 'Resistencia confirmada a glifosato.', user_id: uid, created_at: '2026-09-15 09:00:00', updated_at: now() },
+  { crop_id: 3, tipo: 'insecto', nombre: 'Chinche verde (Nezara viridula)', severidad: 'media', fecha_deteccion: '2026-02-01', tratamiento: 'Tiametoxam + Lambda-cialotrina 150cc/ha', estado: 'controlado', notas: 'Monitoreo semanal. Aplicación en R4.', user_id: uid, created_at: '2026-02-01 11:00:00', updated_at: '2026-02-10 11:00:00' },
+  { crop_id: 3, tipo: 'enfermedad', nombre: 'Mancha marrón (Septoria glycines)', severidad: 'baja', fecha_deteccion: '2026-01-15', tratamiento: null, estado: 'monitoreo', notas: 'Incidencia baja. Sin control químico.', user_id: uid, created_at: '2026-01-15 11:00:00', updated_at: '2026-01-15 11:00:00' },
+  { crop_id: 5, tipo: 'enfermedad', nombre: 'Fusariosis de la espiga (Fusarium graminearum)', severidad: 'alta', fecha_deteccion: '2026-08-25', tratamiento: 'Metconazol 800cc/ha', estado: 'activo', notas: 'Condiciones de alta humedad. Aplicación en espigazón.', user_id: uid, created_at: '2026-08-25 08:00:00', updated_at: now() },
+  { crop_id: 9, tipo: 'insecto', nombre: 'Pulgón de la espiga (Rhopalosiphum padi)', severidad: 'baja', fecha_deteccion: '2026-08-01', tratamiento: null, estado: 'monitoreo', notas: 'Control biológico activo (mariquitas).', user_id: uid, created_at: '2026-08-01 10:00:00', updated_at: now() },
+  { crop_id: 13, tipo: 'insecto', nombre: 'Mosca blanca (Bemisia tabaci)', severidad: 'media', fecha_deteccion: '2026-02-20', tratamiento: 'Jabón potásico + Aceite de neem 2%', estado: 'controlado', notas: 'Trampas cromáticas amarillas en invernadero.', user_id: uid, created_at: '2026-02-20 09:00:00', updated_at: '2026-03-01 09:00:00' },
+  { crop_id: 14, tipo: 'enfermedad', nombre: 'Mildiu (Bremia lactucae)', severidad: 'baja', fecha_deteccion: '2026-09-01', tratamiento: 'Fosetil-Al 2g/L', estado: 'activo', notas: 'Ventilación forzada preventiva.', user_id: uid, created_at: '2026-09-01 08:00:00', updated_at: now() },
 ];
 insert('pests', pests);
 
@@ -184,20 +202,20 @@ insert('harvests', harvests);
 // INVENTORY
 // ============================================================
 const inventory = [
-  { user_id: 1, nombre: 'Urea (46-0-0)', categoria: 'fertilizante', cantidad: 450, unidad: 'kg', fecha_adquisicion: '2025-09-01', fecha_vencimiento: '2027-09-01', costo_unitario: 480, notas: 'Bolsa de 50kg. Granulada.', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
-  { user_id: 1, nombre: 'Fosfato Diamónico (18-46-0)', categoria: 'fertilizante', cantidad: 200, unidad: 'kg', fecha_adquisicion: '2025-09-01', fecha_vencimiento: '2027-09-01', costo_unitario: 680, notas: 'Bolsa de 50kg.', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
-  { user_id: 1, nombre: 'Clorpirifós 48%', categoria: 'insecticida', cantidad: 15, unidad: 'L', fecha_adquisicion: '2025-10-01', fecha_vencimiento: '2027-10-01', costo_unitario: 3200, notas: 'Bidón 5L. Uso restringido.', created_at: '2025-10-01 10:00:00', updated_at: '2025-10-01 10:00:00' },
-  { user_id: 1, nombre: 'Azoxistrobina + Ciproconazol', categoria: 'fungicida', cantidad: 8, unidad: 'L', fecha_adquisicion: '2025-11-01', fecha_vencimiento: '2027-11-01', costo_unitario: 8500, notas: 'Bidón 1L. Amplio espectro.', created_at: '2025-11-01 10:00:00', updated_at: '2025-11-01 10:00:00' },
-  { user_id: 1, nombre: 'Atrazina 50% SC', categoria: 'herbicida', cantidad: 20, unidad: 'L', fecha_adquisicion: '2025-10-15', fecha_vencimiento: '2027-10-15', costo_unitario: 2800, notas: 'Bidón 5L. Pre-emergente maíz.', created_at: '2025-10-15 10:00:00', updated_at: '2025-10-15 10:00:00' },
-  { user_id: 1, nombre: 'Semilla Maíz DK-747 VT3P', categoria: 'semilla', cantidad: 18, unidad: 'bolsa', fecha_adquisicion: '2025-08-01', fecha_vencimiento: '2026-08-01', costo_unitario: 35000, notas: 'Bolsa 60.000 semillas. Híbrido.', created_at: '2025-08-01 10:00:00', updated_at: '2025-08-01 10:00:00' },
-  { user_id: 1, nombre: 'Semilla Soja DM 60i62 IPRO', categoria: 'semilla', cantidad: 25, unidad: 'bolsa', fecha_adquisicion: '2025-09-01', fecha_vencimiento: '2026-09-01', costo_unitario: 28000, notas: 'Bolsa 40kg. Tratada con inoculante.', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
-  { user_id: 1, nombre: 'Semilla Trigo Baguette 802', categoria: 'semilla', cantidad: 20, unidad: 'bolsa', fecha_adquisicion: '2026-04-01', fecha_vencimiento: '2026-12-01', costo_unitario: 18000, notas: 'Bolsa 40kg. Ciclo largo.', created_at: '2026-04-01 10:00:00', updated_at: '2026-04-01 10:00:00' },
-  { user_id: 1, nombre: 'Jabón Potásico', categoria: 'insecticida', cantidad: 10, unidad: 'L', fecha_adquisicion: '2026-01-01', fecha_vencimiento: '2027-01-01', costo_unitario: 1200, notas: 'Bidón 5L. Uso orgánico.', created_at: '2026-01-01 10:00:00', updated_at: '2026-01-01 10:00:00' },
-  { user_id: 1, nombre: 'Nitrato de Calcio', categoria: 'fertilizante', cantidad: 80, unidad: 'kg', fecha_adquisicion: '2026-01-01', fecha_vencimiento: '2027-01-01', costo_unitario: 750, notas: 'Bolsa 25kg. Para fertirriego.', created_at: '2026-01-01 10:00:00', updated_at: '2026-01-01 10:00:00' },
-  { user_id: 1, nombre: 'Aceite de Neem', categoria: 'insecticida', cantidad: 5, unidad: 'L', fecha_adquisicion: '2026-01-01', fecha_vencimiento: '2027-01-01', costo_unitario: 2800, notas: 'Bidón 1L. Orgánico certificado.', created_at: '2026-01-01 10:00:00', updated_at: '2026-01-01 10:00:00' },
-  { user_id: 1, nombre: 'Sulfato de Magnesio', categoria: 'fertilizante', cantidad: 50, unidad: 'kg', fecha_adquisicion: '2026-01-15', fecha_vencimiento: '2028-01-15', costo_unitario: 400, notas: 'Bolsa 25kg. Corrector.', created_at: '2026-01-15 10:00:00', updated_at: '2026-01-15 10:00:00' },
-  { user_id: 1, nombre: 'S-metolacloro 96%', categoria: 'herbicida', cantidad: 12, unidad: 'L', fecha_adquisicion: '2025-10-01', fecha_vencimiento: '2027-10-01', costo_unitario: 4200, notas: 'Bidón 5L. Pre-emergente.', created_at: '2025-10-01 10:00:00', updated_at: '2025-10-01 10:00:00' },
-  { user_id: 1, nombre: 'Metconazol 6%', categoria: 'fungicida', cantidad: 6, unidad: 'L', fecha_adquisicion: '2026-07-01', fecha_vencimiento: '2028-07-01', costo_unitario: 6500, notas: 'Bidón 1L. Específico para fusarium.', created_at: '2026-07-01 10:00:00', updated_at: '2026-07-01 10:00:00' },
+  { user_id: uid, nombre: 'Urea (46-0-0)', categoria: 'fertilizante', cantidad: 450, unidad: 'kg', fecha_adquisicion: '2025-09-01', fecha_vencimiento: '2027-09-01', costo_unitario: 480, notas: 'Bolsa de 50kg. Granulada.', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
+  { user_id: uid, nombre: 'Fosfato Diamónico (18-46-0)', categoria: 'fertilizante', cantidad: 200, unidad: 'kg', fecha_adquisicion: '2025-09-01', fecha_vencimiento: '2027-09-01', costo_unitario: 680, notas: 'Bolsa de 50kg.', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
+  { user_id: uid, nombre: 'Clorpirifós 48%', categoria: 'insecticida', cantidad: 15, unidad: 'L', fecha_adquisicion: '2025-10-01', fecha_vencimiento: '2027-10-01', costo_unitario: 3200, notas: 'Bidón 5L. Uso restringido.', created_at: '2025-10-01 10:00:00', updated_at: '2025-10-01 10:00:00' },
+  { user_id: uid, nombre: 'Azoxistrobina + Ciproconazol', categoria: 'fungicida', cantidad: 8, unidad: 'L', fecha_adquisicion: '2025-11-01', fecha_vencimiento: '2027-11-01', costo_unitario: 8500, notas: 'Bidón 1L. Amplio espectro.', created_at: '2025-11-01 10:00:00', updated_at: '2025-11-01 10:00:00' },
+  { user_id: uid, nombre: 'Atrazina 50% SC', categoria: 'herbicida', cantidad: 20, unidad: 'L', fecha_adquisicion: '2025-10-15', fecha_vencimiento: '2027-10-15', costo_unitario: 2800, notas: 'Bidón 5L. Pre-emergente maíz.', created_at: '2025-10-15 10:00:00', updated_at: '2025-10-15 10:00:00' },
+  { user_id: uid, nombre: 'Semilla Maíz DK-747 VT3P', categoria: 'semilla', cantidad: 18, unidad: 'bolsa', fecha_adquisicion: '2025-08-01', fecha_vencimiento: '2026-08-01', costo_unitario: 35000, notas: 'Bolsa 60.000 semillas. Híbrido.', created_at: '2025-08-01 10:00:00', updated_at: '2025-08-01 10:00:00' },
+  { user_id: uid, nombre: 'Semilla Soja DM 60i62 IPRO', categoria: 'semilla', cantidad: 25, unidad: 'bolsa', fecha_adquisicion: '2025-09-01', fecha_vencimiento: '2026-09-01', costo_unitario: 28000, notas: 'Bolsa 40kg. Tratada con inoculante.', created_at: '2025-09-01 10:00:00', updated_at: '2025-09-01 10:00:00' },
+  { user_id: uid, nombre: 'Semilla Trigo Baguette 802', categoria: 'semilla', cantidad: 20, unidad: 'bolsa', fecha_adquisicion: '2026-04-01', fecha_vencimiento: '2026-12-01', costo_unitario: 18000, notas: 'Bolsa 40kg. Ciclo largo.', created_at: '2026-04-01 10:00:00', updated_at: '2026-04-01 10:00:00' },
+  { user_id: uid, nombre: 'Jabón Potásico', categoria: 'insecticida', cantidad: 10, unidad: 'L', fecha_adquisicion: '2026-01-01', fecha_vencimiento: '2027-01-01', costo_unitario: 1200, notas: 'Bidón 5L. Uso orgánico.', created_at: '2026-01-01 10:00:00', updated_at: '2026-01-01 10:00:00' },
+  { user_id: uid, nombre: 'Nitrato de Calcio', categoria: 'fertilizante', cantidad: 80, unidad: 'kg', fecha_adquisicion: '2026-01-01', fecha_vencimiento: '2027-01-01', costo_unitario: 750, notas: 'Bolsa 25kg. Para fertirriego.', created_at: '2026-01-01 10:00:00', updated_at: '2026-01-01 10:00:00' },
+  { user_id: uid, nombre: 'Aceite de Neem', categoria: 'insecticida', cantidad: 5, unidad: 'L', fecha_adquisicion: '2026-01-01', fecha_vencimiento: '2027-01-01', costo_unitario: 2800, notas: 'Bidón 1L. Orgánico certificado.', created_at: '2026-01-01 10:00:00', updated_at: '2026-01-01 10:00:00' },
+  { user_id: uid, nombre: 'Sulfato de Magnesio', categoria: 'fertilizante', cantidad: 50, unidad: 'kg', fecha_adquisicion: '2026-01-15', fecha_vencimiento: '2028-01-15', costo_unitario: 400, notas: 'Bolsa 25kg. Corrector.', created_at: '2026-01-15 10:00:00', updated_at: '2026-01-15 10:00:00' },
+  { user_id: uid, nombre: 'S-metolacloro 96%', categoria: 'herbicida', cantidad: 12, unidad: 'L', fecha_adquisicion: '2025-10-01', fecha_vencimiento: '2027-10-01', costo_unitario: 4200, notas: 'Bidón 5L. Pre-emergente.', created_at: '2025-10-01 10:00:00', updated_at: '2025-10-01 10:00:00' },
+  { user_id: uid, nombre: 'Metconazol 6%', categoria: 'fungicida', cantidad: 6, unidad: 'L', fecha_adquisicion: '2026-07-01', fecha_vencimiento: '2028-07-01', costo_unitario: 6500, notas: 'Bidón 1L. Específico para fusarium.', created_at: '2026-07-01 10:00:00', updated_at: '2026-07-01 10:00:00' },
 ];
 insert('inventory', inventory);
 
