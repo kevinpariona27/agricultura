@@ -1,9 +1,6 @@
-import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthGuard } from "./shared/components/AuthGuard.js";
 import { AppLayout } from "./shared/layout/AppLayout.js";
-import { AuthLayout } from "./shared/layout/AuthLayout.js";
-import { useThemeStore } from "./stores/theme.js";
 import { LoginPage } from "./features/auth/LoginPage.js";
 import { RegisterPage } from "./features/auth/RegisterPage.js";
 import { DashboardPage } from "./features/dashboard/DashboardPage.js";
@@ -26,20 +23,12 @@ import { InventoryFormPage } from "./features/inventory/InventoryFormPage.js";
 import { ProfilePage } from "./features/users/ProfilePage.js";
 
 export default function App() {
-  const theme = useThemeStore((s) => s.theme);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
-
   return (
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-        </Route>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* Protected routes */}
         <Route element={<AuthGuard />}>

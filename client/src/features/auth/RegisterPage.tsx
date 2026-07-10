@@ -1,7 +1,5 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { UserPlus } from "lucide-react";
 import { useAuthStore } from "../../stores/auth.js";
 import { ApiError } from "../../api/client.js";
 
@@ -45,25 +43,14 @@ export function RegisterPage() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className="flex w-full flex-col items-center"
-    >
-      {/* Circular decorator */}
-      <div className="-mb-6 z-10 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-purple-500 shadow-lg">
-        <UserPlus className="h-7 w-7 text-white" />
-      </div>
-
-      {/* Card */}
-      <div className="w-full max-w-[420px] rounded-2xl bg-white p-10 shadow-lg">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-800">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <div className="w-full max-w-sm rounded-xl bg-white p-8 shadow-sm">
+        <h1 className="mb-6 text-center text-2xl font-bold text-green-800">
           Registrarse
         </h1>
 
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+          <div className="mb-4 rounded bg-red-50 px-4 py-2 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -79,7 +66,7 @@ export function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg bg-gray-100 px-3 py-2.5 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
               placeholder="correo@ejemplo.com"
             />
           </div>
@@ -95,7 +82,7 @@ export function RegisterPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg bg-gray-100 px-3 py-2.5 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
               placeholder="Mínimo 8 caracteres"
             />
           </div>
@@ -111,7 +98,7 @@ export function RegisterPage() {
               minLength={8}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full rounded-lg bg-gray-100 px-3 py-2.5 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
               placeholder="Repetir contraseña"
             />
           </div>
@@ -119,7 +106,7 @@ export function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:from-purple-600 hover:to-purple-700 disabled:opacity-50"
+            className="mt-2 rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800 disabled:opacity-50"
           >
             {loading ? "Registrando..." : "Crear cuenta"}
           </button>
@@ -127,11 +114,11 @@ export function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-gray-600">
           ¿Ya tiene cuenta?{" "}
-          <Link to="/login" className="font-medium text-purple-600 hover:underline">
+          <Link to="/login" className="font-medium text-green-700 hover:underline">
             Iniciar sesión
           </Link>
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }

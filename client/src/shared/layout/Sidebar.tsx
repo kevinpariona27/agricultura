@@ -14,8 +14,8 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   return (
-    <aside className="flex h-full w-64 flex-col bg-slate-900 text-white dark:bg-gray-950 dark:text-gray-100">
-      <div className="border-b border-slate-700 px-6 py-5 text-xl font-bold tracking-tight dark:border-gray-800">
+    <aside className="flex h-full w-64 flex-col bg-slate-900 text-white">
+      <div className="border-b border-slate-700 px-6 py-5 text-xl font-bold tracking-tight">
         Gestión Agrícola
       </div>
 
@@ -27,8 +27,8 @@ export function Sidebar() {
             className={({ isActive }) =>
               `rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
                 isActive
-                  ? "border-l-4 border-emerald-400 bg-emerald-600 text-white dark:bg-emerald-700 dark:border-emerald-400"
-                  : "text-slate-300 hover:bg-slate-800 hover:text-white dark:hover:bg-gray-800"
+                  ? "border-l-4 border-emerald-400 bg-emerald-600 text-white"
+                  : "text-slate-300 hover:bg-slate-800 hover:text-white"
               }`
             }
           >
@@ -37,8 +37,8 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="mt-auto border-t border-slate-700 bg-slate-800/50 px-6 py-4 dark:border-gray-800 dark:bg-gray-900/50">
-        <button className="mb-3 flex w-full items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2.5 font-medium text-gray-900 transition-colors hover:bg-emerald-300 dark:bg-emerald-500 dark:text-white dark:hover:bg-emerald-600">
+      <div className="mt-auto border-t border-slate-700 bg-slate-800/50 px-6 py-4">
+        <button className="mb-3 flex w-full items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2.5 font-medium text-gray-900 transition-colors hover:bg-emerald-300">
           <FileText className="h-5 w-5" />
           Nuevo Reporte
         </button>
@@ -47,7 +47,7 @@ export function Sidebar() {
             localStorage.removeItem("token");
             window.location.href = "/login";
           }}
-          className="w-full rounded px-3 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-slate-700 hover:text-white dark:hover:bg-gray-800"
+          className="w-full rounded px-3 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
         >
           Cerrar sesión
         </button>
