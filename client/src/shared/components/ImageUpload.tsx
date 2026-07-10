@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent, ChangeEvent } from "react";
-import { Check, ImageOff, Loader2, Trash2, Upload, X } from "lucide-react";
+import { Check, Loader2, Trash2, Upload } from "lucide-react";
 
 interface ImageUploadProps {
   currentImage: string | null;
-  onUpload: (file: File) => Promise<void>;
-  onRemove: () => Promise<void>;
+  onUpload: (file: File) => Promise<unknown>;
+  onRemove: () => Promise<unknown>;
   entityLabel: string;
 }
 
@@ -121,7 +121,7 @@ export function ImageUpload({
     setState("idle");
   };
 
-  const hasShownImage = !!shownImage;
+
 
   return (
     <div data-testid="image-upload" className="w-full">

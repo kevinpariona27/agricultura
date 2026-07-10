@@ -78,7 +78,6 @@ export function ReportsPage() {
   }, [items]);
 
   const expiringItems = useMemo(() => {
-    const now = new Date();
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
     return items
