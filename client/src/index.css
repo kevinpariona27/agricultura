@@ -7,7 +7,7 @@
 
   /* Organic Biophilic + Earth palette */
   --color-primary: #15803D;
-  --color-primary-dark: #0F2E1A;
+  --color-primary-dark: #14532D;
   --color-primary-light: #22C55E;
   --color-primary-50: #F0FDF4;
   --color-primary-100: #BBF7D0;
@@ -17,11 +17,17 @@
   --color-accent-dark: #92400E;
 
   --color-surface: #ffffff;
-  --color-app-bg: #F0FDF4;
-  --color-muted: #FEF9E7;
-  --color-muted-foreground: #6B7280;
-  --color-border: #D9E8D5;
-  --color-border-strong: #A8C8A0;
+  --color-app-bg: #F5F7FA;
+  --color-muted: #F1F5F9;
+  --color-muted-foreground: #64748B;
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  --color-sidebar-bg: #ffffff;
+  --color-sidebar-hover: #F1F5F9;
+  --color-sidebar-active: #F0FDF4;
+  --color-sidebar-text: #475569;
+  --color-sidebar-active-text: #15803D;
 
   --color-destructive: #DC2626;
   --color-destructive-light: #FEE2E2;
