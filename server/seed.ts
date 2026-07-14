@@ -35,6 +35,19 @@ async function seed() {
       console.log(`  Created admin user (id=${uid})`);
     }
 
+    // Create additional users for each role
+    for (const [email, password, role] of [
+      ['manager@agroexec.com', 'manager123', 'manager'],
+      ['operario@agroexec.com', 'operario12', 'operator'],
+    ] as const) {
+      const exists = await db('users').select('id').where({ email }).first();
+      if (!exists) {
+        const hash = bcrypt.hashSync(password, 10);
+        await db('users').insert({ email, password_hash: hash, role });
+        console.log(`  Created ${role} user: ${email}`);
+      }
+    }
+
     console.log('\nSeeding data...');
 
     // ── PARCELS (14) ──
