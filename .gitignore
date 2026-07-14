@@ -11,3 +11,9 @@ server/uploads/*
 *.db-wal
 .vercel
 .env*
+
+# Test coverage reports
+coverage/
+
+# Build output
+client/html/
