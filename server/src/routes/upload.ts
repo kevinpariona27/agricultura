@@ -85,7 +85,7 @@ function deleteFile(relativePath: string | null | undefined): void {
 // Extend Express Request to carry entity type for multer
 // We pass the entity via a custom property on the request
 function setEntity(req: Request, _res: Response, next: () => void): void {
-  const entity = req.params.entity;
+  const entity = String(req.params.entity);
   (req as Request & { uploadEntity?: string }).uploadEntity = entity;
   next();
 }
@@ -95,7 +95,7 @@ router.post(
   "/:entity/:id",
   setEntity,
   async (req: Request, res: Response): Promise<void> => {
-    const entity = req.params.entity;
+    const entity = String(req.params.entity);
     const id = Number(req.params.id);
     const userId = req.userId!;
 
@@ -167,7 +167,7 @@ router.post(
 router.delete(
   "/:entity/:id",
   async (req: Request, res: Response): Promise<void> => {
-    const entity = req.params.entity;
+    const entity = String(req.params.entity);
     const id = Number(req.params.id);
     const userId = req.userId!;
 

@@ -39,21 +39,21 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 overflow-auto p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-4 sm:p-8 shadow-sm">
-        <h1 className="mb-6 text-center text-2xl font-bold text-green-800">
+    <div className="flex min-h-screen items-center justify-center bg-app-bg overflow-auto p-4">
+      <div className="w-full max-w-md rounded-2xl bg-surface p-4 sm:p-8 shadow-sm border border-border">
+        <h1 className="mb-6 text-center text-2xl font-bold text-primary-dark">
           Iniciar sesión
         </h1>
 
         {error && (
-          <div className="mb-4 rounded bg-red-50 px-4 py-2 text-sm text-red-700">
+          <div className="mb-4 rounded bg-destructive-light px-4 py-2 text-sm text-destructive-dark">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="mb-1 block text-sm font-medium text-primary-dark/80">
               Correo electrónico
             </label>
             <input
@@ -62,13 +62,13 @@ export function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm transition-colors duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               placeholder="correo@ejemplo.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="mb-1 block text-sm font-medium text-primary-dark/80">
               Contraseña
             </label>
             <input
@@ -77,7 +77,7 @@ export function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm transition-colors duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               placeholder="••••••••"
             />
           </div>
@@ -85,15 +85,15 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800 disabled:opacity-50"
+            className="mt-2 cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-primary-dark disabled:opacity-50"
           >
             {loading ? "Ingresando..." : "Ingresar"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           ¿No tiene cuenta?{" "}
-          <Link to="/register" className="font-medium text-green-700 hover:underline">
+          <Link to="/register" className="font-medium text-primary transition-colors duration-200 hover:underline">
             Registrarse
           </Link>
         </p>

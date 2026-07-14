@@ -4,21 +4,19 @@ import { fileURLToPath } from "node:url";
 import type { Knex } from "knex";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const serverRoot = resolve(__dirname, "..", "..");
 const migrationsDir = resolve(__dirname, "migrations");
 
-const fileDbConfig: Knex.Config = {
-  client: "better-sqlite3",
-  connection: {
-    filename: process.env.DB_PATH || resolve(serverRoot, "data.db"),
-  },
-  useNullAsDefault: true,
+// PostgreSQL config (production/development)
+const pgConfig: Knex.Config = {
+  client: "pg",
+  connection: process.env.DATABASE_URL,
   migrations: {
     directory: migrationsDir,
     extension: "ts",
   },
 };
 
+// SQLite in-memory config (tests only)
 const memoryDbConfig: Knex.Config = {
   client: "better-sqlite3",
   connection: {
@@ -29,9 +27,9 @@ const memoryDbConfig: Knex.Config = {
 
 const isTest = process.env.NODE_ENV === "test";
 
-const db = knex(isTest ? memoryDbConfig : fileDbConfig);
+const db = knex(isTest ? memoryDbConfig : pgConfig);
 
 // Export knexfile config for CLI usage
-export const config = fileDbConfig;
+export const config = pgConfig;
 
 export default db;

@@ -1,17 +1,11 @@
-import Database from 'better-sqlite3';
+import db from './src/db/connection.js';
 import bcrypt from 'bcrypt';
 
-const db = new Database(process.env.DB_PATH || './data.db');
-
-// Enable WAL for speed
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = OFF');
-
 // Skip if already seeded (idempotent)
-const existingCount = db.prepare('SELECT count(*) as c FROM parcels').get() as { c: number };
-if (existingCount.c > 0) {
+const [{ count: existingCount }] = await db('parcels').count('* as c');
+if (Number(existingCount) > 0) {
   console.log('Data already exists — skipping seed.');
-  db.close();
+  await db.destroy();
   process.exit(0);
 }
 
@@ -19,36 +13,29 @@ if (existingCount.c > 0) {
 console.log('Cleaning existing data...');
 const tables = ['harvests', 'irrigations', 'fertilizations', 'pests', 'crops', 'inventory', 'parcels'];
 for (const t of tables) {
-  db.prepare(`DELETE FROM ${t}`).run();
-  // Reset autoincrement
-  db.prepare(`DELETE FROM sqlite_sequence WHERE name = '${t}'`).run();
+  await db(t).del();
   console.log(`  Cleared ${t}`);
 }
 
 const now = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
 
-function insert(table: string, rows: Record<string, unknown>[]) {
+async function insert(table: string, rows: Record<string, unknown>[]) {
   if (rows.length === 0) return;
-  const cols = Object.keys(rows[0]);
-  const placeholders = cols.map(() => '?').join(', ');
-  const stmt = db.prepare(`INSERT INTO ${table} (${cols.join(', ')}) VALUES (${placeholders})`);
-  const insertMany = db.transaction((items: typeof rows) => {
-    for (const row of items) {
-      stmt.run(...cols.map(c => row[c]));
-    }
-  });
-  insertMany(rows);
+  await db(table).insert(rows);
   console.log(`  ${table}: ${rows.length} rows`);
 }
 
 console.log('\nSeeding...');
 
 // Resolve user — prefer admin@agroexec.com, create if missing
-let uid = (db.prepare("SELECT id FROM users WHERE email = 'admin@agroexec.com'").get() as { id: number } | undefined)?.id;
-if (!uid) {
+let uid: number | undefined;
+const adminRow = await db('users').select('id').where({ email: 'admin@agroexec.com' }).first();
+if (adminRow) {
+  uid = adminRow.id;
+} else {
   const hash = bcrypt.hashSync('admin123456', 10);
-  const result = db.prepare("INSERT INTO users (email, password_hash) VALUES ('admin@agroexec.com', ?)").run(hash);
-  uid = Number(result.lastInsertRowid);
+  const [inserted] = await db('users').insert({ email: 'admin@agroexec.com', password_hash: hash }).returning('id');
+  uid = typeof inserted === 'object' ? (inserted as { id: number }).id : inserted;
   console.log(`  Created admin user (id=${uid})`);
 }
 
@@ -64,7 +51,7 @@ const parcels = [
   { user_id: uid, name: 'Lote La Esquina', area: 4.5, location: 'Esquina SE, media sombra', soil_type: 'franco', created_at: '2025-11-01 09:00:00', updated_at: '2025-11-01 09:00:00' },
   { user_id: uid, name: 'Lote Invernadero', area: 1.8, location: 'Cerca del casco, bajo cubierta', soil_type: 'tierra-negra', created_at: '2026-01-01 08:00:00', updated_at: '2026-01-01 08:00:00' },
 ];
-insert('parcels', parcels);
+await insert('parcels', parcels);
 
 // ============================================================
 // CROPS — multiple per parcel with different statuses
@@ -99,7 +86,7 @@ const crops = [
   { parcel_id: 7, variety: 'Lechuga Grand Rapids', planting_date: '2026-08-20', status: 'activo', estimated_harvest_date: '2026-10-15', planting_density: 12.0, notes: 'Hidroponia NFT. Ciclo corto.', created_at: '2026-08-20 06:00:00', updated_at: now() },
   { parcel_id: 7, variety: 'Pimiento California', planting_date: '2026-02-01', status: 'perdido', estimated_harvest_date: '2026-05-15', planting_density: 3.0, notes: 'Afectado por helada tardía. Se replantifica.', created_at: '2026-02-01 07:00:00', updated_at: '2026-04-01 08:00:00' },
 ];
-insert('crops', crops);
+await insert('crops', crops);
 
 // ============================================================
 // IRRIGATIONS
@@ -135,7 +122,7 @@ const irrigations = [
   { crop_id: 14, amount: 2.5, irrigation_date: '2026-09-05', method: 'goteo', duration: 2.0, notes: 'Crecimiento activo.', created_at: '2026-09-05 08:00:00', updated_at: '2026-09-05 08:00:00' },
   { crop_id: 12, amount: 10.0, irrigation_date: '2026-05-01', method: 'aspersion', duration: 4.5, notes: 'Rebrote post-corte.', created_at: '2026-05-01 06:00:00', updated_at: '2026-05-01 06:00:00' },
 ];
-insert('irrigations', irrigations);
+await insert('irrigations', irrigations);
 
 // ============================================================
 // FERTILIZATIONS
@@ -161,7 +148,7 @@ const fertilizations = [
   { crop_id: 13, producto: 'Sulfato de Magnesio', dosis: 30.0, unidad: 'kg/ha', fecha_aplicacion: '2026-02-15', notas: 'Corrección de magnesio.', costo: 22000, created_at: '2026-02-15 08:00:00', updated_at: '2026-02-15 08:00:00' },
   { crop_id: 14, producto: 'Solución Hoagland Modificada', dosis: 5.0, unidad: 'L/semana', fecha_aplicacion: '2026-08-22', notas: 'Solución nutritiva NFT.', costo: 15000, created_at: '2026-08-22 08:00:00', updated_at: '2026-08-22 08:00:00' },
 ];
-insert('fertilizations', fertilizations);
+await insert('fertilizations', fertilizations);
 
 // ============================================================
 // PESTS
@@ -177,7 +164,7 @@ const pests = [
   { crop_id: 13, tipo: 'insecto', nombre: 'Mosca blanca (Bemisia tabaci)', severidad: 'media', fecha_deteccion: '2026-02-20', tratamiento: 'Jabón potásico + Aceite de neem 2%', estado: 'controlado', notas: 'Trampas cromáticas amarillas en invernadero.', user_id: uid, created_at: '2026-02-20 09:00:00', updated_at: '2026-03-01 09:00:00' },
   { crop_id: 14, tipo: 'enfermedad', nombre: 'Mildiu (Bremia lactucae)', severidad: 'baja', fecha_deteccion: '2026-09-01', tratamiento: 'Fosetil-Al 2g/L', estado: 'activo', notas: 'Ventilación forzada preventiva.', user_id: uid, created_at: '2026-09-01 08:00:00', updated_at: now() },
 ];
-insert('pests', pests);
+await insert('pests', pests);
 
 // ============================================================
 // HARVESTS
@@ -196,7 +183,7 @@ const harvests = [
   { crop_id: 11, cantidad: 2200, unidad: 'kg', fecha_cosecha: '2026-05-15', rendimiento: 6.8, perdidas: 1.5, notas: 'Primer corte alfalfa. Heno de calidad.', created_at: '2026-05-15 10:00:00', updated_at: '2026-05-15 10:00:00' },
   { crop_id: 11, cantidad: 1900, unidad: 'kg', fecha_cosecha: '2026-07-01', rendimiento: 6.2, perdidas: 2.0, notas: 'Segundo corte. Buen stand.', created_at: '2026-07-01 10:00:00', updated_at: '2026-07-01 10:00:00' },
 ];
-insert('harvests', harvests);
+await insert('harvests', harvests);
 
 // ============================================================
 // INVENTORY
@@ -217,22 +204,25 @@ const inventory = [
   { user_id: uid, nombre: 'S-metolacloro 96%', categoria: 'herbicida', cantidad: 12, unidad: 'L', fecha_adquisicion: '2025-10-01', fecha_vencimiento: '2027-10-01', costo_unitario: 4200, notas: 'Bidón 5L. Pre-emergente.', created_at: '2025-10-01 10:00:00', updated_at: '2025-10-01 10:00:00' },
   { user_id: uid, nombre: 'Metconazol 6%', categoria: 'fungicida', cantidad: 6, unidad: 'L', fecha_adquisicion: '2026-07-01', fecha_vencimiento: '2028-07-01', costo_unitario: 6500, notas: 'Bidón 1L. Específico para fusarium.', created_at: '2026-07-01 10:00:00', updated_at: '2026-07-01 10:00:00' },
 ];
-insert('inventory', inventory);
-
-db.pragma('foreign_keys = ON');
+await insert('inventory', inventory);
 
 // ============================================================
 // SUMMARY
 // ============================================================
 console.log('\n=== SEED COMPLETE ===');
-const allTables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'knex_%' ORDER BY name").all() as { name: string }[];
+
+// Get all user tables from the public schema (PostgreSQL-compatible)
+const { rows: tableRows } = await db.raw(
+  "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name NOT LIKE 'knex_%' AND table_type = 'BASE TABLE' ORDER BY table_name"
+);
+const allTables: string[] = tableRows.map((r: { table_name: string }) => r.table_name);
 
 let totalRows = 0;
 for (const t of allTables) {
-  const count = db.prepare(`SELECT count(*) as c FROM "${t.name}"`).get() as { c: number };
-  console.log(`  ${t.name}: ${count.c} rows`);
-  totalRows += count.c;
+  const [{ count: c }] = await db(t).count('* as c');
+  console.log(`  ${t}: ${Number(c)} rows`);
+  totalRows += Number(c);
 }
 console.log(`\n  TOTAL: ${totalRows} filas en ${allTables.length} tablas`);
 
-db.close();
+await db.destroy();

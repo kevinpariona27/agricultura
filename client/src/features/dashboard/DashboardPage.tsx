@@ -59,7 +59,7 @@ export function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
+      <div className="rounded-2xl border border-dashed border-border py-12 text-center text-muted-foreground">
         Cargando...
       </div>
     );
@@ -67,7 +67,7 @@ export function DashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-900">
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-primary-dark">
         Dashboard
       </h1>
 
@@ -118,16 +118,16 @@ export function DashboardPage() {
         data-testid="dashboard-charts"
       >
         {/* Donut chart — crop distribution */}
-        <div className="rounded-xl border border-gray-100 bg-white p-6 lg:col-span-1">
-          <h2 className="mb-4 text-base font-semibold text-gray-800">
+        <div className="rounded-2xl border border-border bg-surface p-6 lg:col-span-1">
+          <h2 className="mb-4 text-base font-semibold text-primary-dark">
             Distribución de Cultivos
           </h2>
           <DonutChart />
         </div>
 
         {/* Bar chart — irrigation / harvest evolution */}
-        <div className="rounded-xl border border-gray-100 bg-white p-6 lg:col-span-2">
-          <h2 className="mb-4 text-base font-semibold text-gray-800">
+        <div className="rounded-2xl border border-border bg-surface p-6 lg:col-span-2">
+          <h2 className="mb-4 text-base font-semibold text-primary-dark">
             Evolución Riegos / Cosechas
           </h2>
           <EvolutionBarChart />
@@ -136,17 +136,17 @@ export function DashboardPage() {
 
       {/* Próximos vencimientos */}
       <div className="mb-6">
-        <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
+        <h2 className="mb-3 text-lg font-medium tracking-tight text-primary-dark/90">
           Próximos vencimientos
         </h2>
         {expiringItems.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-200 py-8 text-center text-sm text-gray-500">
+          <div className="rounded-2xl border border-dashed border-border py-8 text-center text-sm text-muted-foreground">
             No hay insumos próximos a vencer.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white">
+          <div className="overflow-x-auto rounded-2xl border border-border bg-surface">
             <table className="w-full text-left text-sm min-w-[600px]">
-              <thead className="bg-gray-50 text-gray-600">
+              <thead className="bg-muted text-muted-foreground">
                 <tr>
                   <th className="w-10 px-3 py-3 font-medium"></th>
                   <th className="px-4 py-3 font-medium">Insumo</th>
@@ -155,7 +155,7 @@ export function DashboardPage() {
                   <th className="px-4 py-3 font-medium">Vencimiento</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {expiringItems.map((item) => (
                   <tr key={item.id}>
                     <td className="px-3 py-3">
@@ -165,17 +165,17 @@ export function DashboardPage() {
                         size="sm"
                       />
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900">
+                    <td className="px-4 py-3 font-medium text-primary-dark">
                       {item.nombre}
                     </td>
-                    <td className="px-4 py-3 capitalize text-gray-600">
+                    <td className="px-4 py-3 capitalize text-muted-foreground">
                       {item.categoria}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-muted-foreground">
                       {item.cantidad} {item.unidad}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="inline-block rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
+                      <span className="inline-block rounded-full bg-destructive-light px-2 py-0.5 text-xs font-medium text-destructive-dark">
                         {new Date(item.fecha_vencimiento!).toLocaleDateString(
                           "es-ES"
                         )}
@@ -192,12 +192,12 @@ export function DashboardPage() {
       {/* Stock bajo */}
       {lowStockItems.length > 0 && (
         <div>
-          <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
+          <h2 className="mb-3 text-lg font-medium tracking-tight text-primary-dark/90">
             Stock bajo (≤ 5 unidades)
           </h2>
-          <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white">
+          <div className="overflow-x-auto rounded-2xl border border-border bg-surface">
             <table className="w-full text-left text-sm min-w-[600px]">
-              <thead className="bg-gray-50 text-gray-600">
+              <thead className="bg-muted text-muted-foreground">
                 <tr>
                   <th className="w-10 px-3 py-3 font-medium"></th>
                   <th className="px-4 py-3 font-medium">Insumo</th>
@@ -205,7 +205,7 @@ export function DashboardPage() {
                   <th className="px-4 py-3 font-medium">Unidad</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {lowStockItems.map((item) => (
                   <tr key={item.id}>
                     <td className="px-3 py-3">
@@ -215,7 +215,7 @@ export function DashboardPage() {
                         size="sm"
                       />
                     </td>
-                    <td className="px-4 py-3 font-medium text-gray-900">
+                    <td className="px-4 py-3 font-medium text-primary-dark">
                       {item.nombre}
                     </td>
                     <td className="px-4 py-3">
@@ -223,7 +223,7 @@ export function DashboardPage() {
                         {item.cantidad}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{item.unidad}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{item.unidad}</td>
                   </tr>
                 ))}
               </tbody>

@@ -15,14 +15,14 @@ interface StatCardProps {
 
 const COLOR_MAP: Record<string, { border: string; bg: string; text: string }> = {
   green: {
-    border: "border-l-green-500",
-    bg: "bg-green-50",
-    text: "text-green-700",
+    border: "border-l-primary-light",
+    bg: "bg-primary-50",
+    text: "text-primary-dark",
   },
   emerald: {
-    border: "border-l-emerald-400",
-    bg: "bg-emerald-50/30",
-    text: "text-emerald-700",
+    border: "border-l-primary",
+    bg: "bg-primary-50/30",
+    text: "text-primary-dark",
   },
   blue: {
     border: "border-l-blue-500",
@@ -40,9 +40,9 @@ const COLOR_MAP: Record<string, { border: string; bg: string; text: string }> = 
     text: "text-purple-700",
   },
   red: {
-    border: "border-l-red-500",
-    bg: "bg-red-50",
-    text: "text-red-700",
+    border: "border-l-destructive",
+    bg: "bg-destructive-light",
+    text: "text-destructive-dark",
   },
   indigo: {
     border: "border-l-indigo-500",
@@ -56,8 +56,8 @@ export function StatCard({ icon, value, label, color, accent = false }: StatCard
 
   const containerClass =
     accent && c
-      ? `rounded-xl border border-gray-100 ${c.bg} border-l-4 ${c.border} p-6 shadow-sm cursor-pointer`
-      : "rounded-xl border border-gray-100 p-6 shadow-sm cursor-pointer";
+      ? `rounded-2xl border border-border ${c.bg} border-l-4 ${c.border} p-6 shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer`
+      : "rounded-2xl border border-border bg-surface p-6 shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer";
 
   return (
     <motion.div
@@ -67,8 +67,8 @@ export function StatCard({ icon, value, label, color, accent = false }: StatCard
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500">{label}</p>
-          <p className={`mt-1 text-3xl font-bold ${c?.text ?? "text-gray-900"}`}>
+          <p className="text-sm font-medium text-muted-foreground">{label}</p>
+          <p className={`mt-1 text-3xl font-bold ${c?.text ?? "text-primary-dark"}`}>
             {value}
           </p>
         </div>

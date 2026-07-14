@@ -57,7 +57,7 @@ export function Sidebar() {
         role="complementary"
         aria-label="Sidebar navigation"
         className={`
-          flex h-full flex-col bg-slate-900 text-white
+          flex h-full flex-col bg-primary-dark text-white
           lg:relative lg:w-16 lg:flex-shrink-0
           fixed inset-y-0 left-0 z-50 w-64 transition-transform duration-300
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -66,14 +66,14 @@ export function Sidebar() {
         {/* Mobile close button */}
         <button
           onClick={close}
-          className="absolute right-3 top-3 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-white lg:hidden"
+          className="absolute right-3 top-3 rounded-lg p-1.5 text-primary-100/60 transition-colors duration-200 hover:bg-primary-dark/70 hover:text-white lg:hidden"
           aria-label="Close navigation"
         >
           <X className="h-5 w-5" />
         </button>
 
         {/* Brand */}
-        <div className="border-b border-slate-700 px-6 py-5 text-xl font-bold tracking-tight lg:text-center lg:text-sm lg:px-2">
+        <div className="border-b border-primary-dark/30 px-6 py-5 text-xl font-bold tracking-tight lg:text-center lg:text-sm lg:px-2">
           <span className="lg:hidden">Gestión Agrícola</span>
           <span className="hidden lg:inline">GA</span>
         </div>
@@ -89,8 +89,8 @@ export function Sidebar() {
               className={({ isActive }) =>
                 `rounded-lg px-4 py-2.5 text-sm font-medium transition-colors lg:px-2 lg:py-3 lg:justify-center ${
                   isActive
-                    ? "border-l-4 border-emerald-400 bg-emerald-600 text-white lg:border-l-0 lg:border-b-2"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    ? "border-l-4 border-primary-light bg-primary text-white lg:border-l-0 lg:border-b-2"
+                    : "text-primary-100/80 transition-colors duration-200 hover:bg-primary-dark/70 hover:text-white"
                 }`
               }
             >
@@ -101,17 +101,17 @@ export function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="mt-auto border-t border-slate-700 bg-slate-800/50 px-6 py-4 lg:px-2">
+        <div className="mt-auto border-t border-primary-dark/30 bg-primary-dark/50 px-6 py-4 lg:px-2">
           <button
             title="Nuevo Reporte"
-            className="mb-3 flex w-full items-center gap-2 rounded-lg bg-emerald-400 px-4 py-2.5 font-medium text-gray-900 transition-colors hover:bg-emerald-300 lg:justify-center lg:px-2"
+            className="mb-3 flex w-full cursor-pointer items-center gap-2 rounded-lg bg-primary-light px-4 py-2.5 font-medium text-primary-dark transition-colors duration-200 hover:bg-primary-light/80 lg:justify-center lg:px-2"
           >
             <FileText className="h-5 w-5" />
             <span className="lg:hidden">Nuevo Reporte</span>
           </button>
           <button
             onClick={handleLogout}
-            className="w-full rounded px-3 py-2 text-left text-sm font-medium text-slate-300 transition-colors hover:bg-slate-700 hover:text-white lg:text-center lg:text-xs lg:px-1"
+            className="w-full cursor-pointer rounded px-3 py-2 text-left text-sm font-medium text-primary-100/80 transition-colors duration-200 hover:bg-primary-dark/60 hover:text-white lg:text-center lg:text-xs lg:px-1"
             title="Cerrar sesión"
           >
             <span className="lg:hidden">Cerrar sesión</span>
