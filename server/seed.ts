@@ -1,6 +1,11 @@
 import db from './src/db/connection.js';
 import bcrypt from 'bcrypt';
 
+// Run migrations first (creates tables if they don't exist)
+console.log('Running migrations...');
+await db.migrate.latest();
+console.log('Migrations complete.');
+
 // Skip if already seeded (idempotent)
 const [{ count: existingCount }] = await db('parcels').count('* as c');
 if (Number(existingCount) > 0) {
