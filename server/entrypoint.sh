@@ -1,8 +1,6 @@
 #!/bin/sh
 # Run seed — idempotent, fails gracefully if already seeded
-# Migrations run inside seed.ts before seeding
-echo "Starting seed..."
-npx tsx seed.ts || echo "Seed failed or skipped (non-fatal)"
+npx tsx seed.ts 2>/dev/null || true
 echo "Seed check complete"
-# Start server (migrations run automatically via db.migrate.latest() in index.ts too)
+# Start server (migrations run automatically via db.migrate.latest() in index.ts)
 exec npx tsx src/index.ts

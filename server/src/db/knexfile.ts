@@ -3,10 +3,14 @@ import { fileURLToPath } from "node:url";
 import type { Knex } from "knex";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const serverRoot = resolve(__dirname, "..", "..");
 
 const config: Knex.Config = {
-  client: "pg",
-  connection: process.env.DATABASE_URL,
+  client: "better-sqlite3",
+  connection: {
+    filename: process.env.DB_PATH || resolve(serverRoot, "data.db"),
+  },
+  useNullAsDefault: true,
   migrations: {
     directory: resolve(__dirname, "migrations"),
     extension: "ts",
