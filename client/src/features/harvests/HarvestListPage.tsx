@@ -18,6 +18,8 @@ export function HarvestListPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchCrops();
@@ -36,6 +38,7 @@ export function HarvestListPage() {
       const df = overrides?.date_from ?? dateFrom;
       const dt = overrides?.date_to ?? dateTo;
       const s = overrides?.search ?? search;
+      setPage(1);
       fetchAll({
         crop_id: c ? Number(c) : undefined,
         date_from: df || undefined,
@@ -167,7 +170,14 @@ export function HarvestListPage() {
           Cargando...
         </div>
       ) : (
-        <HarvestTable harvests={harvests} onSearch={handleSearch} />
+        <HarvestTable
+          harvests={harvests.slice((page - 1) * pageSize, page * pageSize)}
+          onSearch={handleSearch}
+          page={page}
+          pageSize={pageSize}
+          totalItems={harvests.length}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );

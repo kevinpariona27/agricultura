@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import type { Inventory } from "@agri/shared";
 import { ImageDisplay } from "../../../shared/components/ImageDisplay";
+import { Pagination } from "../../../shared/components/Pagination";
 import { SearchInput } from "../../../shared/components/SearchInput";
 
 const CATEGORIA_LABELS: Record<string, string> = {
@@ -24,6 +25,11 @@ interface InventoryTableProps {
   onSearch: (search: string) => void;
   onCategoriaFilter: (categoria: string) => void;
   onStockFilter?: (stock: string) => void;
+  stockFilter?: string;
+  page?: number;
+  pageSize?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
 }
 
 const container = {
@@ -40,9 +46,13 @@ export function InventoryTable({
   onSearch,
   onCategoriaFilter,
   onStockFilter,
+  stockFilter = "",
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
 }: InventoryTableProps) {
   const [searchValue, setSearchValue] = useState("");
-  const [stockFilter, setStockFilter] = useState("");
 
   function handleSearch(value: string) {
     setSearchValue(value);
@@ -50,7 +60,6 @@ export function InventoryTable({
   }
 
   function handleStockFilter(value: string) {
-    setStockFilter(value);
     onStockFilter?.(value);
   }
 
@@ -109,72 +118,68 @@ export function InventoryTable({
         </div>
       </div>
 
-      {/* Table */}
-      {(() => {
-        const filtered = stockFilter === "bajo"
-          ? items.filter((i) => i.cantidad <= 5)
-          : stockFilter === "normal"
-            ? items.filter((i) => i.cantidad > 5)
-            : items;
-
-        if (filtered.length === 0) {
-          return (
-            <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
-              No se encontraron ítems de inventario.
-            </div>
-          );
-        }
-
-        return (
-          <div className="overflow-x-auto rounded-xl border border-gray-100">
-            <table className="w-full text-left text-sm min-w-[600px]">
-              <thead className="bg-gray-50 text-gray-600">
-                <tr>
-                  <th className="w-10 px-3 py-2.5 font-medium"></th>
-                  <th className="px-3 py-2.5 font-medium">Nombre</th>
-                  <th className="px-3 py-2.5 font-medium">Categoría</th>
-                  <th className="px-3 py-2.5 font-medium">Cantidad</th>
-                  <th className="px-3 py-2.5 font-medium">Unidad</th>
-                </tr>
-              </thead>
-              <motion.tbody
-                variants={container}
-                initial="initial"
-                animate="animate"
-                className="divide-y divide-gray-100"
-              >
-                {filtered.map((item) => (
-                  <motion.tr
-                    key={item.id}
-                    variants={rowVariant}
-                    className="cursor-pointer transition-colors hover:bg-gray-50"
-                  >
-                    <td className="px-3 py-2">
-                      <ImageDisplay
-                        src={item.image_url ?? null}
-                        alt={item.nombre}
-                        size="sm"
-                      />
-                    </td>
-                    <td className="px-3 py-2 font-medium text-gray-900">
-                      {item.nombre}
-                    </td>
-                    <td className="px-3 py-2 text-gray-600">
-                      {CATEGORIA_LABELS[item.categoria] ?? item.categoria}
-                    </td>
-                    <td className="px-3 py-2 text-gray-600">
-                      {item.cantidad}
-                    </td>
-                    <td className="px-3 py-2 text-gray-600">
-                      {UNIDAD_LABELS[item.unidad] ?? item.unidad}
-                    </td>
-                  </motion.tr>
-                ))}
-              </motion.tbody>
-            </table>
-          </div>
-        );
-      })()}
+      {/* Table — items are already filtered and sliced by the parent */}
+      {items.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
+          No se encontraron ítems de inventario.
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-gray-100">
+          <table className="w-full text-left text-sm min-w-[600px]">
+            <thead className="bg-gray-50 text-gray-600">
+              <tr>
+                <th className="w-10 px-3 py-2.5 font-medium"></th>
+                <th className="px-3 py-2.5 font-medium">Nombre</th>
+                <th className="px-3 py-2.5 font-medium">Categoría</th>
+                <th className="px-3 py-2.5 font-medium">Cantidad</th>
+                <th className="px-3 py-2.5 font-medium">Unidad</th>
+              </tr>
+            </thead>
+            <motion.tbody
+              variants={container}
+              initial="initial"
+              animate="animate"
+              className="divide-y divide-gray-100"
+            >
+              {items.map((item) => (
+                <motion.tr
+                  key={item.id}
+                  variants={rowVariant}
+                  className="cursor-pointer transition-colors hover:bg-gray-50"
+                >
+                  <td className="px-3 py-2">
+                    <ImageDisplay
+                      src={item.image_url ?? null}
+                      alt={item.nombre}
+                      size="sm"
+                    />
+                  </td>
+                  <td className="px-3 py-2 font-medium text-gray-900">
+                    {item.nombre}
+                  </td>
+                  <td className="px-3 py-2 text-gray-600">
+                    {CATEGORIA_LABELS[item.categoria] ?? item.categoria}
+                  </td>
+                  <td className="px-3 py-2 text-gray-600">
+                    {item.cantidad}
+                  </td>
+                  <td className="px-3 py-2 text-gray-600">
+                    {UNIDAD_LABELS[item.unidad] ?? item.unidad}
+                  </td>
+                </motion.tr>
+              ))}
+            </motion.tbody>
+          </table>
+        </div>
+      )}
+      {page !== undefined && pageSize !== undefined && totalItems !== undefined && onPageChange && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 }

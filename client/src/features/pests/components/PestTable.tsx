@@ -5,6 +5,7 @@ import type { Pest } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
 import { Badge } from "../../../shared/components/Badge";
 import { ImageDisplay } from "../../../shared/components/ImageDisplay";
+import { Pagination } from "../../../shared/components/Pagination";
 import { SearchInput } from "../../../shared/components/SearchInput";
 
 const TIPO_LABELS: Record<string, string> = {
@@ -42,6 +43,10 @@ interface PestTableProps {
   onCropFilter: (crop_id: string) => void;
   onTipoFilter: (tipo: string) => void;
   onEstadoFilter: (estado: string) => void;
+  page?: number;
+  pageSize?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
 }
 
 const container = {
@@ -59,6 +64,10 @@ export function PestTable({
   onCropFilter,
   onTipoFilter,
   onEstadoFilter,
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
 }: PestTableProps) {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
@@ -246,6 +255,14 @@ export function PestTable({
             </motion.tbody>
           </table>
         </div>
+      )}
+      {page !== undefined && pageSize !== undefined && totalItems !== undefined && onPageChange && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+        />
       )}
     </div>
   );

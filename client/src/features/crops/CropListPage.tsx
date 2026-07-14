@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Download } from "lucide-react";
 import { useCropsStore } from "../../stores/crops.js";
@@ -9,6 +9,8 @@ import { exportToExcel } from "../../shared/utils/exportExcel.js";
 export function CropListPage() {
   const navigate = useNavigate();
   const { crops, loading, error, fetchAll, clearError } = useCropsStore();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchAll();
@@ -17,6 +19,7 @@ export function CropListPage() {
 
   const handleSearch = useCallback(
     (search: string) => {
+      setPage(1);
       fetchAll({ search: search || undefined }).catch(() => {});
     },
     [fetchAll]
@@ -24,6 +27,7 @@ export function CropListPage() {
 
   const handleParcelFilter = useCallback(
     (parcel_id: string) => {
+      setPage(1);
       fetchAll({
         parcel_id: parcel_id ? Number(parcel_id) : undefined,
       }).catch(() => {});
@@ -33,10 +37,13 @@ export function CropListPage() {
 
   const handleStatusFilter = useCallback(
     (status: string) => {
+      setPage(1);
       fetchAll({ status: (status || undefined) as any }).catch(() => {});
     },
     [fetchAll]
   );
+
+  const paginatedCrops = crops.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -83,10 +90,14 @@ export function CropListPage() {
         </div>
       ) : (
         <CropTable
-          crops={crops}
+          crops={paginatedCrops}
           onSearch={handleSearch}
           onParcelFilter={handleParcelFilter}
           onStatusFilter={handleStatusFilter}
+          page={page}
+          pageSize={pageSize}
+          totalItems={crops.length}
+          onPageChange={setPage}
         />
       )}
     </div>

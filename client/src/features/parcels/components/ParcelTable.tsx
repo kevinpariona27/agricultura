@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { Parcel } from "@agri/shared";
 import { Badge } from "../../../shared/components/Badge";
 import { ImageDisplay } from "../../../shared/components/ImageDisplay";
+import { Pagination } from "../../../shared/components/Pagination";
 import { SearchInput } from "../../../shared/components/SearchInput";
 import { SOIL_TYPES } from "./ParcelForm.js";
 
@@ -11,6 +12,10 @@ interface ParcelTableProps {
   parcels: Parcel[];
   onSearch: (search: string) => void;
   onFilter: (soil_type: string) => void;
+  page?: number;
+  pageSize?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
 }
 
 const container = {
@@ -22,7 +27,7 @@ const item = {
   animate: { opacity: 1, y: 0 },
 };
 
-export function ParcelTable({ parcels, onSearch, onFilter }: ParcelTableProps) {
+export function ParcelTable({ parcels, onSearch, onFilter, page, pageSize, totalItems, onPageChange }: ParcelTableProps) {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState("");
@@ -127,6 +132,14 @@ export function ParcelTable({ parcels, onSearch, onFilter }: ParcelTableProps) {
             </motion.tbody>
           </table>
         </div>
+      )}
+      {page !== undefined && pageSize !== undefined && totalItems !== undefined && onPageChange && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+        />
       )}
     </div>
   );

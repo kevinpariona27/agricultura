@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Download } from "lucide-react";
 import { useInventoryStore } from "../../stores/inventory";
@@ -9,6 +9,9 @@ export function InventoryListPage() {
   const navigate = useNavigate();
   const { items, loading, error, fetchAll, clearError } =
     useInventoryStore();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [stockFilter, setStockFilter] = useState("");
 
   useEffect(() => {
     fetchAll();
@@ -24,11 +27,33 @@ export function InventoryListPage() {
 
   const handleCategoriaFilter = useCallback(
     (categoria: string) => {
+      setPage(1);
       fetchAll({
         categoria: categoria || undefined,
       }).catch(() => {});
     },
     [fetchAll]
+  );
+
+  const handleStockFilter = useCallback(
+    (stock: string) => {
+      setStockFilter(stock);
+      setPage(1);
+    },
+    []
+  );
+
+  // Apply client-side stock filter, then paginate
+  const filteredItems =
+    stockFilter === "bajo"
+      ? items.filter((i) => i.cantidad <= 5)
+      : stockFilter === "normal"
+        ? items.filter((i) => i.cantidad > 5)
+        : items;
+
+  const paginatedItems = filteredItems.slice(
+    (page - 1) * pageSize,
+    page * pageSize,
   );
 
   return (
@@ -78,9 +103,15 @@ export function InventoryListPage() {
         </div>
       ) : (
         <InventoryTable
-          items={items}
+          items={paginatedItems}
           onSearch={handleSearch}
           onCategoriaFilter={handleCategoriaFilter}
+          onStockFilter={handleStockFilter}
+          stockFilter={stockFilter}
+          page={page}
+          pageSize={pageSize}
+          totalItems={filteredItems.length}
+          onPageChange={setPage}
         />
       )}
     </div>

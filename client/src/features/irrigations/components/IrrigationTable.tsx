@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { Irrigation } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
 import { Badge } from "../../../shared/components/Badge";
+import { Pagination } from "../../../shared/components/Pagination";
 import { SearchInput } from "../../../shared/components/SearchInput";
 import { IRRIGATION_METHOD_LABELS } from "./IrrigationForm";
 
@@ -14,6 +15,10 @@ interface Props {
   onMethodFilter?: (v: string) => void;
   onDateFrom?: (v: string) => void;
   onDateTo?: (v: string) => void;
+  page?: number;
+  pageSize?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
 }
 
 const METHOD_COLORS: Record<string, string> = {
@@ -35,6 +40,10 @@ const item = {
 export function IrrigationTable({
   irrigations,
   onSearch,
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
 }: Props) {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
@@ -130,6 +139,14 @@ export function IrrigationTable({
             </motion.tbody>
           </table>
         </div>
+      )}
+      {page !== undefined && pageSize !== undefined && totalItems !== undefined && onPageChange && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+        />
       )}
     </div>
   );

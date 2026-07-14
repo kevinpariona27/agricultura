@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Download } from "lucide-react";
 import { useFertilizationsStore } from "../../stores/fertilizations";
@@ -9,6 +9,8 @@ export function FertilizationListPage() {
   const navigate = useNavigate();
   const { fertilizations, loading, error, fetchAll, clearError } =
     useFertilizationsStore();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchAll();
@@ -17,6 +19,7 @@ export function FertilizationListPage() {
 
   const handleSearch = useCallback(
     (search: string) => {
+      setPage(1);
       fetchAll({ search: search || undefined }).catch(() => {});
     },
     [fetchAll]
@@ -24,12 +27,15 @@ export function FertilizationListPage() {
 
   const handleCropFilter = useCallback(
     (crop_id: string) => {
+      setPage(1);
       fetchAll({
         crop_id: crop_id ? Number(crop_id) : undefined,
       }).catch(() => {});
     },
     [fetchAll]
   );
+
+  const paginatedFertilizations = fertilizations.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -75,9 +81,13 @@ export function FertilizationListPage() {
         </div>
       ) : (
         <FertilizationTable
-          fertilizations={fertilizations}
+          fertilizations={paginatedFertilizations}
           onSearch={handleSearch}
           onCropFilter={handleCropFilter}
+          page={page}
+          pageSize={pageSize}
+          totalItems={fertilizations.length}
+          onPageChange={setPage}
         />
       )}
     </div>

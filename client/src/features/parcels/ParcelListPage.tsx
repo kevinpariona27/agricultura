@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Download } from "lucide-react";
 import { useParcelsStore } from "../../stores/parcels.js";
@@ -8,6 +8,8 @@ import { exportToExcel } from "../../shared/utils/exportExcel.js";
 export function ParcelListPage() {
   const navigate = useNavigate();
   const { parcels, loading, error, fetchAll, clearError } = useParcelsStore();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchAll();
@@ -16,6 +18,7 @@ export function ParcelListPage() {
 
   const handleSearch = useCallback(
     (search: string) => {
+      setPage(1);
       fetchAll(search, undefined).catch(() => {});
     },
     [fetchAll]
@@ -23,10 +26,13 @@ export function ParcelListPage() {
 
   const handleFilter = useCallback(
     (soil_type: string) => {
+      setPage(1);
       fetchAll(undefined, soil_type || undefined).catch(() => {});
     },
     [fetchAll]
   );
+
+  const paginatedParcels = parcels.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -71,9 +77,13 @@ export function ParcelListPage() {
         </div>
       ) : (
         <ParcelTable
-          parcels={parcels}
+          parcels={paginatedParcels}
           onSearch={handleSearch}
           onFilter={handleFilter}
+          page={page}
+          pageSize={pageSize}
+          totalItems={parcels.length}
+          onPageChange={setPage}
         />
       )}
     </div>

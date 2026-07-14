@@ -22,6 +22,8 @@ export function IrrigationListPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchCrops();
@@ -42,6 +44,7 @@ export function IrrigationListPage() {
       const df = overrides?.date_from ?? dateFrom;
       const dt = overrides?.date_to ?? dateTo;
       const s = overrides?.search ?? search;
+      setPage(1);
       fetchAll({
         crop_id: c ? Number(c) : undefined,
         method: (m || undefined) as any,
@@ -198,7 +201,14 @@ export function IrrigationListPage() {
           Cargando...
         </div>
       ) : (
-        <IrrigationTable irrigations={irrigations} onSearch={handleSearch} />
+        <IrrigationTable
+          irrigations={irrigations.slice((page - 1) * pageSize, page * pageSize)}
+          onSearch={handleSearch}
+          page={page}
+          pageSize={pageSize}
+          totalItems={irrigations.length}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );

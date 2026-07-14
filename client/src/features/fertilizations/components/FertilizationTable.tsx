@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Fertilization } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
+import { Pagination } from "../../../shared/components/Pagination";
 import { SearchInput } from "../../../shared/components/SearchInput";
 
 const UNIT_LABELS: Record<string, string> = {
@@ -14,6 +15,10 @@ interface FertilizationTableProps {
   fertilizations: Fertilization[];
   onSearch: (search: string) => void;
   onCropFilter: (crop_id: string) => void;
+  page?: number;
+  pageSize?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
 }
 
 const container = {
@@ -29,6 +34,10 @@ export function FertilizationTable({
   fertilizations,
   onSearch,
   onCropFilter,
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
 }: FertilizationTableProps) {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
@@ -148,6 +157,14 @@ export function FertilizationTable({
             </motion.tbody>
           </table>
         </div>
+      )}
+      {page !== undefined && pageSize !== undefined && totalItems !== undefined && onPageChange && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+        />
       )}
     </div>
   );

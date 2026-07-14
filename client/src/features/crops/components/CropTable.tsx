@@ -5,6 +5,7 @@ import type { Crop } from "@agri/shared";
 import { useParcelsStore } from "../../../stores/parcels.js";
 import { Badge } from "../../../shared/components/Badge";
 import { ImageDisplay } from "../../../shared/components/ImageDisplay";
+import { Pagination } from "../../../shared/components/Pagination";
 import { SearchInput } from "../../../shared/components/SearchInput";
 import { CROP_STATUS_LABELS, CROP_STATUS_OPTIONS } from "./CropForm.js";
 
@@ -13,6 +14,10 @@ interface CropTableProps {
   onSearch: (search: string) => void;
   onParcelFilter: (parcel_id: string) => void;
   onStatusFilter: (status: string) => void;
+  page?: number;
+  pageSize?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
 }
 
 const CROP_STATUS_COLORS: Record<string, string> = {
@@ -37,6 +42,10 @@ export function CropTable({
   onSearch,
   onParcelFilter,
   onStatusFilter,
+  page,
+  pageSize,
+  totalItems,
+  onPageChange,
 }: CropTableProps) {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState("");
@@ -197,6 +206,14 @@ export function CropTable({
             </motion.tbody>
           </table>
         </div>
+      )}
+      {page !== undefined && pageSize !== undefined && totalItems !== undefined && onPageChange && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          onPageChange={onPageChange}
+        />
       )}
     </div>
   );

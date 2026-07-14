@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Download } from "lucide-react";
 import { usePestsStore } from "../../stores/pests";
@@ -9,6 +9,8 @@ export function PestListPage() {
   const navigate = useNavigate();
   const { pests, loading, error, fetchAll, clearError } =
     usePestsStore();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchAll();
@@ -17,6 +19,7 @@ export function PestListPage() {
 
   const handleSearch = useCallback(
     (search: string) => {
+      setPage(1);
       fetchAll({ search: search || undefined }).catch(() => {});
     },
     [fetchAll]
@@ -24,6 +27,7 @@ export function PestListPage() {
 
   const handleCropFilter = useCallback(
     (crop_id: string) => {
+      setPage(1);
       fetchAll({
         crop_id: crop_id ? Number(crop_id) : undefined,
       }).catch(() => {});
@@ -33,6 +37,7 @@ export function PestListPage() {
 
   const handleTipoFilter = useCallback(
     (tipo: string) => {
+      setPage(1);
       fetchAll({
         tipo: tipo || undefined,
       }).catch(() => {});
@@ -42,12 +47,15 @@ export function PestListPage() {
 
   const handleEstadoFilter = useCallback(
     (estado: string) => {
+      setPage(1);
       fetchAll({
         estado: estado || undefined,
       }).catch(() => {});
     },
     [fetchAll]
   );
+
+  const paginatedPests = pests.slice((page - 1) * pageSize, page * pageSize);
 
   return (
     <div>
@@ -96,11 +104,15 @@ export function PestListPage() {
         </div>
       ) : (
         <PestTable
-          pests={pests}
+          pests={paginatedPests}
           onSearch={handleSearch}
           onCropFilter={handleCropFilter}
           onTipoFilter={handleTipoFilter}
           onEstadoFilter={handleEstadoFilter}
+          page={page}
+          pageSize={pageSize}
+          totalItems={pests.length}
+          onPageChange={setPage}
         />
       )}
     </div>
