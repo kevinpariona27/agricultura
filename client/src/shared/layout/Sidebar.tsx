@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FileText, X } from "lucide-react";
 import { useSidebarStore } from "../../stores/sidebar.js";
@@ -20,6 +20,10 @@ export function Sidebar() {
   const close = useSidebarStore((s) => s.close);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
+
+  const [isDesktopExpanded, setIsDesktopExpanded] = useState(false);
+  const handleMouseEnter = useCallback(() => setIsDesktopExpanded(true), []);
+  const handleMouseLeave = useCallback(() => setIsDesktopExpanded(false), []);
 
   const sidebarRef = useRef<HTMLElement>(null);
 
@@ -56,11 +60,14 @@ export function Sidebar() {
         ref={sidebarRef}
         role="complementary"
         aria-label="Sidebar navigation"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className={`
           flex h-full flex-col bg-primary-dark text-white
           lg:relative lg:w-16 lg:flex-shrink-0
-          fixed inset-y-0 left-0 z-50 w-64 transition-transform duration-300
+          fixed inset-y-0 left-0 z-50 w-64 transition-all duration-300
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          ${isDesktopExpanded ? "lg:!w-64" : ""}
         `}
       >
         {/* Mobile close button */}
@@ -74,8 +81,8 @@ export function Sidebar() {
 
         {/* Brand */}
         <div className="border-b border-primary-dark/30 px-6 py-5 text-xl font-bold tracking-tight lg:text-center lg:text-sm lg:px-2">
-          <span className="lg:hidden">Gestión Agrícola</span>
-          <span className="hidden lg:inline">GA</span>
+          <span className={isDesktopExpanded ? "" : "lg:hidden"}>Gestión Agrícola</span>
+          <span className={isDesktopExpanded ? "hidden" : "hidden lg:inline"}>GA</span>
         </div>
 
         {/* Nav links */}
@@ -87,15 +94,15 @@ export function Sidebar() {
               onClick={close}
               title={item.label}
               className={({ isActive }) =>
-                `rounded-lg px-4 py-2.5 text-sm font-medium transition-colors lg:px-2 lg:py-3 lg:justify-center ${
+                `rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${isDesktopExpanded ? "" : "lg:px-2 lg:py-3 lg:justify-center"} ${
                   isActive
-                    ? "border-l-4 border-primary-light bg-primary text-white lg:border-l-0 lg:border-b-2"
+                    ? `border-l-4 border-primary-light bg-primary text-white ${isDesktopExpanded ? "" : "lg:border-l-0 lg:border-b-2"}`
                     : "text-primary-100/80 transition-colors duration-200 hover:bg-primary-dark/70 hover:text-white"
                 }`
               }
             >
-              <span className="lg:hidden">{item.label}</span>
-              <span className="hidden lg:inline text-xs">{item.label.slice(0, 3)}</span>
+              <span className={isDesktopExpanded ? "" : "lg:hidden"}>{item.label}</span>
+              <span className={isDesktopExpanded ? "hidden" : "hidden lg:inline text-xs"}>{item.label.slice(0, 3)}</span>
             </NavLink>
           ))}
         </nav>
@@ -107,15 +114,15 @@ export function Sidebar() {
             className="mb-3 flex w-full cursor-pointer items-center gap-2 rounded-lg bg-primary-light px-4 py-2.5 font-medium text-primary-dark transition-colors duration-200 hover:bg-primary-light/80 lg:justify-center lg:px-2"
           >
             <FileText className="h-5 w-5" />
-            <span className="lg:hidden">Nuevo Reporte</span>
+            <span className={isDesktopExpanded ? "" : "lg:hidden"}>Nuevo Reporte</span>
           </button>
           <button
             onClick={handleLogout}
             className="w-full cursor-pointer rounded px-3 py-2 text-left text-sm font-medium text-primary-100/80 transition-colors duration-200 hover:bg-primary-dark/60 hover:text-white lg:text-center lg:text-xs lg:px-1"
             title="Cerrar sesión"
           >
-            <span className="lg:hidden">Cerrar sesión</span>
-            <span className="hidden lg:inline">Salir</span>
+            <span className={isDesktopExpanded ? "" : "lg:hidden"}>Cerrar sesión</span>
+            <span className={isDesktopExpanded ? "hidden" : "hidden lg:inline"}>Salir</span>
           </button>
         </div>
       </aside>
