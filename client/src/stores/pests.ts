@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Pest } from "@agri/shared";
-import { get, post, put, del, uploadFile, removeImage } from "../api/client";
+import { get, post, put, del, uploadFile, removeImage, isNetworkError } from "../api/client";
+import { enqueue } from "../shared/utils/offlineQueue";
 
 export interface PestFilters {
   crop_id?: number;
@@ -76,7 +77,12 @@ export const usePestsStore = create<PestsState>((set) => ({
         loading: false,
       }));
       return pest;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "POST", url: "/pests", body: data });
+        set({ loading: false });
+        return { id: -Date.now(), ...data, tratamiento: data.tratamiento ?? undefined, notas: data.notas ?? undefined, image_url: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as unknown as Pest;
+      }
       set({ error: "Error al crear la plaga", loading: false });
       throw new Error("Error al crear la plaga");
     }
@@ -92,7 +98,12 @@ export const usePestsStore = create<PestsState>((set) => ({
         loading: false,
       }));
       return pest;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "PUT", url: `/pests/${id}`, body: data });
+        set({ loading: false });
+        return { id, ...data } as unknown as Pest;
+      }
       set({ error: "Error al actualizar la plaga", loading: false });
       throw new Error("Error al actualizar la plaga");
     }
@@ -107,7 +118,16 @@ export const usePestsStore = create<PestsState>((set) => ({
         current: state.current?.id === id ? null : state.current,
         loading: false,
       }));
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "DELETE", url: `/pests/${id}` });
+        set((state) => ({
+          pests: state.pests.filter((p) => p.id !== id),
+          current: state.current?.id === id ? null : state.current,
+          loading: false,
+        }));
+        return;
+      }
       set({ error: "Error al eliminar la plaga", loading: false });
       throw new Error("Error al eliminar la plaga");
     }

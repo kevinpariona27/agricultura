@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Inventory } from "@agri/shared";
-import { get, post, put, del } from "../api/client";
+import { get, post, put, del, isNetworkError } from "../api/client";
+import { enqueue } from "../shared/utils/offlineQueue";
 
 export interface InventoryFilters {
   categoria?: string;
@@ -70,7 +71,12 @@ export const useInventoryStore = create<InventoryState>((set) => ({
         loading: false,
       }));
       return item;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "POST", url: "/inventory", body: data });
+        set({ loading: false });
+        return { id: -Date.now(), ...data, user_id: 0, fecha_adquisicion: data.fecha_adquisicion ?? undefined, fecha_vencimiento: data.fecha_vencimiento ?? undefined, costo_unitario: data.costo_unitario ?? undefined, notas: data.notas ?? undefined, created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as unknown as Inventory;
+      }
       set({ error: "Error al crear el ítem", loading: false });
       throw new Error("Error al crear el ítem");
     }
@@ -86,7 +92,12 @@ export const useInventoryStore = create<InventoryState>((set) => ({
         loading: false,
       }));
       return item;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "PUT", url: `/inventory/${id}`, body: data });
+        set({ loading: false });
+        return { id, ...data } as unknown as Inventory;
+      }
       set({ error: "Error al actualizar el ítem", loading: false });
       throw new Error("Error al actualizar el ítem");
     }
@@ -101,7 +112,16 @@ export const useInventoryStore = create<InventoryState>((set) => ({
         current: state.current?.id === id ? null : state.current,
         loading: false,
       }));
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "DELETE", url: `/inventory/${id}` });
+        set((state) => ({
+          items: state.items.filter((i) => i.id !== id),
+          current: state.current?.id === id ? null : state.current,
+          loading: false,
+        }));
+        return;
+      }
       set({ error: "Error al eliminar el ítem", loading: false });
       throw new Error("Error al eliminar el ítem");
     }

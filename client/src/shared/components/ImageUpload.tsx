@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent, ChangeEvent } from "react";
-import { Check, Loader2, Trash2, Upload } from "lucide-react";
+import { Check, Loader2, Trash2, Upload, MapPin } from "lucide-react";
 
 interface ImageUploadProps {
   currentImage: string | null;
@@ -13,6 +13,11 @@ const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 type UploadState = "idle" | "uploading" | "error" | "success";
 
+interface GpsCoords {
+  lat: number;
+  lng: number;
+}
+
 export function ImageUpload({
   currentImage,
   onUpload,
@@ -23,6 +28,7 @@ export function ImageUpload({
   const [error, setError] = useState("");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [gpsCoords, setGpsCoords] = useState<GpsCoords | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selectedFileRef = useRef<File | null>(null);
 
@@ -49,6 +55,22 @@ export function ImageUpload({
       selectedFileRef.current = file;
       setError("");
       setState("idle");
+
+      // Try to get GPS coordinates
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setGpsCoords({
+              lat: parseFloat(position.coords.latitude.toFixed(6)),
+              lng: parseFloat(position.coords.longitude.toFixed(6)),
+            });
+          },
+          () => {
+            setGpsCoords(null);
+          },
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      }
     },
     [previewUrl],
   );
@@ -227,13 +249,21 @@ export function ImageUpload({
 
       {/* Upload button (after file selection) */}
       {selectedFileRef.current && state === "idle" && previewUrl && (
-        <button
-          type="button"
-          onClick={handleUpload}
-          className="mt-3 w-full rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-        >
-          Upload image
-        </button>
+        <div>
+          {gpsCoords && (
+            <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+              <MapPin className="h-3 w-3" />
+              Ubicación: Lat {gpsCoords.lat}, Lng {gpsCoords.lng}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={handleUpload}
+            className="mt-3 w-full rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+          >
+            Upload image
+          </button>
+        </div>
       )}
 
       {/* Error state */}

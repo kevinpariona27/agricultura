@@ -6,6 +6,7 @@ import { FertilizationTable } from "./components/FertilizationTable";
 import { exportToExcel } from "../../shared/utils/exportExcel";
 import { exportTableToPDF } from "../../shared/utils/exportPDF";
 import { ProtectedAction } from "../../shared/components/ProtectedAction";
+import { SkeletonTable } from "../../shared/components/Skeleton";
 
 export function FertilizationListPage() {
   const navigate = useNavigate();
@@ -100,9 +101,7 @@ export function FertilizationListPage() {
       )}
 
       {loading && fertilizations.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
-          Cargando...
-        </div>
+        <SkeletonTable rows={5} cols={6} />
       ) : (
         <FertilizationTable
           fertilizations={paginatedFertilizations}

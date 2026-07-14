@@ -8,6 +8,7 @@ import { HARVEST_UNIT_LABELS } from "./components/HarvestForm";
 import { exportToExcel } from "../../shared/utils/exportExcel";
 import { exportTableToPDF } from "../../shared/utils/exportPDF";
 import { ProtectedAction } from "../../shared/components/ProtectedAction";
+import { SkeletonTable } from "../../shared/components/Skeleton";
 
 export function HarvestListPage() {
   const navigate = useNavigate();
@@ -190,9 +191,7 @@ export function HarvestListPage() {
       </div>
 
       {loading && harvests.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
-          Cargando...
-        </div>
+        <SkeletonTable rows={5} cols={7} />
       ) : (
         <HarvestTable
           harvests={harvests.slice((page - 1) * pageSize, page * pageSize)}

@@ -5,6 +5,7 @@ import { Sidebar } from "./Sidebar.js";
 import { Header } from "./Header.js";
 import { useSidebarStore } from "../../stores/sidebar.js";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts.js";
+import { OfflineBanner } from "../components/OfflineBanner.js";
 
 export function AppLayout() {
   const location = useLocation();
@@ -23,6 +24,7 @@ export function AppLayout() {
       <Sidebar />
       <div className="flex flex-1 flex-col min-w-0">
         <Header />
+        <OfflineBanner />
         <main className="flex-1 overflow-auto bg-app-bg p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div
@@ -36,6 +38,9 @@ export function AppLayout() {
             </motion.div>
           </AnimatePresence>
         </main>
+        <footer className="border-t border-border bg-surface px-4 py-3 text-center text-xs text-muted-foreground">
+          Gestión Agrícola v2.0 © 2026 — Ayacucho, Perú
+        </footer>
       </div>
     </div>
   );

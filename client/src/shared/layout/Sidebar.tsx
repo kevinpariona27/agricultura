@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { to: "/inventory", label: "Inventario" },
   { to: "/costs", label: "Costos", short: "Cst" },
   { to: "/calendar", label: "Calendario", short: "Cal" },
+  { to: "/import", label: "Importar", short: "Imp" },
   { to: "/map", label: "Mapa" },
   { to: "/reports", label: "Reportes" },
   { to: "/alerts", label: "Alertas", short: "Alt" },

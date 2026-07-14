@@ -6,6 +6,7 @@ import { PestTable } from "./components/PestTable";
 import { exportToExcel } from "../../shared/utils/exportExcel";
 import { exportTableToPDF } from "../../shared/utils/exportPDF";
 import { ProtectedAction } from "../../shared/components/ProtectedAction";
+import { SkeletonTable } from "../../shared/components/Skeleton";
 
 export function PestListPage() {
   const navigate = useNavigate();
@@ -124,9 +125,7 @@ export function PestListPage() {
       )}
 
       {loading && pests.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
-          Cargando...
-        </div>
+        <SkeletonTable rows={5} cols={7} />
       ) : (
         <PestTable
           pests={paginatedPests}

@@ -11,6 +11,7 @@ import {
 import { exportToExcel } from "../../shared/utils/exportExcel";
 import { exportTableToPDF } from "../../shared/utils/exportPDF";
 import { ProtectedAction } from "../../shared/components/ProtectedAction";
+import { SkeletonTable } from "../../shared/components/Skeleton";
 
 export function IrrigationListPage() {
   const navigate = useNavigate();
@@ -220,9 +221,7 @@ export function IrrigationListPage() {
       </div>
 
       {loading && irrigations.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
-          Cargando...
-        </div>
+        <SkeletonTable rows={5} cols={5} />
       ) : (
         <IrrigationTable
           irrigations={irrigations.slice((page - 1) * pageSize, page * pageSize)}

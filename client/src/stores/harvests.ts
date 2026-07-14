@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Harvest, HarvestUnit } from "@agri/shared";
-import { get, post, put, del } from "../api/client";
+import { get, post, put, del, isNetworkError } from "../api/client";
+import { enqueue } from "../shared/utils/offlineQueue";
 
 export interface HarvestFilters {
   crop_id?: number;
@@ -68,7 +69,12 @@ export const useHarvestsStore = create<HarvestsState>((set) => ({
       const harvest = await post<Harvest>("/harvests", data);
       set((state) => ({ harvests: [harvest, ...state.harvests], loading: false }));
       return harvest;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "POST", url: "/harvests", body: data });
+        set({ loading: false });
+        return { id: -Date.now(), ...data, rendimiento: data.rendimiento ?? undefined, perdidas: data.perdidas ?? undefined, notas: data.notas ?? undefined, created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as unknown as Harvest;
+      }
       set({ error: "Error al crear la cosecha", loading: false });
       throw new Error("Error al crear la cosecha");
     }
@@ -84,7 +90,12 @@ export const useHarvestsStore = create<HarvestsState>((set) => ({
         loading: false,
       }));
       return harvest;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "PUT", url: `/harvests/${id}`, body: data });
+        set({ loading: false });
+        return { id, ...data } as unknown as Harvest;
+      }
       set({ error: "Error al actualizar la cosecha", loading: false });
       throw new Error("Error al actualizar la cosecha");
     }
@@ -95,7 +106,12 @@ export const useHarvestsStore = create<HarvestsState>((set) => ({
     try {
       await del(`/harvests/${id}`);
       set((state) => ({ harvests: state.harvests.filter((h) => h.id !== id), current: state.current?.id === id ? null : state.current, loading: false }));
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "DELETE", url: `/harvests/${id}` });
+        set((state) => ({ harvests: state.harvests.filter((h) => h.id !== id), current: state.current?.id === id ? null : state.current, loading: false }));
+        return;
+      }
       set({ error: "Error al eliminar la cosecha", loading: false });
       throw new Error("Error al eliminar la cosecha");
     }

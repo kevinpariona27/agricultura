@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Irrigation, IrrigationMethod } from "@agri/shared";
-import { get, post, put, del } from "../api/client.js";
+import { get, post, put, del, isNetworkError } from "../api/client.js";
+import { enqueue } from "../shared/utils/offlineQueue.js";
 
 export interface IrrigationFilters {
   crop_id?: number;
@@ -69,7 +70,12 @@ export const useIrrigationsStore = create<IrrigationsState>((set) => ({
       const irrigation = await post<Irrigation>("/irrigations", data);
       set((state) => ({ irrigations: [irrigation, ...state.irrigations], loading: false }));
       return irrigation;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "POST", url: "/irrigations", body: data });
+        set({ loading: false });
+        return { id: -Date.now(), ...data, duration: data.duration ?? undefined, notes: data.notes ?? undefined, created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as unknown as Irrigation;
+      }
       set({ error: "Error al crear el riego", loading: false });
       throw new Error("Error al crear el riego");
     }
@@ -85,7 +91,12 @@ export const useIrrigationsStore = create<IrrigationsState>((set) => ({
         loading: false,
       }));
       return irrigation;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "PUT", url: `/irrigations/${id}`, body: data });
+        set({ loading: false });
+        return { id, ...data } as unknown as Irrigation;
+      }
       set({ error: "Error al actualizar el riego", loading: false });
       throw new Error("Error al actualizar el riego");
     }
@@ -96,7 +107,12 @@ export const useIrrigationsStore = create<IrrigationsState>((set) => ({
     try {
       await del(`/irrigations/${id}`);
       set((state) => ({ irrigations: state.irrigations.filter((i) => i.id !== id), current: state.current?.id === id ? null : state.current, loading: false }));
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "DELETE", url: `/irrigations/${id}` });
+        set((state) => ({ irrigations: state.irrigations.filter((i) => i.id !== id), current: state.current?.id === id ? null : state.current, loading: false }));
+        return;
+      }
       set({ error: "Error al eliminar el riego", loading: false });
       throw new Error("Error al eliminar el riego");
     }

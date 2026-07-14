@@ -30,6 +30,8 @@ import { PestListPage } from "./features/pests/PestListPage.js";
 import { PestDetailPage } from "./features/pests/PestDetailPage.js";
 import { PestFormPage } from "./features/pests/PestFormPage.js";
 import { CuadernoCampo } from "./features/legal/CuadernoCampo.js";
+import { ImportPage } from "./features/import/ImportPage.js";
+import { NotFoundPage } from "./features/errors/NotFoundPage.js";
 
 /** Redirects authenticated users to dashboard */
 function PublicRoute({ children }: { children: React.ReactNode }) {
@@ -91,11 +93,13 @@ export default function App() {
             <Route path="/map" element={<MapPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/legal" element={<CuadernoCampo />} />
+            <Route path="/import" element={<ImportPage />} />
           </Route>
         </Route>
 
-        {/* Default redirect */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        {/* 404 — must be last */}
+        <Route path="*" element={<Navigate to="/404" replace />} />
+        <Route path="/404" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

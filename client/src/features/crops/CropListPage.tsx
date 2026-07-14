@@ -7,6 +7,7 @@ import { CROP_STATUS_LABELS } from "./components/CropForm.js";
 import { exportToExcel } from "../../shared/utils/exportExcel.js";
 import { exportTableToPDF } from "../../shared/utils/exportPDF.js";
 import { ProtectedAction } from "../../shared/components/ProtectedAction.js";
+import { SkeletonTable } from "../../shared/components/Skeleton.js";
 
 export function CropListPage() {
   const navigate = useNavigate();
@@ -109,9 +110,7 @@ export function CropListPage() {
       )}
 
       {loading && crops.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
-          Cargando...
-        </div>
+        <SkeletonTable rows={5} cols={6} />
       ) : (
         <CropTable
           crops={paginatedCrops}

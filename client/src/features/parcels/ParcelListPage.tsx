@@ -6,6 +6,7 @@ import { ParcelTable } from "./components/ParcelTable.js";
 import { exportToExcel } from "../../shared/utils/exportExcel.js";
 import { exportTableToPDF } from "../../shared/utils/exportPDF.js";
 import { ProtectedAction } from "../../shared/components/ProtectedAction.js";
+import { SkeletonTable } from "../../shared/components/Skeleton.js";
 
 export function ParcelListPage() {
   const navigate = useNavigate();
@@ -95,9 +96,7 @@ export function ParcelListPage() {
       )}
 
       {loading && parcels.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
-          Cargando...
-        </div>
+        <SkeletonTable rows={5} cols={5} />
       ) : (
         <ParcelTable
           parcels={paginatedParcels}

@@ -36,10 +36,12 @@ import {
   Wind,
   Thermometer,
   Calendar as CalendarIcon,
+  Clock,
 } from "lucide-react";
 import { DonutChart } from "./components/DonutChart";
 import { EvolutionBarChart } from "./components/EvolutionBarChart";
 import { EmptyState } from "../../shared/components/EmptyState";
+import { Skeleton } from "../../shared/components/Skeleton";
 import { BarChart3 } from "lucide-react";
 import { buildCropCostRows } from "../costs/components/CostsTable";
 
@@ -398,10 +400,88 @@ export function DashboardPage() {
       .slice(0, 5);
   }, [fertilizations]);
 
+  // Recent activity timeline
+  interface Activity {
+    id: string;
+    icon: React.ComponentType<{ className?: string }>;
+    iconColor: string;
+    description: string;
+    timestamp: string;
+  }
+
+  const recentActivity = useMemo(() => {
+    const activities: Activity[] = [];
+
+    const addActivities = <T extends { id: number; created_at: string }>(
+      items: T[],
+      icon: React.ComponentType<{ className?: string }>,
+      iconColor: string,
+      label: string,
+      nameFn: (item: T) => string = () => ""
+    ) => {
+      for (const item of items) {
+        activities.push({
+          id: `${label}-${item.id}`,
+          icon,
+          iconColor,
+          description: `${label}: ${nameFn(item) || `#${item.id}`}`,
+          timestamp: item.created_at,
+        });
+      }
+    };
+
+    addActivities(parcels, Wheat, "text-emerald-500", "Parcela", (p) => p.name);
+    addActivities(crops, Sprout, "text-indigo-500", "Cultivo", (c) => c.variety);
+    addActivities(irrigations, Droplets, "text-blue-500", "Riego");
+    addActivities(harvests, Pizza, "text-amber-500", "Cosecha");
+    addActivities(pests, Bug, "text-red-500", "Plaga", (p) => p.nombre);
+    addActivities(items, Package, "text-purple-500", "Inventario", (i) => i.nombre);
+    addActivities(fertilizations, Award, "text-fuchsia-500", "Fertilización", (f) => f.producto);
+
+    return activities
+      .sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      )
+      .slice(0, 10);
+  }, [parcels, crops, irrigations, harvests, pests, items, fertilizations]);
+
+  function timeAgo(dateStr: string): string {
+    const now = Date.now();
+    const then = new Date(dateStr).getTime();
+    const diffMs = now - then;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHrs = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMin < 1) return "ahora";
+    if (diffMin < 60) return `hace ${diffMin} min`;
+    if (diffHrs < 24) return `hace ${diffHrs}h`;
+    if (diffDays < 30) return `hace ${diffDays} días`;
+    return new Date(dateStr).toLocaleDateString("es-ES");
+  }
+
   if (loading) {
     return (
-      <div className="rounded-2xl border border-dashed border-border py-12 text-center text-muted-foreground">
-        Cargando...
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} className="rounded-2xl border border-border bg-surface p-6">
+              <Skeleton className="mb-3 h-4 w-20" />
+              <Skeleton className="h-8 w-16" />
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="rounded-2xl border border-border bg-surface p-6">
+            <Skeleton className="mb-4 h-5 w-48" />
+            <Skeleton className="h-40 w-full rounded-full" />
+          </div>
+          <div className="rounded-2xl border border-border bg-surface p-6 lg:col-span-2">
+            <Skeleton className="mb-4 h-5 w-48" />
+            <Skeleton className="h-64 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -838,109 +918,149 @@ export function DashboardPage() {
       {/* TAB: Operativo */}
       {/* ================================================================ */}
       {activeTab === "operativo" && (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Upcoming Irrigations */}
-          <div className="rounded-2xl border border-border bg-surface p-6">
-            <div className="mb-4 flex items-center gap-2">
-              <Droplets className="h-5 w-5 text-blue-500" />
-              <h2 className="text-base font-semibold text-primary-dark">
-                Próximos riegos
-              </h2>
+        <>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Upcoming Irrigations */}
+            <div className="rounded-2xl border border-border bg-surface p-6">
+              <div className="mb-4 flex items-center gap-2">
+                <Droplets className="h-5 w-5 text-blue-500" />
+                <h2 className="text-base font-semibold text-primary-dark">
+                  Próximos riegos
+                </h2>
+              </div>
+              {upcomingIrrigations.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No hay riegos programados.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {upcomingIrrigations.map((i) => (
+                    <li
+                      key={i.id}
+                      className="flex items-start gap-2 rounded-lg border border-border bg-app-bg p-3"
+                    >
+                      <CalendarIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500" />
+                      <div>
+                        <p className="text-sm font-medium text-primary-dark">
+                          {i.amount}L — {i.method}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(i.irrigation_date)}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            {upcomingIrrigations.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No hay riegos programados.
-              </p>
-            ) : (
-              <ul className="space-y-3">
-                {upcomingIrrigations.map((i) => (
-                  <li
-                    key={i.id}
-                    className="flex items-start gap-2 rounded-lg border border-border bg-app-bg p-3"
-                  >
-                    <CalendarIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500" />
-                    <div>
-                      <p className="text-sm font-medium text-primary-dark">
-                        {i.amount}L — {i.method}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(i.irrigation_date)}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+
+            {/* Upcoming Harvests */}
+            <div className="rounded-2xl border border-border bg-surface p-6">
+              <div className="mb-4 flex items-center gap-2">
+                <Pizza className="h-5 w-5 text-amber-500" />
+                <h2 className="text-base font-semibold text-primary-dark">
+                  Próximas cosechas
+                </h2>
+              </div>
+              {upcomingHarvests.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No hay cosechas programadas.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {upcomingHarvests.map((c) => (
+                    <li
+                      key={c.id}
+                      className="flex items-start gap-2 rounded-lg border border-border bg-app-bg p-3"
+                    >
+                      <CalendarIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" />
+                      <div>
+                        <p className="text-sm font-medium text-primary-dark">
+                          {c.variety}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Est. {formatDate(c.estimated_harvest_date!)}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Pending Fertilizations */}
+            <div className="rounded-2xl border border-border bg-surface p-6">
+              <div className="mb-4 flex items-center gap-2">
+                <Award className="h-5 w-5 text-purple-500" />
+                <h2 className="text-base font-semibold text-primary-dark">
+                  Fertilizaciones pendientes
+                </h2>
+              </div>
+              {pendingFertilizations.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No hay fertilizaciones pendientes.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {pendingFertilizations.map((f) => (
+                    <li
+                      key={f.id}
+                      className="flex items-start gap-2 rounded-lg border border-border bg-app-bg p-3"
+                    >
+                      <CalendarIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-500" />
+                      <div>
+                        <p className="text-sm font-medium text-primary-dark">
+                          {f.producto} ({f.dosis} {f.unidad})
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDate(f.fecha_aplicacion)}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
-          {/* Upcoming Harvests */}
-          <div className="rounded-2xl border border-border bg-surface p-6">
+          {/* Recent Activity Timeline */}
+          <div className="mt-6 rounded-2xl border border-border bg-surface p-6">
             <div className="mb-4 flex items-center gap-2">
-              <Pizza className="h-5 w-5 text-amber-500" />
+              <Clock className="h-5 w-5 text-primary" />
               <h2 className="text-base font-semibold text-primary-dark">
-                Próximas cosechas
+                Actividad reciente
               </h2>
             </div>
-            {upcomingHarvests.length === 0 ? (
+            {recentActivity.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                No hay cosechas programadas.
+                No hay actividad registrada.
               </p>
             ) : (
-              <ul className="space-y-3">
-                {upcomingHarvests.map((c) => (
-                  <li
-                    key={c.id}
-                    className="flex items-start gap-2 rounded-lg border border-border bg-app-bg p-3"
-                  >
-                    <CalendarIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" />
-                    <div>
-                      <p className="text-sm font-medium text-primary-dark">
-                        {c.variety}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Est. {formatDate(c.estimated_harvest_date!)}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              <div className="relative">
+                {/* Timeline vertical line */}
+                <div className="absolute left-[15px] top-2 bottom-2 w-px bg-border" />
+                <ul className="space-y-4">
+                  {recentActivity.map((activity) => {
+                    const Icon = activity.icon;
+                    return (
+                      <li key={activity.id} className="relative flex items-start gap-3 pl-10">
+                        <div className={`absolute left-0 flex h-8 w-8 items-center justify-center rounded-full bg-muted ${activity.iconColor}`}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-700">{activity.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {timeAgo(activity.timestamp)}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             )}
           </div>
-
-          {/* Pending Fertilizations */}
-          <div className="rounded-2xl border border-border bg-surface p-6">
-            <div className="mb-4 flex items-center gap-2">
-              <Award className="h-5 w-5 text-purple-500" />
-              <h2 className="text-base font-semibold text-primary-dark">
-                Fertilizaciones pendientes
-              </h2>
-            </div>
-            {pendingFertilizations.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No hay fertilizaciones pendientes.
-              </p>
-            ) : (
-              <ul className="space-y-3">
-                {pendingFertilizations.map((f) => (
-                  <li
-                    key={f.id}
-                    className="flex items-start gap-2 rounded-lg border border-border bg-app-bg p-3"
-                  >
-                    <CalendarIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-500" />
-                    <div>
-                      <p className="text-sm font-medium text-primary-dark">
-                        {f.producto} ({f.dosis} {f.unidad})
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(f.fecha_aplicacion)}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
+        </>
       )}
     </div>
   );

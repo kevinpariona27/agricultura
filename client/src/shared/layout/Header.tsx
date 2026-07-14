@@ -1,11 +1,13 @@
-import { Bell, ChevronRight, FileText, Menu, User } from "lucide-react";
+import { Bell, ChevronRight, FileText, Menu, User, Moon, Sun } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useNotificationStore } from "../../stores/notificationStore";
 import { useUserStore } from "../../stores/user";
 import { useSidebarStore } from "../../stores/sidebar";
+import { useThemeStore } from "../../stores/theme";
 import { ImageDisplay } from "../components/ImageDisplay";
 import { NotificationDropdown } from "../components/NotificationDropdown";
+import { Tooltip } from "../components/Tooltip";
 import { exportTableToPDF } from "../utils/exportPDF";
 
 const ROUTE_LABELS: Record<string, string> = {
@@ -30,6 +32,7 @@ export function Header() {
   const { profile, fetchProfile } = useUserStore();
   const toggle = useSidebarStore((s) => s.toggle);
   const sidebarOpen = useSidebarStore((s) => s.isOpen);
+  const { effective, toggle: toggleTheme } = useThemeStore();
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,54 +90,75 @@ export function Header() {
       )}
 
       <div className="flex-1" />
-      <button
-        onClick={() =>
-          exportTableToPDF(
-            "Panel General",
-            [
-              { header: "Tipo", dataKey: "type" },
-              { header: "Mensaje", dataKey: "message" },
-            ],
-            notifications.map((n) => ({
-              type: n.type ?? "",
-              message: n.message ?? "",
-            })),
-            "dashboard"
-          )
-        }
-        className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm text-primary-dark transition-colors duration-200 hover:bg-primary-50"
-      >
-        <FileText className="h-4 w-4" />
-        Descargar PDF
-      </button>
-      {token && (
+      <Tooltip text="Descargar PDF">
         <button
-          onClick={() => navigate("/profile")}
-          className="cursor-pointer rounded-full transition-opacity hover:opacity-80 focus:outline-none"
-          aria-label="Ir al perfil"
+          onClick={() =>
+            exportTableToPDF(
+              "Panel General",
+              [
+                { header: "Tipo", dataKey: "type" },
+                { header: "Mensaje", dataKey: "message" },
+              ],
+              notifications.map((n) => ({
+                type: n.type ?? "",
+                message: n.message ?? "",
+              })),
+              "dashboard"
+            )
+          }
+          className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm text-primary-dark transition-colors duration-200 hover:bg-primary-50"
         >
-          <ImageDisplay
-            src={profile?.avatar_url ?? null}
-            alt="Avatar de usuario"
-            size="sm"
-            fallbackIcon={User}
-            rounded={true}
-          />
+          <FileText className="h-4 w-4" />
+          Descargar PDF
         </button>
+      </Tooltip>
+      {token && (
+        <Tooltip text="Ir al perfil">
+          <button
+            onClick={() => navigate("/profile")}
+            className="cursor-pointer rounded-full transition-opacity hover:opacity-80 focus:outline-none"
+            aria-label="Ir al perfil"
+          >
+            <ImageDisplay
+              src={profile?.avatar_url ?? null}
+              alt="Avatar de usuario"
+              size="sm"
+              fallbackIcon={User}
+              rounded={true}
+            />
+          </button>
+        </Tooltip>
       )}
       <div className="relative">
-        <button
-          onClick={() => setNotifOpen(!notifOpen)}
-          className="relative cursor-pointer rounded-lg p-2 transition-colors duration-200 hover:bg-primary-50"
-          aria-label="Notificaciones"
-        >
-          <Bell className="h-5 w-5 text-primary-dark/70" />
-          {notifications.length > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-xs font-bold text-white">
-              {notifications.length > 99 ? "99+" : notifications.length}
-            </span>
-          )}
-        </button>
+        <Tooltip text={effective === "dark" ? "Modo claro" : "Modo oscuro"}>
+          <button
+            onClick={toggleTheme}
+            className="cursor-pointer rounded-lg p-2 transition-colors duration-200 hover:bg-primary-50"
+            aria-label={effective === "dark" ? "Activar modo claro" : "Activar modo oscuro"}
+          >
+            {effective === "dark" ? (
+              <Sun className="h-5 w-5 text-amber-500" />
+            ) : (
+              <Moon className="h-5 w-5 text-primary-dark/70" />
+            )}
+          </button>
+        </Tooltip>
+      </div>
+      <div className="relative">
+        <Tooltip text="Notificaciones">
+          <button
+            onClick={() => setNotifOpen(!notifOpen)}
+            className="relative cursor-pointer rounded-lg p-2 transition-colors duration-200 hover:bg-primary-50"
+            aria-label="Notificaciones"
+          >
+            <Bell className="h-5 w-5 text-primary-dark/70" />
+            {notifications.length > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-xs font-bold text-white">
+                {notifications.length > 99 ? "99+" : notifications.length}
+              </span>
+            )}
+          </button>
+        </Tooltip>
         <NotificationDropdown isOpen={notifOpen} onClose={() => setNotifOpen(false)} />
       </div>
     </header>

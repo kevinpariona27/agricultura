@@ -5,6 +5,7 @@ import { useFertilizationsStore } from "../../stores/fertilizations";
 import { useHarvestsStore } from "../../stores/harvests";
 import { useParcelsStore } from "../../stores/parcels";
 import { CostsTable, buildCropCostRows } from "./components/CostsTable";
+import { SkeletonTable } from "../../shared/components/Skeleton";
 
 function formatCurrency(value: number): string {
   return `$${value.toLocaleString("es-ES", {
@@ -58,8 +59,11 @@ export function CostsPage() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-dashed border-border py-12 text-center text-muted-foreground">
-        Cargando...
+      <div>
+        <h1 className="mb-6 text-2xl font-semibold tracking-tight text-primary-dark">
+          Costos por Cultivo
+        </h1>
+        <SkeletonTable rows={5} cols={8} />
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Crop, CropStatus } from "@agri/shared";
-import { get, post, put, del } from "../api/client.js";
+import { get, post, put, del, isNetworkError } from "../api/client.js";
+import { enqueue } from "../shared/utils/offlineQueue.js";
 
 export interface CropFilters {
   parcel_id?: number;
@@ -71,7 +72,12 @@ export const useCropsStore = create<CropsState>((set) => ({
         loading: false,
       }));
       return crop;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "POST", url: "/crops", body: data });
+        set({ loading: false });
+        return { id: -Date.now(), ...data, estimated_harvest_date: data.estimated_harvest_date ?? undefined, planting_density: data.planting_density ?? undefined, notes: data.notes ?? undefined, created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as unknown as Crop;
+      }
       set({ error: "Error al crear el cultivo", loading: false });
       throw new Error("Error al crear el cultivo");
     }
@@ -87,7 +93,12 @@ export const useCropsStore = create<CropsState>((set) => ({
         loading: false,
       }));
       return crop;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "PUT", url: `/crops/${id}`, body: data });
+        set({ loading: false });
+        return { id, ...data } as unknown as Crop;
+      }
       set({ error: "Error al actualizar el cultivo", loading: false });
       throw new Error("Error al actualizar el cultivo");
     }
@@ -102,7 +113,16 @@ export const useCropsStore = create<CropsState>((set) => ({
         current: state.current?.id === id ? null : state.current,
         loading: false,
       }));
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "DELETE", url: `/crops/${id}` });
+        set((state) => ({
+          crops: state.crops.filter((c) => c.id !== id),
+          current: state.current?.id === id ? null : state.current,
+          loading: false,
+        }));
+        return;
+      }
       set({ error: "Error al eliminar el cultivo", loading: false });
       throw new Error("Error al eliminar el cultivo");
     }

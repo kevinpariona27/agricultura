@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Parcel } from "@agri/shared";
-import { get, post, put, del, uploadFile, removeImage } from "../api/client.js";
+import { get, post, put, del, uploadFile, removeImage, isNetworkError } from "../api/client.js";
+import { enqueue } from "../shared/utils/offlineQueue.js";
 
 interface ParcelsState {
   parcels: Parcel[];
@@ -64,6 +65,11 @@ export const useParcelsStore = create<ParcelsState>((set) => ({
       }));
       return parcel;
     } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "POST", url: "/parcels", body: data });
+        set({ loading: false });
+        return { id: -Date.now(), ...data, user_id: 0, image_url: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as unknown as Parcel;
+      }
       set({ error: "Error al crear el lote", loading: false });
       throw err;
     }
@@ -80,6 +86,11 @@ export const useParcelsStore = create<ParcelsState>((set) => ({
       }));
       return parcel;
     } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "PUT", url: `/parcels/${id}`, body: data });
+        set({ loading: false });
+        return { id, ...data, user_id: 0, image_url: null, created_at: "", updated_at: new Date().toISOString() } as unknown as Parcel;
+      }
       set({ error: "Error al actualizar el lote", loading: false });
       throw err;
     }
@@ -95,6 +106,15 @@ export const useParcelsStore = create<ParcelsState>((set) => ({
         loading: false,
       }));
     } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "DELETE", url: `/parcels/${id}` });
+        set((state) => ({
+          parcels: state.parcels.filter((p) => p.id !== id),
+          current: state.current?.id === id ? null : state.current,
+          loading: false,
+        }));
+        return;
+      }
       set({ error: "Error al eliminar el lote", loading: false });
       throw err;
     }

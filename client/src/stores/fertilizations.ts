@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Fertilization, FertilizationUnit } from "@agri/shared";
-import { get, post, put, del } from "../api/client";
+import { get, post, put, del, isNetworkError } from "../api/client";
+import { enqueue } from "../shared/utils/offlineQueue";
 
 export interface FertilizationFilters {
   crop_id?: number;
@@ -74,7 +75,12 @@ export const useFertilizationsStore = create<FertilizationsState>((set) => ({
         loading: false,
       }));
       return fert;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "POST", url: "/fertilizations", body: data });
+        set({ loading: false });
+        return { id: -Date.now(), ...data, costo: data.costo ?? undefined, notas: data.notas ?? undefined, created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as unknown as Fertilization;
+      }
       set({ error: "Error al crear la fertilización", loading: false });
       throw new Error("Error al crear la fertilización");
     }
@@ -92,7 +98,12 @@ export const useFertilizationsStore = create<FertilizationsState>((set) => ({
         loading: false,
       }));
       return fert;
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "PUT", url: `/fertilizations/${id}`, body: data });
+        set({ loading: false });
+        return { id, ...data } as unknown as Fertilization;
+      }
       set({ error: "Error al actualizar la fertilización", loading: false });
       throw new Error("Error al actualizar la fertilización");
     }
@@ -107,7 +118,16 @@ export const useFertilizationsStore = create<FertilizationsState>((set) => ({
         current: state.current?.id === id ? null : state.current,
         loading: false,
       }));
-    } catch {
+    } catch (err) {
+      if (isNetworkError(err)) {
+        enqueue({ method: "DELETE", url: `/fertilizations/${id}` });
+        set((state) => ({
+          fertilizations: state.fertilizations.filter((f) => f.id !== id),
+          current: state.current?.id === id ? null : state.current,
+          loading: false,
+        }));
+        return;
+      }
       set({ error: "Error al eliminar la fertilización", loading: false });
       throw new Error("Error al eliminar la fertilización");
     }

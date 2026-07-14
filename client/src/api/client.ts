@@ -8,6 +8,20 @@ function getAuthHeaders(): Record<string, string> {
   return {};
 }
 
+export class NetworkError extends Error {
+  constructor(message = "Network error") {
+    super(message);
+    this.name = "NetworkError";
+  }
+}
+
+export function isNetworkError(err: unknown): boolean {
+  return (
+    err instanceof NetworkError ||
+    (err instanceof TypeError && err.message === "Failed to fetch")
+  );
+}
+
 async function request<T>(
   path: string,
   options: RequestInit = {}
@@ -18,10 +32,18 @@ async function request<T>(
     ...getAuthHeaders(),
   };
 
-  const res = await fetch(url, {
-    ...options,
-    headers: { ...headers, ...options.headers },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...options,
+      headers: { ...headers, ...options.headers },
+    });
+  } catch (err) {
+    if (err instanceof TypeError && err.message === "Failed to fetch") {
+      throw new NetworkError();
+    }
+    throw err;
+  }
 
   const data = await res.json();
 
