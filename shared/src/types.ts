@@ -41,6 +41,17 @@ export type InventoryCategory = "fertilizante" | "pesticida" | "semilla" | "herr
 export type InventoryUnit = "kg" | "L" | "unidad" | "bolsa";
 export interface Inventory { id: number; user_id: number; nombre: string; categoria: InventoryCategory; cantidad: number; unidad: InventoryUnit; fecha_adquisicion?: string; fecha_vencimiento?: string; costo_unitario?: number; notas?: string; created_at: string; updated_at: string; }
 
+export type TelemetrySensorType = "soil_moisture" | "temperature" | "humidity" | "rainfall" | "evapotranspiration";
+export interface Telemetry {
+  id: number;
+  parcel_id: number;
+  sensor_type: TelemetrySensorType;
+  value: number;
+  unit: string;
+  recorded_at: string;
+  created_at: string;
+}
+
 export interface ApiResponse<T> { data?: T; error?: string; }
 export interface LoginPayload { email: string; password: string; }
 export interface RegisterPayload { email: string; password: string; }

@@ -26,6 +26,7 @@ import { ProfilePage } from "./features/users/ProfilePage.js";
 import { PestListPage } from "./features/pests/PestListPage.js";
 import { PestDetailPage } from "./features/pests/PestDetailPage.js";
 import { PestFormPage } from "./features/pests/PestFormPage.js";
+import { CuadernoCampo } from "./features/legal/CuadernoCampo.js";
 
 export default function App() {
   return (
@@ -67,6 +68,7 @@ export default function App() {
             <Route path="/costs" element={<CostsPage />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/legal" element={<CuadernoCampo />} />
           </Route>
         </Route>
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FileText, X } from "lucide-react";
+import { FileText, X, ClipboardCheck } from "lucide-react";
 import { useSidebarStore } from "../../stores/sidebar.js";
 import { useAuthStore } from "../../stores/auth.js";
 
