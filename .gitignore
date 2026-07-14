@@ -11,6 +11,7 @@ server/uploads/*
 *.db-wal
 .vercel
 .env*
+.playwright-mcp/
 
 # Test coverage reports
 coverage/

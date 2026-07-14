@@ -2,10 +2,22 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { Link } from "react-router-dom";
 import { MapPin, Ruler } from "lucide-react";
-import L from "leaflet";
+import L, { Control } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet-draw";
+
+// Type augmentation for leaflet-draw
+declare module "leaflet" {
+  namespace Control {
+    class Draw extends Control {
+      constructor(options?: any);
+    }
+  }
+  namespace DrawEvents {
+    const CREATED: string;
+  }
+}
 import { useParcelsStore } from "../../stores/parcels";
 import { geocodeLocation, spreadCoords } from "../../shared/utils/geocode";
 
@@ -51,7 +63,7 @@ function DrawControl({ onPolygonDrawn }: { onPolygonDrawn: (poly: DrawnPolygon) 
     const drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
 
-    const drawControl = new (L.Control as any).Draw({
+    const drawControl = new L.Control.Draw({
       edit: { featureGroup: drawnItems },
       draw: {
         polygon: { allowIntersection: false, showArea: true, metric: true, shapeOptions: { color: "#15803D" } },

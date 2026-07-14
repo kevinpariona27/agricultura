@@ -56,6 +56,9 @@ export default defineConfig({
       },
     }),
   ],
+  optimizeDeps: {
+    include: ["leaflet-draw"],
+  },
   server: {
     port: 5173,
     proxy: {
