@@ -141,9 +141,8 @@ export function DashboardPage() {
     for (const h of harvests) {
       if (h.rendimiento == null) continue;
       const crop = crops.find((c) => c.id === h.crop_id);
-      const cropName = (crop?.variety ?? `Cultivo #${h.crop_id}`).length > 18 
-        ? (crop?.variety ?? `Cultivo #${h.crop_id}`).slice(0, 18) + "…"
-        : (crop?.variety ?? `Cultivo #${h.crop_id}`);
+      const fullName = crop?.variety ?? `Cultivo #${h.crop_id}`;
+      const cropName = fullName.length > 15 ? fullName.slice(0, 15) + "…" : fullName;
       const prev = grouped.get(h.crop_id) ?? {
         name: cropName,
         total: 0,
@@ -231,7 +230,7 @@ export function DashboardPage() {
                 dataKey="name"
                 type="category"
                 tick={{ fontSize: 12, fill: "#6b7280" }}
-                width={120}
+                width={150}
               />
               <Tooltip
                 formatter={(value) => [
