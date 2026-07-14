@@ -1,18 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useInventoryStore } from "../../stores/inventory";
 import {
   InventoryForm,
   type InventoryFormData,
 } from "./components/InventoryForm";
-import { ImageUpload } from "../../shared/components/ImageUpload";
 
 export function InventoryFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
-  const { current, loading, error, fetchOne, create, update, uploadImage, removeImage, clearError } =
+  const { current, loading, error, fetchOne, create, update, clearError } =
     useInventoryStore();
+  const [createdId, setCreatedId] = useState<number | null>(null);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -22,8 +22,8 @@ export function InventoryFormPage() {
   }, [id, isEdit, fetchOne, clearError]);
 
   async function handleCreate(data: InventoryFormData) {
-    await create(data);
-    navigate("/inventory");
+    const item = await create(data);
+    setCreatedId(item.id);
   }
 
   async function handleUpdate(data: InventoryFormData) {
@@ -81,22 +81,31 @@ export function InventoryFormPage() {
         {isEdit ? "Editar ítem" : "Nuevo ítem"}
       </h1>
 
-      <InventoryForm
-        initialValues={initialValues}
-        onSubmit={isEdit ? handleUpdate : handleCreate}
-        submitLabel={isEdit ? "Guardar cambios" : "Crear ítem"}
-        loading={loading}
-      />
-
-      {isEdit && id && (
-        <div className="mt-6">
-          <ImageUpload
-            currentImage={current?.image_url ?? null}
-            onUpload={(file) => uploadImage(Number(id), file)}
-            onRemove={() => removeImage(Number(id))}
-            entityLabel="Foto del producto"
-          />
+      {!isEdit && createdId && (
+        <div className="mt-6 rounded-lg border border-border bg-primary-50 p-4 text-sm text-primary-dark">
+          ✅ Ítem creado correctamente.{" "}
+          <button onClick={() => navigate("/inventory")} className="font-medium underline hover:text-primary">
+            Volver a la lista
+          </button>
         </div>
+      )}
+
+      {isEdit && !createdId && (
+        <InventoryForm
+          initialValues={initialValues}
+          onSubmit={isEdit ? handleUpdate : handleCreate}
+          submitLabel={isEdit ? "Guardar cambios" : "Crear ítem"}
+          loading={loading}
+        />
+      )}
+
+      {!isEdit && !createdId && (
+        <InventoryForm
+          initialValues={initialValues}
+          onSubmit={handleCreate}
+          submitLabel="Crear ítem"
+          loading={loading}
+        />
       )}
     </div>
   );

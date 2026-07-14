@@ -1,15 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCropsStore } from "../../stores/crops.js";
 import { CropForm, type CropFormData } from "./components/CropForm.js";
-import { ImageUpload } from "../../shared/components/ImageUpload.js";
 
 export function CropFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
-  const { current, loading, error, fetchOne, create, update, uploadImage, removeImage, clearError } =
+  const { current, loading, error, fetchOne, create, update, clearError } =
     useCropsStore();
+  const [createdId, setCreatedId] = useState<number | null>(null);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -19,8 +19,8 @@ export function CropFormPage() {
   }, [id, isEdit, fetchOne, clearError]);
 
   async function handleCreate(data: CropFormData) {
-    await create(data);
-    navigate("/crops");
+    const crop = await create(data);
+    setCreatedId(crop.id);
   }
 
   async function handleUpdate(data: CropFormData) {
@@ -77,22 +77,31 @@ export function CropFormPage() {
         {isEdit ? "Editar cultivo" : "Nuevo cultivo"}
       </h1>
 
-      <CropForm
-        initialValues={initialValues}
-        onSubmit={isEdit ? handleUpdate : handleCreate}
-        submitLabel={isEdit ? "Guardar cambios" : "Crear cultivo"}
-        loading={loading}
-      />
-
-      {isEdit && id && (
-        <div className="mt-6">
-          <ImageUpload
-            currentImage={current?.image_url ?? null}
-            onUpload={(file) => uploadImage(Number(id), file)}
-            onRemove={() => removeImage(Number(id))}
-            entityLabel="Foto del cultivo"
-          />
+      {!isEdit && createdId && (
+        <div className="mt-6 rounded-lg border border-border bg-primary-50 p-4 text-sm text-primary-dark">
+          ✅ Cultivo creado correctamente.{" "}
+          <button onClick={() => navigate("/crops")} className="font-medium underline hover:text-primary">
+            Volver a la lista
+          </button>
         </div>
+      )}
+
+      {isEdit && !createdId && (
+        <CropForm
+          initialValues={initialValues}
+          onSubmit={isEdit ? handleUpdate : handleCreate}
+          submitLabel={isEdit ? "Guardar cambios" : "Crear cultivo"}
+          loading={loading}
+        />
+      )}
+
+      {!isEdit && !createdId && (
+        <CropForm
+          initialValues={initialValues}
+          onSubmit={handleCreate}
+          submitLabel="Crear cultivo"
+          loading={loading}
+        />
       )}
     </div>
   );

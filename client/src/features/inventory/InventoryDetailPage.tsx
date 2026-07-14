@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Package } from "lucide-react";
 import { useInventoryStore } from "../../stores/inventory";
 import { DeleteDialog } from "../../shared/components/DeleteDialog";
-import { ImageDisplay } from "../../shared/components/ImageDisplay";
 
 const CATEGORIA_LABELS: Record<string, string> = {
   fertilizante: "Fertilizante",
@@ -148,15 +146,6 @@ export function InventoryDetailPage() {
       </div>
 
       <div className="rounded-xl border border-gray-100 bg-white">
-        <div className="flex justify-center py-6">
-          <ImageDisplay
-            src={current.image_url ?? null}
-            alt={current.nombre}
-            size="lg"
-            rounded
-            fallbackIcon={Package}
-          />
-        </div>
         <dl className="divide-y divide-gray-100">
           {fields.map(({ label, value }) => (
             <div

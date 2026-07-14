@@ -1,10 +1,4 @@
-import { unlink } from "node:fs";
-import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import db from "../db/connection.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const uploadsDir = resolve(__dirname, "..", "..", "uploads");
 
 export interface InventoryRow {
   id: number;
@@ -16,7 +10,6 @@ export interface InventoryRow {
   fecha_adquisicion?: string;
   fecha_vencimiento?: string;
   costo_unitario?: number;
-  image_url?: string | null;
   notas?: string;
   created_at: string;
   updated_at: string;
@@ -114,21 +107,11 @@ export async function remove(
   const owned = await db("inventory")
     .where("id", id)
     .where("user_id", userId)
-    .select("*")
+    .select("id")
     .first();
 
   if (!owned) {
     return false;
-  }
-
-  // Clean up image file on disk
-  if (owned.image_url) {
-    const filePath = resolve(uploadsDir, owned.image_url);
-    unlink(filePath, (err) => {
-      if (err && (err as NodeJS.ErrnoException).code !== "ENOENT") {
-        console.error(`Failed to delete image for inventory ${id}:`, err.message);
-      }
-    });
   }
 
   const deleted = await db("inventory").where({ id }).del();

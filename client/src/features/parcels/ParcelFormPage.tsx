@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useParcelsStore } from "../../stores/parcels.js";
 import { ParcelForm, type ParcelFormData } from "./components/ParcelForm.js";
@@ -10,6 +10,7 @@ export function ParcelFormPage() {
   const isEdit = Boolean(id);
   const { current, loading, error, fetchOne, create, update, uploadImage, removeImage, clearError } =
     useParcelsStore();
+  const [createdId, setCreatedId] = useState<number | null>(null);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -19,8 +20,8 @@ export function ParcelFormPage() {
   }, [id, isEdit, fetchOne, clearError]);
 
   async function handleCreate(data: ParcelFormData) {
-    await create(data);
-    navigate("/parcels");
+    const parcel = await create(data);
+    setCreatedId(parcel.id);
   }
 
   async function handleUpdate(data: ParcelFormData) {
@@ -74,23 +75,43 @@ export function ParcelFormPage() {
         {isEdit ? "Editar parcela" : "Nueva parcela"}
       </h1>
 
-      <ParcelForm
-        initialValues={initialValues}
-        onSubmit={isEdit ? handleUpdate : handleCreate}
-        submitLabel={isEdit ? "Guardar cambios" : "Crear parcela"}
-        loading={loading}
-      />
+      {!isEdit && createdId && (
+        <div className="mt-6 rounded-lg border border-border bg-primary-50 p-4 text-sm text-primary-dark">
+          ✅ Lote creado correctamente.{" "}
+          <button onClick={() => navigate("/parcels")} className="font-medium underline hover:text-primary">
+            Volver a la lista
+          </button>
+        </div>
+      )}
 
-      {isEdit && id && (
+      {isEdit && !createdId && (
+        <ParcelForm
+          initialValues={initialValues}
+          onSubmit={isEdit ? handleUpdate : handleCreate}
+          submitLabel={isEdit ? "Guardar cambios" : "Crear parcela"}
+          loading={loading}
+        />
+      )}
+
+      {!isEdit && !createdId && (
+        <ParcelForm
+          initialValues={initialValues}
+          onSubmit={handleCreate}
+          submitLabel="Crear parcela"
+          loading={loading}
+        />
+      )}
+
+      {(isEdit && id) || createdId ? (
         <div className="mt-6">
           <ImageUpload
             currentImage={current?.image_url ?? null}
-            onUpload={(file) => uploadImage(Number(id), file)}
-            onRemove={() => removeImage(Number(id))}
+            onUpload={(file) => uploadImage(Number(isEdit ? id : createdId), file)}
+            onRemove={() => removeImage(Number(isEdit ? id : createdId))}
             entityLabel="Foto del lote"
           />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

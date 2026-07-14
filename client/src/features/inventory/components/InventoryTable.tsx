@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import type { Inventory } from "@agri/shared";
-import { ImageDisplay } from "../../../shared/components/ImageDisplay";
 import { Pagination } from "../../../shared/components/Pagination";
 import { SearchInput } from "../../../shared/components/SearchInput";
 
@@ -128,7 +127,6 @@ export function InventoryTable({
           <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
-                <th className="w-10 px-3 py-2.5 font-medium"></th>
                 <th className="px-3 py-2.5 font-medium">Nombre</th>
                 <th className="px-3 py-2.5 font-medium">Categoría</th>
                 <th className="px-3 py-2.5 font-medium">Cantidad</th>
@@ -147,13 +145,6 @@ export function InventoryTable({
                   variants={rowVariant}
                   className="cursor-pointer transition-colors hover:bg-gray-50"
                 >
-                  <td className="px-3 py-2">
-                    <ImageDisplay
-                      src={item.image_url ?? null}
-                      alt={item.nombre}
-                      size="sm"
-                    />
-                  </td>
                   <td className="px-3 py-2 font-medium text-gray-900">
                     {item.nombre}
                   </td>

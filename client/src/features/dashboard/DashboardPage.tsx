@@ -17,7 +17,6 @@ import { useHarvestsStore } from "../../stores/harvests";
 import { useInventoryStore } from "../../stores/inventory";
 import { useNotificationStore } from "../../stores/notificationStore";
 import { StatCard } from "../../shared/components/StatCard";
-import { ImageDisplay } from "../../shared/components/ImageDisplay";
 import { DonutChart } from "./components/DonutChart";
 import { EvolutionBarChart } from "./components/EvolutionBarChart";
 import { EmptyState } from "../../shared/components/EmptyState";
@@ -299,7 +298,6 @@ export function DashboardPage() {
             <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="bg-muted text-muted-foreground">
                 <tr>
-                  <th className="w-10 px-3 py-3 font-medium"></th>
                   <th className="px-4 py-3 font-medium">Insumo</th>
                   <th className="px-4 py-3 font-medium">Categoría</th>
                   <th className="px-4 py-3 font-medium">Cantidad</th>
@@ -309,13 +307,6 @@ export function DashboardPage() {
               <tbody className="divide-y divide-border">
                 {expiringItems.map((item) => (
                   <tr key={item.id}>
-                    <td className="px-3 py-3">
-                      <ImageDisplay
-                        src={item.image_url ?? null}
-                        alt={item.nombre}
-                        size="sm"
-                      />
-                    </td>
                     <td className="px-4 py-3 font-medium text-primary-dark">
                       {item.nombre}
                     </td>
@@ -350,7 +341,6 @@ export function DashboardPage() {
             <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="bg-muted text-muted-foreground">
                 <tr>
-                  <th className="w-10 px-3 py-3 font-medium"></th>
                   <th className="px-4 py-3 font-medium">Insumo</th>
                   <th className="px-4 py-3 font-medium">Cantidad</th>
                   <th className="px-4 py-3 font-medium">Unidad</th>
@@ -359,13 +349,6 @@ export function DashboardPage() {
               <tbody className="divide-y divide-border">
                 {lowStockItems.map((item) => (
                   <tr key={item.id}>
-                    <td className="px-3 py-3">
-                      <ImageDisplay
-                        src={item.image_url ?? null}
-                        alt={item.nombre}
-                        size="sm"
-                      />
-                    </td>
                     <td className="px-4 py-3 font-medium text-primary-dark">
                       {item.nombre}
                     </td>

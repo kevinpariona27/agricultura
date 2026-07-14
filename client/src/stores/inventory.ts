@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { Inventory } from "@agri/shared";
-import { get, post, put, del, uploadFile, removeImage } from "../api/client";
+import { get, post, put, del } from "../api/client";
 
 export interface InventoryFilters {
   categoria?: string;
@@ -28,8 +28,6 @@ interface InventoryState {
   create: (data: CreateInventoryData) => Promise<Inventory>;
   update: (id: number, data: Partial<CreateInventoryData>) => Promise<Inventory>;
   remove: (id: number) => Promise<void>;
-  uploadImage: (id: number, file: File) => Promise<Inventory>;
-  removeImage: (id: number) => Promise<Inventory>;
   clearError: () => void;
 }
 
@@ -106,38 +104,6 @@ export const useInventoryStore = create<InventoryState>((set) => ({
     } catch {
       set({ error: "Error al eliminar el ítem", loading: false });
       throw new Error("Error al eliminar el ítem");
-    }
-  },
-
-  uploadImage: async (id: number, file: File) => {
-    set({ loading: true, error: null });
-    try {
-      const item = await uploadFile<Inventory>("inventory", id, file);
-      set((state) => ({
-        items: state.items.map((i) => (i.id === id ? item : i)),
-        current: state.current?.id === id ? item : state.current,
-        loading: false,
-      }));
-      return item;
-    } catch {
-      set({ error: "Error al subir la imagen del ítem", loading: false });
-      throw new Error("Error al subir la imagen del ítem");
-    }
-  },
-
-  removeImage: async (id: number) => {
-    set({ loading: true, error: null });
-    try {
-      const item = await removeImage<Inventory>("inventory", id);
-      set((state) => ({
-        items: state.items.map((i) => (i.id === id ? item : i)),
-        current: state.current?.id === id ? item : state.current,
-        loading: false,
-      }));
-      return item;
-    } catch {
-      set({ error: "Error al eliminar la imagen del ítem", loading: false });
-      throw new Error("Error al eliminar la imagen del ítem");
     }
   },
 
