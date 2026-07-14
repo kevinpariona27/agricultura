@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -40,6 +40,16 @@ function formatCurrency(value: number): string {
   })}`;
 }
 
+/** Get unique years from harvest dates */
+function getAvailableYears(harvestDates: string[]): number[] {
+  const years = new Set<number>();
+  for (const d of harvestDates) {
+    const y = new Date(d + "T00:00:00").getFullYear();
+    if (!isNaN(y)) years.add(y);
+  }
+  return Array.from(years).sort();
+}
+
 export function ReportsPage() {
   const { parcels, fetchAll: fetchParcels, loading: loadingParcels } =
     useParcelsStore();
@@ -55,6 +65,10 @@ export function ReportsPage() {
   const { pests, fetchAll: fetchPests, loading: loadingPests } =
     usePestsStore();
 
+  // Year selector state
+  const [compareYearA, setCompareYearA] = useState<number | null>(null);
+  const [compareYearB, setCompareYearB] = useState<number | null>(null);
+
   useEffect(() => {
     fetchParcels();
     fetchCrops();
@@ -65,6 +79,22 @@ export function ReportsPage() {
 
   const loading =
     loadingParcels || loadingCrops || loadingHarvs || loadingFerts || loadingPests;
+
+  // Available years
+  const availableYears = useMemo(
+    () => getAvailableYears(harvests.map((h) => h.fecha_cosecha)),
+    [harvests]
+  );
+
+  // Auto-select first two years
+  useEffect(() => {
+    if (availableYears.length >= 2) {
+      if (compareYearA === null) setCompareYearA(availableYears[0]);
+      if (compareYearB === null) setCompareYearB(availableYears[1]);
+    } else if (availableYears.length === 1) {
+      if (compareYearA === null) setCompareYearA(availableYears[0]);
+    }
+  }, [availableYears, compareYearA, compareYearB]);
 
   // --- Section 1: Summary stats ---
   const cultivosActivos = useMemo(
@@ -105,20 +135,17 @@ export function ReportsPage() {
 
   // --- Section 3: Costos vs Ingresos ---
   const costsVsRevenue = useMemo(() => {
-    // Fertilization costs per crop
     const costByCrop = new Map<number, number>();
     for (const f of fertilizations) {
       costByCrop.set(f.crop_id, (costByCrop.get(f.crop_id) ?? 0) + (f.costo ?? 0));
     }
 
-    // Harvest kg per crop
     const kgByCrop = new Map<number, number>();
     for (const h of harvests) {
       const kg = h.unidad === "ton" ? h.cantidad * 1000 : h.cantidad;
       kgByCrop.set(h.crop_id, (kgByCrop.get(h.crop_id) ?? 0) + kg);
     }
 
-    // Vegetable keyword check (same heuristic as costs)
     const vegetableKeywords = [
       "tomate", "lechuga", "zanahoria", "cebolla", "pimiento",
       "brocoli", "coliflor", "espinaca", "acelga", "berenjena",
@@ -146,7 +173,7 @@ export function ReportsPage() {
         };
       })
       .sort((a, b) => b.costos + b.ingresos - (a.costos + a.ingresos))
-      .slice(0, 10); // top 10 for readability
+      .slice(0, 10);
   }, [fertilizations, harvests, crops]);
 
   // --- Section 5: Comparativa de Rendimiento entre Campañas ---
@@ -162,7 +189,6 @@ export function ReportsPage() {
   ];
 
   const yieldComparison = useMemo(() => {
-    // Group harvests by crop variety
     const byVariety = new Map<
       string,
       { crop_id: number; fecha_cosecha: string; rendimiento: number }[]
@@ -181,12 +207,10 @@ export function ReportsPage() {
       byVariety.set(variety, entry);
     }
 
-    // Collect all unique harvest dates across all crops
     const allDates = Array.from(
       new Set(harvests.filter((h) => h.rendimiento != null).map((h) => h.fecha_cosecha)),
     ).sort();
 
-    // Build chart data: one row per crop, with a column per harvest date
     return Array.from(byVariety.entries()).map(([variety, entries]) => {
       const row: Record<string, string | number> = { name: variety };
       for (const date of allDates) {
@@ -202,6 +226,39 @@ export function ReportsPage() {
       new Set(harvests.filter((h) => h.rendimiento != null).map((h) => h.fecha_cosecha)),
     ).sort();
   }, [harvests]);
+
+  // --- Enhanced: Year-based comparison ---
+  const yearComparisonData = useMemo(() => {
+    if (compareYearA === null || compareYearB === null) return [];
+
+    const cropYieldByYear = new Map<
+      string,
+      { yearA: number; yearB: number }
+    >();
+
+    for (const h of harvests) {
+      if (h.rendimiento == null) continue;
+      const year = new Date(h.fecha_cosecha + "T00:00:00").getFullYear();
+      if (year !== compareYearA && year !== compareYearB) continue;
+
+      const crop = crops.find((c) => c.id === h.crop_id);
+      const name = crop?.variety ?? `Cultivo #${h.crop_id}`;
+
+      const prev = cropYieldByYear.get(name) ?? { yearA: 0, yearB: 0 };
+      if (year === compareYearA) {
+        prev.yearA = Math.max(prev.yearA, h.rendimiento);
+      } else {
+        prev.yearB = Math.max(prev.yearB, h.rendimiento);
+      }
+      cropYieldByYear.set(name, prev);
+    }
+
+    return Array.from(cropYieldByYear.entries()).map(([name, data]) => ({
+      name,
+      [`${compareYearA}`]: data.yearA,
+      [`${compareYearB}`]: data.yearB,
+    }));
+  }, [harvests, crops, compareYearA, compareYearB]);
 
   // --- Section 4: Distribución de Plagas ---
   const pestDistribution = useMemo(() => {
@@ -371,12 +428,90 @@ export function ReportsPage() {
         <h2 className="mb-4 text-base font-semibold text-primary-dark">
           Comparativa de Rendimiento entre Campañas
         </h2>
-        {yieldComparison.length === 0 || comparisonDates.length === 0 ? (
-          <EmptyState
-            IconComponent={BarChart3}
-            message="No hay suficientes cosechas con rendimiento para comparar."
-          />
+
+        {/* Year selector for enhanced comparison */}
+        {availableYears.length >= 2 && (
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground">Año A:</label>
+              <select
+                value={compareYearA ?? ""}
+                onChange={(e) => setCompareYearA(Number(e.target.value))}
+                className="rounded-lg border border-border bg-app-bg px-3 py-1.5 text-sm text-primary-dark focus:border-primary focus:outline-none"
+              >
+                {availableYears.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <span className="text-sm font-bold text-muted-foreground">vs</span>
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground">Año B:</label>
+              <select
+                value={compareYearB ?? ""}
+                onChange={(e) => setCompareYearB(Number(e.target.value))}
+                className="rounded-lg border border-border bg-app-bg px-3 py-1.5 text-sm text-primary-dark focus:border-primary focus:outline-none"
+              >
+                {availableYears.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Year comparison bar chart */}
+        {yearComparisonData.length > 0 && compareYearA && compareYearB ? (
+          <div className="mb-6">
+            <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+              Rendimiento {compareYearA} vs {compareYearB} por cultivo (kg/ha)
+            </h3>
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={yearComparisonData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 12, fill: "#6b7280" }}
+                  interval={0}
+                  angle={-20}
+                  textAnchor="end"
+                  height={60}
+                />
+                <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} />
+                <Tooltip
+                  formatter={(value) => [
+                    `${Number(value).toLocaleString("es-ES")} kg/ha`,
+                    undefined,
+                  ]}
+                />
+                <Legend />
+                <Bar
+                  dataKey={`${compareYearA}`}
+                  name={`${compareYearA}`}
+                  fill="#15803D"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey={`${compareYearB}`}
+                  name={`${compareYearB}`}
+                  fill="#D4A017"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         ) : (
+          <div className="mb-6 rounded-xl border border-dashed border-border py-6 text-center text-sm text-muted-foreground">
+            Selecciona dos años con cosechas para comparar el rendimiento por cultivo.
+          </div>
+        )}
+
+        {/* Original date-based comparison (existing) */}
+        {yieldComparison.length > 0 && comparisonDates.length > 0 ? (
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={yieldComparison}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -416,7 +551,7 @@ export function ReportsPage() {
               ))}
             </BarChart>
           </ResponsiveContainer>
-        )}
+        ) : null}
       </div>
     </div>
   );

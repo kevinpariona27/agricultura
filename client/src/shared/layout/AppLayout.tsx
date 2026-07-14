@@ -4,10 +4,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "./Sidebar.js";
 import { Header } from "./Header.js";
 import { useSidebarStore } from "../../stores/sidebar.js";
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts.js";
 
 export function AppLayout() {
   const location = useLocation();
   const close = useSidebarStore((s) => s.close);
+
+  // Enable global keyboard shortcuts
+  useKeyboardShortcuts();
 
   // Auto-close sidebar on route change (mobile overlay navigation)
   useEffect(() => {

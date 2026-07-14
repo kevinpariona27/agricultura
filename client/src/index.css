@@ -32,15 +32,43 @@
   --radius-3xl: 1.5rem;
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   html,
   body {
     font-family: "Fira Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Warm table row hover */
   tbody tr:hover {
     background-color: #FEF9E7;
     transition: background-color 150ms ease;
+  }
+
+  /* Dark mode overrides */
+  .dark {
+    --color-surface: #1a1f1a;
+    --color-app-bg: #121712;
+    --color-muted: #2a2f2a;
+    --color-muted-foreground: #9ca3af;
+    --color-border: #333a33;
+    --color-border-strong: #4a554a;
+    --color-primary-50: #0F2E1A;
+    --color-primary-100: #1a4a2a;
+    color-scheme: dark;
+  }
+
+  .dark tbody tr:hover {
+    background-color: #2a2f2a;
+  }
+
+  .dark .bg-surface {
+    background-color: var(--color-surface);
+  }
+
+  .dark .bg-app-bg {
+    background-color: var(--color-app-bg);
   }
 }

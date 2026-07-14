@@ -1,10 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthGuard } from "./shared/components/AuthGuard.js";
 import { AppLayout } from "./shared/layout/AppLayout.js";
+import { LandingPage } from "./features/landing/LandingPage.js";
 import { LoginPage } from "./features/auth/LoginPage.js";
 import { RegisterPage } from "./features/auth/RegisterPage.js";
 import { DashboardPage } from "./features/dashboard/DashboardPage.js";
 import { ReportsPage } from "./features/reports/ReportsPage.js";
+import { CalendarPage } from "./features/calendar/CalendarPage.js";
+import { AlertSettings } from "./features/alerts/AlertSettings.js";
 import { ParcelListPage } from "./features/parcels/ParcelListPage.js";
 import { ParcelDetailPage } from "./features/parcels/ParcelDetailPage.js";
 import { ParcelFormPage } from "./features/parcels/ParcelFormPage.js";
@@ -28,11 +31,28 @@ import { PestDetailPage } from "./features/pests/PestDetailPage.js";
 import { PestFormPage } from "./features/pests/PestFormPage.js";
 import { CuadernoCampo } from "./features/legal/CuadernoCampo.js";
 
+/** Redirects authenticated users to dashboard */
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const token = localStorage.getItem("token");
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <LandingPage />
+            </PublicRoute>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
@@ -41,6 +61,8 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/alerts" element={<AlertSettings />} />
             <Route path="/parcels" element={<ParcelListPage />} />
             <Route path="/parcels/new" element={<ParcelFormPage />} />
             <Route path="/parcels/:id" element={<ParcelDetailPage />} />

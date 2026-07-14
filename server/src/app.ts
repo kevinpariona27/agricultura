@@ -14,6 +14,7 @@ import inventoryRoutes from "./routes/inventory.js";
 import userRoutes from "./routes/users.js";
 import uploadRoutes from "./routes/upload.js";
 import telemetryRoutes from "./routes/telemetry.js";
+import alertRoutes from "./routes/alerts.js";
 import { errorHandler } from "./middleware/error.js";
 import { auditMiddleware } from "./middleware/audit.js";
 
@@ -63,6 +64,7 @@ app.use("/api/irrigations", irrigationRoutes);
   app.use("/api/users", userRoutes);
   app.use("/api/upload", uploadRoutes);
   app.use("/api/telemetry", telemetryRoutes);
+app.use("/api/alerts", alertRoutes);
 
   // Serve SPA static files in production (when client dist is available — e.g., Fly.io)
   const clientDist = resolve(__dirname, "..", "..", "client", "dist");

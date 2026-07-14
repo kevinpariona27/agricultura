@@ -13,8 +13,10 @@ const NAV_ITEMS = [
   { to: "/pests", label: "Plagas" },
   { to: "/inventory", label: "Inventario" },
   { to: "/costs", label: "Costos", short: "Cst" },
+  { to: "/calendar", label: "Calendario", short: "Cal" },
   { to: "/map", label: "Mapa" },
   { to: "/reports", label: "Reportes" },
+  { to: "/alerts", label: "Alertas", short: "Alt" },
   { to: "/legal", label: "Cuaderno" },
   { to: "/profile", label: "Perfil" },
 ] as const;
