@@ -1,10 +1,11 @@
 import db from './src/db/connection.js';
 import bcrypt from 'bcrypt';
 
-// Run migrations first (creates tables if they don't exist)
-console.log('Running migrations...');
-await db.migrate.latest();
-console.log('Migrations complete.');
+async function main() {
+  // Run migrations first (creates tables if they don't exist)
+  console.log('Running migrations...');
+  await db.migrate.latest();
+  console.log('Migrations complete.');
 
 // Skip if already seeded (idempotent)
 const [{ count: existingCount }] = await db('parcels').count('* as c');
@@ -230,4 +231,10 @@ for (const t of allTables) {
 }
 console.log(`\n  TOTAL: ${totalRows} filas en ${allTables.length} tablas`);
 
-await db.destroy();
+  await db.destroy();
+}
+
+main().catch((err) => {
+  console.error('Seed failed:', err);
+  process.exit(1);
+});
