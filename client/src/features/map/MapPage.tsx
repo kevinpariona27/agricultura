@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polygon, useMap } from "react-leaflet";
-import { Link, useNavigate } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { Link } from "react-router-dom";
 import { MapPin, Ruler } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -91,7 +91,6 @@ export function MapPage() {
   const [drawnPolygon, setDrawnPolygon] = useState<DrawnPolygon | null>(null);
   const [parcelName, setParcelName] = useState("");
   const [saving, setSaving] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
   useEffect(() => { const t = setTimeout(() => setMapReady(true), 100); return () => clearTimeout(t); }, []);
