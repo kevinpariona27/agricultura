@@ -145,7 +145,7 @@ export function PestForm({
 
       <div>
         <label htmlFor="crop_id" className={labelClass}>
-          Cultivo
+          Cultivo <span className="text-destructive ml-0.5">*</span>
         </label>
         <select
           id="crop_id"
@@ -167,7 +167,7 @@ export function PestForm({
       <div className="flex gap-4">
         <div className="flex-1">
           <label htmlFor="tipo" className={labelClass}>
-            Tipo
+            Tipo <span className="text-destructive ml-0.5">*</span>
           </label>
           <select
             id="tipo"
@@ -187,7 +187,7 @@ export function PestForm({
 
         <div className="flex-1">
           <label htmlFor="severidad" className={labelClass}>
-            Severidad
+            Severidad <span className="text-destructive ml-0.5">*</span>
           </label>
           <select
             id="severidad"
@@ -208,7 +208,7 @@ export function PestForm({
 
       <div>
         <label htmlFor="nombre" className={labelClass}>
-          Nombre
+          Nombre <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="nombre"
@@ -224,7 +224,7 @@ export function PestForm({
 
       <div>
         <label htmlFor="fecha_deteccion" className={labelClass}>
-          Fecha de detección
+          Fecha de detección <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="fecha_deteccion"
@@ -241,7 +241,7 @@ export function PestForm({
 
       <div>
         <label htmlFor="estado" className={labelClass}>
-          Estado
+          Estado <span className="text-destructive ml-0.5">*</span>
         </label>
         <select
           id="estado"

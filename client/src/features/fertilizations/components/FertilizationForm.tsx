@@ -130,7 +130,7 @@ export function FertilizationForm({
 
       <div>
         <label htmlFor="crop_id" className={labelClass}>
-          Cultivo
+          Cultivo <span className="text-destructive ml-0.5">*</span>
         </label>
         <select
           id="crop_id"
@@ -151,7 +151,7 @@ export function FertilizationForm({
 
       <div>
         <label htmlFor="producto" className={labelClass}>
-          Producto
+          Producto <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="producto"
@@ -168,7 +168,7 @@ export function FertilizationForm({
       <div className="flex gap-4">
         <div className="flex-1">
           <label htmlFor="dosis" className={labelClass}>
-            Dosis
+            Dosis <span className="text-destructive ml-0.5">*</span>
           </label>
           <input
             id="dosis"
@@ -186,7 +186,7 @@ export function FertilizationForm({
 
         <div className="w-32">
           <label htmlFor="unidad" className={labelClass}>
-            Unidad
+            Unidad <span className="text-destructive ml-0.5">*</span>
           </label>
           <select
             id="unidad"
@@ -207,7 +207,7 @@ export function FertilizationForm({
 
       <div>
         <label htmlFor="fecha_aplicacion" className={labelClass}>
-          Fecha de aplicación
+          Fecha de aplicación <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="fecha_aplicacion"

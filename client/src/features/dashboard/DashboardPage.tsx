@@ -17,7 +17,7 @@ import { useHarvestsStore } from "../../stores/harvests";
 import { useInventoryStore } from "../../stores/inventory";
 import { useNotificationStore } from "../../stores/notificationStore";
 import { StatCard } from "../../shared/components/StatCard";
-import { Wheat, Sprout, Droplets, Bug, Pizza, Package } from "lucide-react";
+import { Wheat, Sprout, Droplets, Bug, Pizza, Package, AlertTriangle } from "lucide-react";
 import { DonutChart } from "./components/DonutChart";
 import { EvolutionBarChart } from "./components/EvolutionBarChart";
 import { EmptyState } from "../../shared/components/EmptyState";
@@ -174,6 +174,16 @@ export function DashboardPage() {
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-primary-dark">
         Dashboard
       </h1>
+
+      {/* Resumen rápido */}
+      <div className="mb-6 flex items-center gap-3 rounded-2xl border border-accent bg-accent-light px-5 py-4 text-sm text-accent-dark">
+        <AlertTriangle className="h-5 w-5 flex-shrink-0" />
+        <span>
+          Hoy: <strong>{riegosEsteMes}</strong> riegos este mes,{" "}
+          <strong>{plagasActivas}</strong> plagas activas,{" "}
+          <strong>{inventarioCritico}</strong> items con stock crítico
+        </span>
+      </div>
 
       {/* Stats grid */}
       <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

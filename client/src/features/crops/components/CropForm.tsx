@@ -138,7 +138,7 @@ export function CropForm({
 
       <div>
         <label htmlFor="parcel_id" className={labelClass}>
-          Parcela
+          Parcela <span className="text-destructive ml-0.5">*</span>
         </label>
         <select
           id="parcel_id"
@@ -159,7 +159,7 @@ export function CropForm({
 
       <div>
         <label htmlFor="variety" className={labelClass}>
-          Variedad
+          Variedad <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="variety"
@@ -175,7 +175,7 @@ export function CropForm({
 
       <div>
         <label htmlFor="planting_date" className={labelClass}>
-          Fecha de siembra
+          Fecha de siembra <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="planting_date"
@@ -192,7 +192,7 @@ export function CropForm({
 
       <div>
         <label htmlFor="status" className={labelClass}>
-          Estado
+          Estado <span className="text-destructive ml-0.5">*</span>
         </label>
         <select
           id="status"

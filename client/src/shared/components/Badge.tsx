@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 type BadgeVariant = "success" | "warning" | "danger" | "info" | "neutral";
 type BadgeSize = "sm" | "md";
 
@@ -31,11 +33,13 @@ export function Badge({
   const sizeClasses = SIZE_CLASSES[size];
 
   return (
-    <span
+    <motion.span
       data-testid="badge"
-      className={`inline-block rounded-full font-semibold ${sizeClasses} ${variantClasses}`}
+      initial={{ scale: 0.9 }}
+      animate={{ scale: 1 }}
+      className={`inline-block rounded-full font-semibold transition-colors duration-200 ${sizeClasses} ${variantClasses}`}
     >
       {label}
-    </span>
+    </motion.span>
   );
 }

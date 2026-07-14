@@ -35,7 +35,7 @@ export function Header() {
 
   return (
     <header
-      className="flex w-full items-center gap-4 px-4 sm:px-8 py-3 sm:py-4"
+      className="flex w-full items-center gap-4 border-b border-border bg-white/80 px-4 py-3 backdrop-blur-sm sm:px-8 sm:py-4"
       data-testid="header"
       role="banner"
     >

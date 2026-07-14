@@ -102,7 +102,7 @@ export function ParcelForm({
 
       <div>
         <label htmlFor="name" className={labelClass}>
-          Nombre
+          Nombre <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="name"
@@ -118,7 +118,7 @@ export function ParcelForm({
 
       <div>
         <label htmlFor="area" className={labelClass}>
-          Área (hectáreas)
+          Área (hectáreas) <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="area"
@@ -136,7 +136,7 @@ export function ParcelForm({
 
       <div>
         <label htmlFor="location" className={labelClass}>
-          Ubicación
+          Ubicación <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="location"
@@ -152,7 +152,7 @@ export function ParcelForm({
 
       <div>
         <label htmlFor="soil_type" className={labelClass}>
-          Tipo de suelo
+          Tipo de suelo <span className="text-destructive ml-0.5">*</span>
         </label>
         <select
           id="soil_type"

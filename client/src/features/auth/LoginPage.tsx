@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/auth.js";
 import { ApiError } from "../../api/client.js";
+import { Sprout } from "lucide-react";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -39,11 +40,15 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-app-bg overflow-auto p-4">
-      <div className="w-full max-w-md rounded-2xl bg-surface p-4 sm:p-8 shadow-sm border border-border">
-        <h1 className="mb-6 text-center text-2xl font-bold text-primary-dark">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-light overflow-auto p-4">
+      <div className="w-full max-w-md rounded-2xl bg-surface p-4 sm:p-8 shadow-lg border border-border-strong">
+        <div className="mb-2 flex justify-center">
+          <Sprout className="h-12 w-12 text-primary" />
+        </div>
+        <h1 className="mb-1 text-center text-2xl font-bold text-primary-dark">
           Iniciar sesión
         </h1>
+        <p className="mb-6 text-center text-sm text-muted-foreground">Gestión Agrícola</p>
 
         {error && (
           <div className="mb-4 rounded bg-destructive-light px-4 py-2 text-sm text-destructive-dark">

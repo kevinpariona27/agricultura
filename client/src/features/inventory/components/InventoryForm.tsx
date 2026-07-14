@@ -132,7 +132,7 @@ export function InventoryForm({
 
       <div>
         <label htmlFor="nombre" className={labelClass}>
-          Nombre
+          Nombre <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="nombre"
@@ -149,7 +149,7 @@ export function InventoryForm({
       <div className="flex gap-4">
         <div className="flex-1">
           <label htmlFor="categoria" className={labelClass}>
-            Categoría
+            Categoría <span className="text-destructive ml-0.5">*</span>
           </label>
           <select
             id="categoria"
@@ -171,7 +171,7 @@ export function InventoryForm({
 
         <div className="flex-1">
           <label htmlFor="unidad" className={labelClass}>
-            Unidad
+            Unidad <span className="text-destructive ml-0.5">*</span>
           </label>
           <select
             id="unidad"
@@ -192,7 +192,7 @@ export function InventoryForm({
 
       <div>
         <label htmlFor="cantidad" className={labelClass}>
-          Cantidad
+          Cantidad <span className="text-destructive ml-0.5">*</span>
         </label>
         <input
           id="cantidad"
