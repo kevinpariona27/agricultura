@@ -17,7 +17,15 @@ try {
   // .env is optional (e.g., in production with real env vars)
 }
 
-const app = createApp();
+let app;
+try {
+  app = createApp();
+} catch (err: unknown) {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error(message);
+  process.exit(1);
+}
+
 const PORT = process.env.PORT ?? 3001;
 
 // Run migrations then start server

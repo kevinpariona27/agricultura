@@ -144,8 +144,8 @@ export function DashboardPage() {
             No hay insumos próximos a vencer.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white">
+            <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
                   <th className="w-10 px-3 py-3 font-medium"></th>
@@ -195,8 +195,8 @@ export function DashboardPage() {
           <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
             Stock bajo (≤ 5 unidades)
           </h2>
-          <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white">
+            <table className="w-full text-left text-sm min-w-[600px]">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
                   <th className="w-10 px-3 py-3 font-medium"></th>

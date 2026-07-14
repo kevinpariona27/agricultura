@@ -28,8 +28,19 @@ function ensureUploadsDir(): void {
 export function createApp() {
   ensureUploadsDir();
 
+  // Validate required environment variables
+  const jwtSecret = process.env.JWT_SECRET;
+  const corsOrigin = process.env.CORS_ORIGIN;
+
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET environment variable is required");
+  }
+  if (!corsOrigin) {
+    throw new Error("CORS_ORIGIN environment variable is required");
+  }
+
   const app = express();
-  app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
+  app.use(cors({ origin: corsOrigin }));
   app.use(express.json());
 
   // Serve uploaded files as static assets
@@ -46,7 +57,19 @@ app.use("/api/irrigations", irrigationRoutes);
   app.use("/api/inventory", inventoryRoutes);
   app.use("/api/users", userRoutes);
   app.use("/api/upload", uploadRoutes);
-  app.use((_req, res) => { res.status(404).json({ error: "Not found" }); });
+
+  // Serve SPA static files in production (when client dist is available — e.g., Fly.io)
+  const clientDist = resolve(__dirname, "..", "..", "client", "dist");
+  if (process.env.SERVE_CLIENT === "true" || existsSync(clientDist)) {
+    app.use(express.static(clientDist));
+    // SPA fallback: non-API, non-static routes → index.html
+    app.get("*", (_req, res) => {
+      res.sendFile(resolve(clientDist, "index.html"));
+    });
+  } else {
+    app.use((_req, res) => { res.status(404).json({ error: "Not found" }); });
+  }
+
   app.use(errorHandler);
   return app;
 }

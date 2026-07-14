@@ -27,22 +27,29 @@ beforeEach(() => {
   localStorageMock.clear();
 });
 
+/**
+ * Mirror production App.tsx routing:
+ *   /login is OUTSIDE AuthGuard
+ *   Protected routes are INSIDE AuthGuard
+ */
 function renderWithRouter(initialRoute: string) {
   return render(
     <MemoryRouter initialEntries={[initialRoute]}>
       <Routes>
+        {/* Public — outside AuthGuard, matches production */}
         <Route path="/login" element={<div>Login Page</div>} />
+        {/* Protected — inside AuthGuard, matches production */}
         <Route element={<AuthGuard />}>
+          <Route path="/dashboard" element={<div>Dashboard</div>} />
           <Route path="/parcels" element={<div>Protected Content</div>} />
         </Route>
-        <Route path="/" element={<div>Home</div>} />
       </Routes>
     </MemoryRouter>
   );
 }
 
 describe("AuthGuard", () => {
-  it("redirects to /login when no token exists", () => {
+  it("redirects unauthenticated users from /parcels to /login", () => {
     renderWithRouter("/parcels");
 
     // Should redirect to login page
@@ -51,7 +58,7 @@ describe("AuthGuard", () => {
     expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
   });
 
-  it("renders child route when valid token exists", () => {
+  it("renders protected content when valid token exists", () => {
     localStorageMock.setItem("token", "valid-jwt-token");
 
     renderWithRouter("/parcels");
@@ -62,12 +69,19 @@ describe("AuthGuard", () => {
     expect(screen.queryByText("Login Page")).not.toBeInTheDocument();
   });
 
-  it("redirects to /login for any protected route when unauthenticated", () => {
-    renderWithRouter("/");
+  it("redirects unauthenticated users from /dashboard to /login", () => {
+    renderWithRouter("/dashboard");
 
-    // Home route is NOT protected, should show Home
-    // But the default redirect goes to /parcels which is protected...
-    // Let's just test the guard itself works
-    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
+    expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
+  });
+
+  it("renders dashboard when valid token exists", () => {
+    localStorageMock.setItem("token", "valid-jwt-token");
+
+    renderWithRouter("/dashboard");
+
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
+    expect(screen.queryByText("Login Page")).not.toBeInTheDocument();
   });
 });

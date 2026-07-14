@@ -1,11 +1,11 @@
 schema: spec-driven
 
 context: |
-  Intended stack: React (JavaScript/TypeScript) single-page application
-  Domain: Agricultural management ("gestión agrícola")
-  Project state: Unbootstrapped — no package.json, source files, or toolchain yet
-  Architecture: Undetermined (bootstrapping pending)
-  Style: Undetermined (convention pending)
+  Stack: React 19 + Vite 6 + Tailwind CSS 4 (client), Node.js/Express + Knex + SQLite (server), TypeScript shared types
+  Architecture: Monorepo (npm workspaces) — @agri/server, @agri/client, @agri/shared
+  Domain: Agricultural management — parcels, crops, irrigation, fertilization, pests, harvests, inventory, auth
+  Testing: Vitest 4 (unit+integration), Supertest (server), Testing Library + jsdom (client), @vitest/coverage-v8
+  Quality: TypeScript strict mode; no linter or formatter configured
 
 rules:
   proposal:
@@ -24,27 +24,27 @@ rules:
     tdd: false
     test_command: ""
   verify:
-    test_command: ""
-    build_command: ""
+    test_command: "npm run test --workspace=server; if ($?) { npm run test --workspace=client }"
+    build_command: "npm run build --workspace=server; if ($?) { npm run build --workspace=client }"
     coverage_threshold: 0
   archive:
     - Warn before merging destructive deltas
 
 testing:
-  strict_tdd: false
-  reason: No test runner, linter, or toolchain detected — project is unbootstrapped
-  detected: 2026-07-08
+  strict_tdd: true
+  reason: Test runners detected (Vitest 4 in server + client), prior config based on stale unbootstrapped state — defaulting to strict TDD
+  detected: 2026-07-13
   runner:
-    framework: None
-    command: ""
+    framework: Vitest
+    command: "vitest run"
   layers:
-    unit: false
-    integration: false
+    unit: true
+    integration: true
     e2e: false
   coverage:
-    available: false
-    command: ""
+    available: true
+    command: "vitest run --coverage"
   quality:
     linter: false
-    type_checker: false
+    type_checker: true
     formatter: false

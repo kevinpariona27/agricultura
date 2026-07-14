@@ -1,17 +1,25 @@
+import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "./Sidebar.js";
 import { Header } from "./Header.js";
+import { useSidebarStore } from "../../stores/sidebar.js";
 
 export function AppLayout() {
   const location = useLocation();
+  const close = useSidebarStore((s) => s.close);
+
+  // Auto-close sidebar on route change (mobile overlay navigation)
+  useEffect(() => {
+    close();
+  }, [location.pathname, close]);
 
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col min-w-0">
         <Header />
-        <main className="flex-1 overflow-auto bg-gray-50 p-8">
+        <main className="flex-1 overflow-auto bg-gray-50 p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

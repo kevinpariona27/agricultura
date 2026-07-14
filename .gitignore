@@ -9,3 +9,5 @@ server/uploads/*
 # SQLite WAL files
 *.db-shm
 *.db-wal
+.vercel
+.env*

@@ -57,8 +57,8 @@ export function HarvestTable({
           No se encontraron cosechas.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-gray-100">
-          <table className="w-full text-left text-sm">
+        <div className="overflow-x-auto rounded-xl border border-gray-100">
+          <table className="w-full text-left text-sm min-w-[600px]">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
                 <th className="px-3 py-2.5 font-medium">Cultivo</th>
