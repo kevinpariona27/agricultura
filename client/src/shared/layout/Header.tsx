@@ -1,4 +1,4 @@
-import { Bell, Download, FileText, Menu, User } from "lucide-react";
+import { Bell, FileText, Menu, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotificationStore } from "../../stores/notificationStore";
@@ -55,12 +55,10 @@ export function Header() {
           exportTableToPDF(
             "Panel General",
             [
-              { header: "Notificación", dataKey: "title" },
               { header: "Tipo", dataKey: "type" },
               { header: "Mensaje", dataKey: "message" },
             ],
             notifications.map((n) => ({
-              title: n.title ?? "",
               type: n.type ?? "",
               message: n.message ?? "",
             })),
