@@ -33,17 +33,6 @@ const SEVERITY_LABELS: Record<string, string> = {
   alta: "Alta",
 };
 
-const CHART_COLORS = [
-  "#15803D",
-  "#22C55E",
-  "#60a5fa",
-  "#f59e0b",
-  "#ef4444",
-  "#8b5cf6",
-  "#ec4899",
-  "#14b8a6",
-];
-
 function formatCurrency(value: number): string {
   return `$${value.toLocaleString("es-ES", {
     minimumFractionDigits: 2,
@@ -243,8 +232,8 @@ export function ReportsPage() {
               />
               <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} />
               <Tooltip
-                formatter={(value: number) => [
-                  `${value.toLocaleString("es-ES")} kg/ha`,
+                formatter={(value) => [
+                  `${Number(value).toLocaleString("es-ES")} kg/ha`,
                   "Rendimiento",
                 ]}
               />
@@ -284,8 +273,8 @@ export function ReportsPage() {
               />
               <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} />
               <Tooltip
-                formatter={(value: number) => [
-                  formatCurrency(value),
+                formatter={(value) => [
+                  formatCurrency(Number(value)),
                   undefined,
                 ]}
               />

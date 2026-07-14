@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import type { Crop, Fertilization, Harvest, Parcel } from "@agri/shared";
 
 export interface CropCostRow {
