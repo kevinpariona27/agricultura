@@ -66,7 +66,7 @@ export function Sidebar() {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className={`
-          flex h-full flex-col bg-primary-dark text-white dark:bg-[#0A1F0A]
+          flex h-full flex-col bg-primary-dark text-white
           lg:relative lg:w-16 lg:flex-shrink-0
           fixed inset-y-0 left-0 z-50 w-64 transition-all duration-300
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}

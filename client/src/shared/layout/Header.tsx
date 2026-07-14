@@ -1,10 +1,9 @@
-import { Bell, Download, Menu, Moon, Sun, User } from "lucide-react";
+import { Bell, Download, Menu, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotificationStore } from "../../stores/notificationStore";
 import { useUserStore } from "../../stores/user";
 import { useSidebarStore } from "../../stores/sidebar";
-import { useThemeStore } from "../../stores/theme";
 import { ImageDisplay } from "../components/ImageDisplay";
 import { NotificationDropdown } from "../components/NotificationDropdown";
 
@@ -16,7 +15,6 @@ export function Header() {
   const { profile, fetchProfile } = useUserStore();
   const toggle = useSidebarStore((s) => s.toggle);
   const sidebarOpen = useSidebarStore((s) => s.isOpen);
-  const { isDark, toggle: toggleTheme } = useThemeStore();
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const [notifOpen, setNotifOpen] = useState(false);
@@ -51,13 +49,6 @@ export function Header() {
       </button>
 
       <div className="flex-1" />
-      <button
-        onClick={toggleTheme}
-        className="rounded-lg p-2 text-primary-dark/70 transition-colors duration-200 hover:bg-primary-50"
-        aria-label={isDark ? "Activar modo claro" : "Activar modo oscuro"}
-      >
-        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-      </button>
       <button onClick={() => window.print()} className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm text-primary-dark transition-colors duration-200 hover:bg-primary-50">
         <Download className="h-4 w-4" />
         Descargar PDF
