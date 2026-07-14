@@ -18,37 +18,38 @@ interface WeatherState {
 }
 
 // Mock weather data for demo (no API key required)
+// Ayacucho, Peru — mild climate at ~2700m elevation
 const MOCK_WEATHER: WeatherData[] = [
   {
-    temp: 24,
-    feels_like: 26,
-    humidity: 65,
-    wind_speed: 12,
+    temp: 20,
+    feels_like: 21,
+    humidity: 55,
+    wind_speed: 10,
     condition: "Parcialmente nublado",
     icon: "02d",
-    city: "Buenos Aires",
+    city: "Ayacucho",
     loaded: true,
     error: null,
   },
   {
     temp: 18,
     feels_like: 17,
-    humidity: 78,
+    humidity: 65,
     wind_speed: 8,
     condition: "Lluvia ligera",
     icon: "10d",
-    city: "Buenos Aires",
+    city: "Ayacucho",
     loaded: true,
     error: null,
   },
   {
-    temp: 31,
-    feels_like: 33,
-    humidity: 45,
-    wind_speed: 15,
+    temp: 22,
+    feels_like: 23,
+    humidity: 50,
+    wind_speed: 12,
     condition: "Soleado",
     icon: "01d",
-    city: "Buenos Aires",
+    city: "Ayacucho",
     loaded: true,
     error: null,
   },
@@ -67,7 +68,7 @@ export const useWeatherStore = create<WeatherState>((set) => ({
     wind_speed: 0,
     condition: "",
     icon: "01d",
-    city: "Cargando...",
+    city: "Ayacucho",
     loaded: false,
     error: null,
   },
@@ -76,7 +77,7 @@ export const useWeatherStore = create<WeatherState>((set) => ({
     try {
       // Try real API first with demo key (works for basic usage)
       const res = await fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=Buenos%20Aires,AR&units=metric&lang=es&appid=9de243494c0b295d0e1662c0780a09e6"
+        "https://api.openweathermap.org/data/2.5/weather?q=Ayacucho,PE&units=metric&lang=es&appid=9de243494c0b295d0e1662c0780a09e6"
       );
       if (res.ok) {
         const data = await res.json();
@@ -88,7 +89,7 @@ export const useWeatherStore = create<WeatherState>((set) => ({
             wind_speed: Math.round(data.wind.speed * 3.6), // m/s → km/h
             condition: data.weather[0]?.description ?? "Desconocido",
             icon: data.weather[0]?.icon ?? "01d",
-            city: data.name ?? "Buenos Aires",
+            city: data.name ?? "Ayacucho",
             loaded: true,
             error: null,
           },

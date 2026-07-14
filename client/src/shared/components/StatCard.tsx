@@ -52,17 +52,17 @@ export function StatCard({ icon: Icon, value, label, color, accent = false, onCl
   const c = color ? COLOR_MAP[color] ?? COLOR_MAP.blue : null;
   const containerClass =
     accent && c
-      ? `rounded-2xl border border-border ${c.bg} border-l-4 ${c.border} p-6 shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer`
-      : "rounded-2xl border border-border bg-surface p-6 shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer";
+      ? `rounded-2xl border border-border ${c.bg} border-l-4 ${c.border} p-4 shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer`
+      : "rounded-2xl border border-border bg-surface p-4 shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer";
 
   return (
-    <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.15 }} className={containerClass} onClick={onClick}>
+    <motion.div whileHover={{ scale: 1.03 }} transition={{ duration: 0.15 }} className={containerClass} onClick={onClick}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
-          <p className={`mt-1 text-3xl font-bold ${c?.text ?? "text-primary-dark"}`}>{value}</p>
+          <p className={`mt-1 text-2xl font-bold ${c?.text ?? "text-primary-dark"}`}>{value}</p>
         </div>
-        <Icon className="h-8 w-8 text-primary-light/60" />
+        <Icon className="h-6 w-6 text-primary-light/60" />
       </div>
     </motion.div>
   );

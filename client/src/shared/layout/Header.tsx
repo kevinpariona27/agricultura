@@ -1,12 +1,26 @@
-import { Bell, FileText, Menu, User } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Bell, ChevronRight, FileText, Menu, User } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useNotificationStore } from "../../stores/notificationStore";
 import { useUserStore } from "../../stores/user";
 import { useSidebarStore } from "../../stores/sidebar";
 import { ImageDisplay } from "../components/ImageDisplay";
 import { NotificationDropdown } from "../components/NotificationDropdown";
 import { exportTableToPDF } from "../utils/exportPDF";
+
+const ROUTE_LABELS: Record<string, string> = {
+  dashboard: "Dashboard",
+  parcels: "Parcelas",
+  crops: "Cultivos",
+  pests: "Plagas",
+  inventory: "Inventario",
+  costs: "Costos",
+  map: "Mapa",
+  reports: "Reportes",
+  calendar: "Calendario",
+  legal: "Cuaderno",
+  alerts: "Alertas",
+};
 
 export function Header() {
   const notifications = useNotificationStore((s) => s.notifications);
@@ -18,7 +32,13 @@ export function Header() {
   const sidebarOpen = useSidebarStore((s) => s.isOpen);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
+  const location = useLocation();
   const [notifOpen, setNotifOpen] = useState(false);
+
+  const breadcrumbs = useMemo(() => {
+    const segments = location.pathname.split("/").filter(Boolean);
+    return segments.map((seg) => ROUTE_LABELS[seg] ?? seg);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (token && !profile) {
@@ -48,6 +68,23 @@ export function Header() {
       >
         <Menu className="h-5 w-5" />
       </button>
+
+      {/* Breadcrumbs */}
+      {breadcrumbs.length > 0 && (
+        <nav className="hidden sm:flex items-center gap-1.5 text-sm text-gray-400" aria-label="Breadcrumb">
+          {breadcrumbs.map((crumb, i) => {
+            const isLast = i === breadcrumbs.length - 1;
+            return (
+              <span key={crumb} className="flex items-center gap-1.5">
+                {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-gray-300" />}
+                <span className={isLast ? "text-gray-600 font-medium" : ""}>
+                  {crumb}
+                </span>
+              </span>
+            );
+          })}
+        </nav>
+      )}
 
       <div className="flex-1" />
       <button

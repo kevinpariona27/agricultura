@@ -1,20 +1,22 @@
 const LOCATION_MAP: Record<string, [number, number]> = {
-  "sector norte": [-26.0, -60.0],
-  "sector sur": [-38.0, -62.0],
-  "sector este": [-32.0, -58.0],
-  "sector oeste": [-35.0, -66.0],
-  "zona norte": [-25.0, -59.5],
-  "zona sur": [-39.0, -62.5],
-  "zona este": [-31.0, -57.5],
-  "zona oeste": [-36.0, -65.5],
+  "sector norte": [-13.15, -74.21],
+  "sector sur": [-13.18, -74.23],
+  "sector este": [-13.16, -74.20],
+  "sector oeste": [-13.17, -74.25],
+  "centro del campo": [-13.1631, -74.2244],
+  "bajo cubierta": [-13.1600, -74.2220],
+  "zona norte": [-13.1450, -74.2050],
+  "zona sur": [-13.1850, -74.2350],
+  "zona este": [-13.1580, -74.1950],
+  "zona oeste": [-13.1750, -74.2550],
 };
 
-const ARGENTINA_CENTER: [number, number] = [-38.4161, -63.6167];
+const AYACUCHO_CENTER: [number, number] = [-13.1631, -74.2244];
 
 /**
  * Parses a parcel location text into approximate latitude/longitude coordinates.
  * Known region keywords are matched against a hardcoded map.
- * Falls back to the center of Argentina for unknown locations.
+ * Falls back to Ayacucho, Peru center for unknown locations.
  */
 export function geocodeLocation(location: string): [number, number] {
   const lower = location.toLowerCase().trim();
@@ -23,7 +25,7 @@ export function geocodeLocation(location: string): [number, number] {
       return coords;
     }
   }
-  return ARGENTINA_CENTER;
+  return AYACUCHO_CENTER;
 }
 
 /**

@@ -119,7 +119,7 @@ export function MapPage() {
       <div className="overflow-hidden rounded-2xl border border-border">
         {mapReady ? (
           <div style={{ height: "70vh", width: "100%" }}>
-            <MapContainer center={[-38.4161, -63.6167]} zoom={5} style={{ height: "100%", width: "100%" }} scrollWheelZoom={true}>
+            <MapContainer center={[-13.1631, -74.2244]} zoom={7} style={{ height: "100%", width: "100%" }} scrollWheelZoom={true}>
               <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               {markers.map((m) => (
                 <Marker key={m.id} position={m.coords}>

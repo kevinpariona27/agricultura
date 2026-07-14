@@ -408,12 +408,8 @@ export function DashboardPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-primary-dark">
-        Dashboard
-      </h1>
-
-      {/* Tab Navigation */}
-      <div className="mb-6 flex border-b border-border">
+      {/* Tab Navigation — full-width, no top margin, replaces old heading */}
+      <div className="-mx-4 sm:-mx-8 mb-6 flex border-b border-border px-4 sm:px-8">
         {TABS.map((tab) => (
           <button
             key={tab.key}
