@@ -1,5 +1,14 @@
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 import { useParcelsStore } from "../../stores/parcels";
 import { useCropsStore } from "../../stores/crops";
 import { useIrrigationsStore } from "../../stores/irrigations";
@@ -11,6 +20,8 @@ import { StatCard } from "../../shared/components/StatCard";
 import { ImageDisplay } from "../../shared/components/ImageDisplay";
 import { DonutChart } from "./components/DonutChart";
 import { EvolutionBarChart } from "./components/EvolutionBarChart";
+import { EmptyState } from "../../shared/components/EmptyState";
+import { BarChart3 } from "lucide-react";
 
 export function DashboardPage() {
   const navigate = useNavigate();
@@ -121,6 +132,34 @@ export function DashboardPage() {
     return items.filter((item) => item.cantidad <= 5);
   }, [items]);
 
+  // Top Rendimiento — top 5 crops by yield
+  const topYield = useMemo(() => {
+    const grouped = new Map<
+      number,
+      { name: string; total: number; count: number }
+    >();
+    for (const h of harvests) {
+      if (h.rendimiento == null) continue;
+      const crop = crops.find((c) => c.id === h.crop_id);
+      const cropName = crop?.variety ?? `Cultivo #${h.crop_id}`;
+      const prev = grouped.get(h.crop_id) ?? {
+        name: cropName,
+        total: 0,
+        count: 0,
+      };
+      prev.total += h.rendimiento;
+      prev.count += 1;
+      grouped.set(h.crop_id, prev);
+    }
+    return Array.from(grouped.values())
+      .map((g) => ({
+        name: g.name,
+        rendimiento: Math.round(g.total / g.count),
+      }))
+      .sort((a, b) => b.rendimiento - a.rendimiento)
+      .slice(0, 5);
+  }, [harvests, crops]);
+
   if (loading) {
     return (
       <div className="rounded-2xl border border-dashed border-border py-12 text-center text-muted-foreground">
@@ -202,6 +241,48 @@ export function DashboardPage() {
           </h2>
           <EvolutionBarChart />
         </div>
+      </div>
+
+      {/* Top Rendimiento */}
+      <div className="mb-8 rounded-2xl border border-border bg-surface p-6">
+        <h2 className="mb-4 text-base font-semibold text-primary-dark">
+          Top Rendimiento (kg/ha)
+        </h2>
+        {topYield.length === 0 ? (
+          <EmptyState
+            IconComponent={BarChart3}
+            message="No hay datos de rendimiento registrados."
+          />
+        ) : (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={topYield} layout="vertical">
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#e5e7eb"
+                horizontal={false}
+              />
+              <XAxis type="number" tick={{ fontSize: 12, fill: "#6b7280" }} />
+              <YAxis
+                dataKey="name"
+                type="category"
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                width={120}
+              />
+              <Tooltip
+                formatter={(value) => [
+                  `${Number(value).toLocaleString("es-ES")} kg/ha`,
+                  "Rendimiento",
+                ]}
+              />
+              <Bar
+                dataKey="rendimiento"
+                fill="#15803D"
+                radius={[0, 4, 4, 0]}
+                barSize={24}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       {/* Próximos vencimientos */}

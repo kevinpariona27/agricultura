@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: "/harvests", label: "Cosechas" },
   { to: "/inventory", label: "Inventario" },
   { to: "/costs", label: "Costos" },
+  { to: "/map", label: "Mapa" },
   { to: "/reports", label: "Reportes" },
   { to: "/profile", label: "Perfil" },
 ] as const;

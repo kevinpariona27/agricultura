@@ -149,6 +149,60 @@ export function ReportsPage() {
       .slice(0, 10); // top 10 for readability
   }, [fertilizations, harvests, crops]);
 
+  // --- Section 5: Comparativa de Rendimiento entre Campañas ---
+  const HARVEST_COLORS = [
+    "#15803D",
+    "#2563EB",
+    "#D97706",
+    "#7C3AED",
+    "#DC2626",
+    "#0891B2",
+    "#4F46E5",
+    "#B45309",
+  ];
+
+  const yieldComparison = useMemo(() => {
+    // Group harvests by crop variety
+    const byVariety = new Map<
+      string,
+      { crop_id: number; fecha_cosecha: string; rendimiento: number }[]
+    >();
+
+    for (const h of harvests) {
+      if (h.rendimiento == null) continue;
+      const crop = crops.find((c) => c.id === h.crop_id);
+      const variety = crop?.variety ?? `Cultivo #${h.crop_id}`;
+      const entry = byVariety.get(variety) ?? [];
+      entry.push({
+        crop_id: h.crop_id,
+        fecha_cosecha: h.fecha_cosecha,
+        rendimiento: h.rendimiento,
+      });
+      byVariety.set(variety, entry);
+    }
+
+    // Collect all unique harvest dates across all crops
+    const allDates = Array.from(
+      new Set(harvests.filter((h) => h.rendimiento != null).map((h) => h.fecha_cosecha)),
+    ).sort();
+
+    // Build chart data: one row per crop, with a column per harvest date
+    return Array.from(byVariety.entries()).map(([variety, entries]) => {
+      const row: Record<string, string | number> = { name: variety };
+      for (const date of allDates) {
+        const match = entries.find((e) => e.fecha_cosecha === date);
+        row[date] = match ? match.rendimiento : 0;
+      }
+      return row;
+    });
+  }, [harvests, crops]);
+
+  const comparisonDates = useMemo(() => {
+    return Array.from(
+      new Set(harvests.filter((h) => h.rendimiento != null).map((h) => h.fecha_cosecha)),
+    ).sort();
+  }, [harvests]);
+
   // --- Section 4: Distribución de Plagas ---
   const pestDistribution = useMemo(() => {
     const bySeveridad = new Map<string, number>();
@@ -329,6 +383,59 @@ export function ReportsPage() {
               <Tooltip />
               <Legend />
             </PieChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      {/* Section 5: Comparativa de Rendimiento entre Campañas */}
+      <div className="mb-8 rounded-2xl border border-border bg-surface p-6">
+        <h2 className="mb-4 text-base font-semibold text-primary-dark">
+          Comparativa de Rendimiento entre Campañas
+        </h2>
+        {yieldComparison.length === 0 || comparisonDates.length === 0 ? (
+          <EmptyState
+            IconComponent={BarChart3}
+            message="No hay suficientes cosechas con rendimiento para comparar."
+          />
+        ) : (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={yieldComparison}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                interval={0}
+                angle={-20}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} />
+              <Tooltip
+                formatter={(value) => [
+                  `${Number(value).toLocaleString("es-ES")} kg/ha`,
+                  undefined,
+                ]}
+                labelFormatter={(label) => `Cultivo: ${label}`}
+              />
+              <Legend
+                formatter={(value) =>
+                  new Date(value).toLocaleDateString("es-ES", {
+                    day: "numeric",
+                    month: "short",
+                    year: "2-digit",
+                  })
+                }
+              />
+              {comparisonDates.map((date, idx) => (
+                <Bar
+                  key={date}
+                  dataKey={date}
+                  name={date}
+                  fill={HARVEST_COLORS[idx % HARVEST_COLORS.length]}
+                  radius={[4, 4, 0, 0]}
+                />
+              ))}
+            </BarChart>
           </ResponsiveContainer>
         )}
       </div>

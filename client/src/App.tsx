@@ -21,6 +21,7 @@ import { InventoryListPage } from "./features/inventory/InventoryListPage.js";
 import { InventoryDetailPage } from "./features/inventory/InventoryDetailPage.js";
 import { InventoryFormPage } from "./features/inventory/InventoryFormPage.js";
 import { CostsPage } from "./features/costs/CostsPage.js";
+import { MapPage } from "./features/map/MapPage.js";
 import { ProfilePage } from "./features/users/ProfilePage.js";
 
 export default function App() {
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="/inventory/:id" element={<InventoryDetailPage />} />
             <Route path="/inventory/:id/edit" element={<InventoryFormPage />} />
             <Route path="/costs" element={<CostsPage />} />
+            <Route path="/map" element={<MapPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
