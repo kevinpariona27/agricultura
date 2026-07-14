@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePestsStore } from "../../stores/pests";
 import { PestForm, type PestFormData } from "./components/PestForm";
@@ -10,6 +10,7 @@ export function PestFormPage() {
   const isEdit = Boolean(id);
   const { current, loading, error, fetchOne, create, update, uploadImage, removeImage, clearError } =
     usePestsStore();
+  const [createdId, setCreatedId] = useState<number | null>(null);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -19,8 +20,8 @@ export function PestFormPage() {
   }, [id, isEdit, fetchOne, clearError]);
 
   async function handleCreate(data: PestFormData) {
-    await create(data);
-    navigate("/pests");
+    const pest = await create(data);
+    setCreatedId(pest.id);
   }
 
   async function handleUpdate(data: PestFormData) {
@@ -78,23 +79,43 @@ export function PestFormPage() {
         {isEdit ? "Editar plaga" : "Nueva plaga"}
       </h1>
 
-      <PestForm
-        initialValues={initialValues}
-        onSubmit={isEdit ? handleUpdate : handleCreate}
-        submitLabel={isEdit ? "Guardar cambios" : "Crear plaga"}
-        loading={loading}
-      />
+      {!isEdit && createdId && (
+        <div className="mt-6 rounded-lg border border-border bg-primary-50 p-4 text-sm text-primary-dark">
+          ✅ Plaga creada correctamente.{" "}
+          <button onClick={() => navigate("/pests")} className="font-medium underline hover:text-primary">
+            Volver a la lista
+          </button>
+        </div>
+      )}
 
-      {isEdit && id && (
+      {isEdit && !createdId && (
+        <PestForm
+          initialValues={initialValues}
+          onSubmit={isEdit ? handleUpdate : handleCreate}
+          submitLabel={isEdit ? "Guardar cambios" : "Crear plaga"}
+          loading={loading}
+        />
+      )}
+
+      {!isEdit && !createdId && (
+        <PestForm
+          initialValues={initialValues}
+          onSubmit={handleCreate}
+          submitLabel="Crear plaga"
+          loading={loading}
+        />
+      )}
+
+      {(isEdit && id) || createdId ? (
         <div className="mt-6">
           <ImageUpload
             currentImage={current?.image_url ?? null}
-            onUpload={(file) => uploadImage(Number(id), file)}
-            onRemove={() => removeImage(Number(id))}
+            onUpload={(file) => uploadImage(Number(isEdit ? id : createdId), file)}
+            onRemove={() => removeImage(Number(isEdit ? id : createdId))}
             entityLabel="Foto de la plaga"
           />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
