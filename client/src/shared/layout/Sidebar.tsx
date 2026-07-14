@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FileText, X } from "lucide-react";
+import { Calculator, FileText, X } from "lucide-react";
 import { useSidebarStore } from "../../stores/sidebar.js";
 import { useAuthStore } from "../../stores/auth.js";
 
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: "/irrigations", label: "Riegos" },
   { to: "/harvests", label: "Cosechas" },
   { to: "/inventory", label: "Inventario" },
+  { to: "/costs", label: "Costos" },
   { to: "/reports", label: "Reportes" },
   { to: "/profile", label: "Perfil" },
 ] as const;

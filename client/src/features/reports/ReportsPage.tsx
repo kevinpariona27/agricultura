@@ -1,9 +1,31 @@
 import { useEffect, useMemo } from "react";
-import { useHarvestsStore } from "../../stores/harvests";
-import { useInventoryStore } from "../../stores/inventory";
-import { usePestsStore } from "../../stores/pests";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import { BarChart3, PieChart as PieChartIcon } from "lucide-react";
+import { useParcelsStore } from "../../stores/parcels";
 import { useCropsStore } from "../../stores/crops";
+import { useHarvestsStore } from "../../stores/harvests";
+import { useFertilizationsStore } from "../../stores/fertilizations";
+import { usePestsStore } from "../../stores/pests";
 import { StatCard } from "../../shared/components/StatCard";
+import { EmptyState } from "../../shared/components/EmptyState";
+
+const SEVERITY_COLORS: Record<string, string> = {
+  baja: "#22c55e",
+  media: "#f59e0b",
+  alta: "#ef4444",
+};
 
 const SEVERITY_LABELS: Record<string, string> = {
   baja: "Baja",
@@ -11,113 +33,149 @@ const SEVERITY_LABELS: Record<string, string> = {
   alta: "Alta",
 };
 
-const SEVERITY_COLORS: Record<string, string> = {
-  baja: "bg-green-100 text-green-800",
-  media: "bg-yellow-100 text-yellow-800",
-  alta: "bg-red-100 text-red-800",
-};
+const CHART_COLORS = [
+  "#15803D",
+  "#22C55E",
+  "#60a5fa",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+  "#14b8a6",
+];
 
-const TIPO_LABELS: Record<string, string> = {
-  plaga: "Plaga",
-  enfermedad: "Enfermedad",
-};
+function formatCurrency(value: number): string {
+  return `$${value.toLocaleString("es-ES", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
 
 export function ReportsPage() {
-  const {
-    harvests,
-    fetchAll: fetchHarvests,
-    loading: loadingHarv,
-  } = useHarvestsStore();
-  const {
-    items,
-    fetchAll: fetchInventory,
-    loading: loadingInv,
-  } = useInventoryStore();
-  const {
-    pests,
-    fetchAll: fetchPests,
-    loading: loadingPests,
-  } = usePestsStore();
+  const { parcels, fetchAll: fetchParcels, loading: loadingParcels } =
+    useParcelsStore();
   const { crops, fetchAll: fetchCrops, loading: loadingCrops } =
     useCropsStore();
+  const { harvests, fetchAll: fetchHarvs, loading: loadingHarvs } =
+    useHarvestsStore();
+  const {
+    fertilizations,
+    fetchAll: fetchFerts,
+    loading: loadingFerts,
+  } = useFertilizationsStore();
+  const { pests, fetchAll: fetchPests, loading: loadingPests } =
+    usePestsStore();
 
   useEffect(() => {
-    fetchHarvests();
-    fetchInventory();
-    fetchPests();
+    fetchParcels();
     fetchCrops();
-  }, [fetchHarvests, fetchInventory, fetchPests, fetchCrops]);
+    fetchHarvs();
+    fetchFerts();
+    fetchPests();
+  }, [fetchParcels, fetchCrops, fetchHarvs, fetchFerts, fetchPests]);
 
   const loading =
-    loadingHarv || loadingInv || loadingPests || loadingCrops;
+    loadingParcels || loadingCrops || loadingHarvs || loadingFerts || loadingPests;
 
-  const harvestSummary = useMemo(() => {
-    const grouped = new Map<number, { total: number; count: number }>();
+  // --- Section 1: Summary stats ---
+  const cultivosActivos = useMemo(
+    () =>
+      crops.filter(
+        (c) => c.status !== "cosechado" && c.status !== "cancelado"
+      ).length,
+    [crops]
+  );
+
+  const totalInversion = useMemo(
+    () => fertilizations.reduce((sum, f) => sum + (f.costo ?? 0), 0),
+    [fertilizations]
+  );
+
+  // --- Section 2: Rendimiento por Cultivo ---
+  const yieldByCrop = useMemo(() => {
+    const grouped = new Map<
+      number,
+      { name: string; total: number; count: number }
+    >();
     for (const h of harvests) {
-      const prev = grouped.get(h.crop_id) ?? { total: 0, count: 0 };
-      grouped.set(h.crop_id, {
-        total: prev.total + h.cantidad,
-        count: prev.count + 1,
-      });
+      if (h.rendimiento == null) continue;
+      const crop = crops.find((c) => c.id === h.crop_id);
+      const cropName = crop?.variety ?? `Cultivo #${h.crop_id}`;
+      const prev = grouped.get(h.crop_id) ?? { name: cropName, total: 0, count: 0 };
+      prev.total += h.rendimiento;
+      prev.count += 1;
+      grouped.set(h.crop_id, prev);
     }
-    return Array.from(grouped.entries())
-      .map(([cropId, data]) => {
-        const crop = crops.find((c) => c.id === cropId);
-        return {
-          cropId,
-          cropName: crop?.variety ?? `Cultivo #${cropId}`,
-          totalCantidad: data.total,
-          harvestCount: data.count,
-        };
-      })
-      .sort((a, b) => b.totalCantidad - a.totalCantidad);
+    return Array.from(grouped.values())
+      .map((g) => ({
+        name: g.name,
+        rendimiento: Math.round(g.total / g.count),
+      }))
+      .sort((a, b) => b.rendimiento - a.rendimiento);
   }, [harvests, crops]);
 
-  const lowStockItems = useMemo(() => {
-    return items.filter((item) => item.cantidad <= 5);
-  }, [items]);
+  // --- Section 3: Costos vs Ingresos ---
+  const costsVsRevenue = useMemo(() => {
+    // Fertilization costs per crop
+    const costByCrop = new Map<number, number>();
+    for (const f of fertilizations) {
+      costByCrop.set(f.crop_id, (costByCrop.get(f.crop_id) ?? 0) + (f.costo ?? 0));
+    }
 
-  const expiringItems = useMemo(() => {
-    const thirtyDaysFromNow = new Date();
-    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-    return items
-      .filter((item) => {
-        if (!item.fecha_vencimiento) return false;
-        return new Date(item.fecha_vencimiento) <= thirtyDaysFromNow;
+    // Harvest kg per crop
+    const kgByCrop = new Map<number, number>();
+    for (const h of harvests) {
+      const kg = h.unidad === "ton" ? h.cantidad * 1000 : h.cantidad;
+      kgByCrop.set(h.crop_id, (kgByCrop.get(h.crop_id) ?? 0) + kg);
+    }
+
+    // Vegetable keyword check (same heuristic as costs)
+    const vegetableKeywords = [
+      "tomate", "lechuga", "zanahoria", "cebolla", "pimiento",
+      "brocoli", "coliflor", "espinaca", "acelga", "berenjena",
+      "calabaza", "zapallo", "pepino", "remolacha", "apio",
+      "papa", "batata", "ajo", "chaucha", "arveja",
+    ];
+
+    const allCropIds = new Set([
+      ...costByCrop.keys(),
+      ...kgByCrop.keys(),
+    ]);
+
+    return Array.from(allCropIds)
+      .map((cropId) => {
+        const crop = crops.find((c) => c.id === cropId);
+        const name = crop?.variety ?? `Cultivo #${cropId}`;
+        const isVeg = crop
+          ? vegetableKeywords.some((kw) => crop.variety.toLowerCase().includes(kw))
+          : false;
+        const pricePerKg = isVeg ? 1.0 : 0.5;
+        return {
+          name,
+          costos: costByCrop.get(cropId) ?? 0,
+          ingresos: Math.round((kgByCrop.get(cropId) ?? 0) * pricePerKg),
+        };
       })
-      .sort(
-        (a, b) =>
-          new Date(a.fecha_vencimiento!).getTime() -
-          new Date(b.fecha_vencimiento!).getTime()
-      );
-  }, [items]);
+      .sort((a, b) => b.costos + b.ingresos - (a.costos + a.ingresos))
+      .slice(0, 10); // top 10 for readability
+  }, [fertilizations, harvests, crops]);
 
+  // --- Section 4: Distribución de Plagas ---
   const pestDistribution = useMemo(() => {
-    const byTipo = new Map<string, number>();
     const bySeveridad = new Map<string, number>();
     for (const p of pests) {
-      byTipo.set(p.tipo, (byTipo.get(p.tipo) ?? 0) + 1);
       bySeveridad.set(p.severidad, (bySeveridad.get(p.severidad) ?? 0) + 1);
     }
-    return {
-      byTipo: Array.from(byTipo.entries()).map(([tipo, count]) => ({
-        tipo,
-        label: TIPO_LABELS[tipo] ?? tipo,
-        count,
-      })),
-      bySeveridad: Array.from(bySeveridad.entries()).map(
-        ([severidad, count]) => ({
-          severidad,
-          label: SEVERITY_LABELS[severidad] ?? severidad,
-          count,
-        })
-      ),
-    };
+    return Array.from(bySeveridad.entries()).map(([severidad, count]) => ({
+      name: SEVERITY_LABELS[severidad] ?? severidad,
+      value: count,
+      fill: SEVERITY_COLORS[severidad] ?? "#6b7280",
+    }));
   }, [pests]);
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">
+      <div className="rounded-2xl border border-dashed border-border py-12 text-center text-muted-foreground">
         Cargando...
       </div>
     );
@@ -125,238 +183,165 @@ export function ReportsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-900">Reportes</h1>
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-primary-dark">
+        Reportes
+      </h1>
 
-      {/* Summary stats */}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {/* Section 1: Resumen General */}
+      <h2 className="mb-4 text-lg font-medium tracking-tight text-primary-dark/90">
+        Resumen General
+      </h2>
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          icon="🌾"
+          value={parcels.length}
+          label="Total parcelas"
+          color="emerald"
+          accent
+        />
+        <StatCard
+          icon="🌱"
+          value={cultivosActivos}
+          label="Cultivos activos"
+          color="indigo"
+        />
         <StatCard
           icon="🌽"
           value={harvests.length}
           label="Cosechas totales"
+          color="amber"
         />
         <StatCard
-          icon="📦"
-          value={items.length}
-          label="Insumos registrados"
-        />
-        <StatCard
-          icon="🐛"
-          value={pests.length}
-          label="Plagas registradas"
+          icon="💰"
+          value={totalInversion}
+          label="Inversión total"
+          color="blue"
         />
       </div>
 
-      {/* Harvest summary */}
-      <div className="mb-8">
-        <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
-          Resumen de cosechas por cultivo
+      {/* Section 2: Rendimiento por Cultivo */}
+      <div className="mb-8 rounded-2xl border border-border bg-surface p-6">
+        <h2 className="mb-4 text-base font-semibold text-primary-dark">
+          Rendimiento por Cultivo (kg/ha)
         </h2>
-        {harvestSummary.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-200 py-8 text-center text-sm text-gray-500">
-            No hay cosechas registradas.
-          </div>
+        {yieldByCrop.length === 0 ? (
+          <EmptyState
+            IconComponent={BarChart3}
+            message="No hay datos de rendimiento registrados."
+          />
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-gray-100">
-            <table className="w-full text-left text-sm min-w-[600px]">
-              <thead className="bg-gray-50 text-gray-600">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Cultivo</th>
-                  <th className="px-4 py-3 font-medium">
-                    Cantidad total
-                  </th>
-                  <th className="px-4 py-3 font-medium">
-                    N° de cosechas
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {harvestSummary.map((row) => (
-                  <tr key={row.cropId}>
-                    <td className="px-4 py-3 font-medium text-gray-900">
-                      {row.cropName}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {row.totalCantidad.toLocaleString("es-ES")}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {row.harvestCount}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={yieldByCrop}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                interval={0}
+                angle={-20}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} />
+              <Tooltip
+                formatter={(value: number) => [
+                  `${value.toLocaleString("es-ES")} kg/ha`,
+                  "Rendimiento",
+                ]}
+              />
+              <Legend />
+              <Bar
+                dataKey="rendimiento"
+                name="Rendimiento (kg/ha)"
+                fill="#15803D"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         )}
       </div>
 
-      {/* Inventory status */}
-      <div className="mb-8">
-        <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
-          Estado del inventario
+      {/* Section 3: Costos vs Ingresos */}
+      <div className="mb-8 rounded-2xl border border-border bg-surface p-6">
+        <h2 className="mb-4 text-base font-semibold text-primary-dark">
+          Costos vs Ingresos por Cultivo
         </h2>
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Low stock */}
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-gray-600">
-              Stock bajo (≤ 5 unidades)
-            </h3>
-            {lowStockItems.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm text-gray-500">
-                No hay insumos con stock bajo.
-              </div>
-            ) : (
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
-                <table className="w-full text-left text-sm min-w-[600px]">
-                  <thead className="bg-gray-50 text-gray-600">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">Insumo</th>
-                      <th className="px-4 py-2 font-medium">Cantidad</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {lowStockItems.map((item) => (
-                      <tr key={item.id}>
-                        <td className="px-4 py-2 text-gray-900">
-                          {item.nombre}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span className="inline-block rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                            {item.cantidad} {item.unidad}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          {/* Near expiration */}
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-gray-600">
-              Próximos vencimientos (30 días)
-            </h3>
-            {expiringItems.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm text-gray-500">
-                No hay insumos próximos a vencer.
-              </div>
-            ) : (
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
-                <table className="w-full text-left text-sm min-w-[600px]">
-                  <thead className="bg-gray-50 text-gray-600">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">Insumo</th>
-                      <th className="px-4 py-2 font-medium">Vence</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {expiringItems.map((item) => (
-                      <tr key={item.id}>
-                        <td className="px-4 py-2 text-gray-900">
-                          {item.nombre}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span className="inline-block rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
-                            {new Date(
-                              item.fecha_vencimiento!
-                            ).toLocaleDateString("es-ES")}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
+        {costsVsRevenue.length === 0 ? (
+          <EmptyState
+            IconComponent={BarChart3}
+            message="No hay datos de costos o ingresos registrados."
+          />
+        ) : (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={costsVsRevenue}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                interval={0}
+                angle={-20}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis tick={{ fontSize: 12, fill: "#6b7280" }} />
+              <Tooltip
+                formatter={(value: number) => [
+                  formatCurrency(value),
+                  undefined,
+                ]}
+              />
+              <Legend />
+              <Bar
+                dataKey="costos"
+                name="Costos"
+                stackId="a"
+                fill="#ef4444"
+                radius={[0, 0, 0, 0]}
+              />
+              <Bar
+                dataKey="ingresos"
+                name="Ingresos estimados"
+                stackId="a"
+                fill="#22C55E"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
-      {/* Pest history */}
-      <div>
-        <h2 className="mb-3 text-lg font-medium tracking-tight text-gray-800">
-          Historial de plagas
+      {/* Section 4: Distribución de Plagas */}
+      <div className="mb-8 rounded-2xl border border-border bg-surface p-6">
+        <h2 className="mb-4 text-base font-semibold text-primary-dark">
+          Distribución de Plagas por Severidad
         </h2>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* By type */}
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-gray-600">
-              Distribución por tipo
-            </h3>
-            {pestDistribution.byTipo.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm text-gray-500">
-                No hay plagas registradas.
-              </div>
-            ) : (
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
-                <table className="w-full text-left text-sm min-w-[600px]">
-                  <thead className="bg-gray-50 text-gray-600">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">Tipo</th>
-                      <th className="px-4 py-2 font-medium">Cantidad</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {pestDistribution.byTipo.map((row) => (
-                      <tr key={row.tipo}>
-                        <td className="px-4 py-2 text-gray-900">
-                          {row.label}
-                        </td>
-                        <td className="px-4 py-2 text-gray-600">
-                          {row.count}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          {/* By severity */}
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-gray-600">
-              Distribución por severidad
-            </h3>
-            {pestDistribution.bySeveridad.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-gray-200 py-6 text-center text-sm text-gray-500">
-                No hay plagas registradas.
-              </div>
-            ) : (
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
-                <table className="w-full text-left text-sm min-w-[600px]">
-                  <thead className="bg-gray-50 text-gray-600">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">Severidad</th>
-                      <th className="px-4 py-2 font-medium">Cantidad</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {pestDistribution.bySeveridad.map((row) => (
-                      <tr key={row.severidad}>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                              SEVERITY_COLORS[row.severidad] ??
-                              "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {row.label}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2 text-gray-600">
-                          {row.count}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
+        {pestDistribution.length === 0 ? (
+          <EmptyState
+            IconComponent={PieChartIcon}
+            message="No hay plagas registradas."
+          />
+        ) : (
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart>
+              <Pie
+                data={pestDistribution}
+                cx="50%"
+                cy="50%"
+                innerRadius={70}
+                outerRadius={120}
+                paddingAngle={2}
+                dataKey="value"
+                nameKey="name"
+                label={({ name, value }) => `${name}: ${value}`}
+              >
+                {pestDistribution.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

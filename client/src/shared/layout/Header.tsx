@@ -76,7 +76,9 @@ export function Header() {
         >
           <Bell className="h-5 w-5 text-primary-dark/70" />
           {notifications.length > 0 && (
-            <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-primary-light" />
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-xs font-bold text-white">
+              {notifications.length > 99 ? "99+" : notifications.length}
+            </span>
           )}
         </button>
         <NotificationDropdown isOpen={notifOpen} onClose={() => setNotifOpen(false)} />

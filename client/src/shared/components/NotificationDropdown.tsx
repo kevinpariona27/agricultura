@@ -26,7 +26,10 @@ export function NotificationDropdown({
   onClose,
 }: NotificationDropdownProps) {
   const navigate = useNavigate();
-  const notifications = useNotificationStore((s) => s.notifications);
+  const allNotifications = useNotificationStore((s) => s.notifications);
+
+  // Show last 5 notifications (already sorted by priority in the store)
+  const notifications = allNotifications.slice(0, 5);
 
   function handleClick(notif: NotificationItem) {
     onClose();
@@ -47,6 +50,11 @@ export function NotificationDropdown({
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <h3 className="text-sm font-semibold text-primary-dark">
               Notificaciones
+              {allNotifications.length > 0 && (
+                <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-white">
+                  {allNotifications.length}
+                </span>
+              )}
             </h3>
             <button
               onClick={onClose}
