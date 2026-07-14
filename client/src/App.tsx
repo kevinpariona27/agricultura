@@ -23,6 +23,9 @@ import { InventoryFormPage } from "./features/inventory/InventoryFormPage.js";
 import { CostsPage } from "./features/costs/CostsPage.js";
 import { MapPage } from "./features/map/MapPage.js";
 import { ProfilePage } from "./features/users/ProfilePage.js";
+import { PestListPage } from "./features/pests/PestListPage.js";
+import { PestDetailPage } from "./features/pests/PestDetailPage.js";
+import { PestFormPage } from "./features/pests/PestFormPage.js";
 
 export default function App() {
   return (
@@ -57,6 +60,10 @@ export default function App() {
             <Route path="/inventory/new" element={<InventoryFormPage />} />
             <Route path="/inventory/:id" element={<InventoryDetailPage />} />
             <Route path="/inventory/:id/edit" element={<InventoryFormPage />} />
+            <Route path="/pests" element={<PestListPage />} />
+            <Route path="/pests/new" element={<PestFormPage />} />
+            <Route path="/pests/:id" element={<PestDetailPage />} />
+            <Route path="/pests/:id/edit" element={<PestFormPage />} />
             <Route path="/costs" element={<CostsPage />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/profile" element={<ProfilePage />} />

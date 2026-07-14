@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: "/crops", label: "Cultivos" },
   { to: "/irrigations", label: "Riegos" },
   { to: "/harvests", label: "Cosechas" },
+  { to: "/pests", label: "Plagas" },
   { to: "/inventory", label: "Inventario" },
   { to: "/costs", label: "Costos" },
   { to: "/map", label: "Mapa" },
