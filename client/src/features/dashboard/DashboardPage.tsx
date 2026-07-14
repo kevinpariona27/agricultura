@@ -17,6 +17,7 @@ import { useHarvestsStore } from "../../stores/harvests";
 import { useInventoryStore } from "../../stores/inventory";
 import { useNotificationStore } from "../../stores/notificationStore";
 import { StatCard } from "../../shared/components/StatCard";
+import { Wheat, Sprout, Droplets, Bug, Pizza, Package } from "lucide-react";
 import { DonutChart } from "./components/DonutChart";
 import { EvolutionBarChart } from "./components/EvolutionBarChart";
 import { EmptyState } from "../../shared/components/EmptyState";
@@ -140,7 +141,9 @@ export function DashboardPage() {
     for (const h of harvests) {
       if (h.rendimiento == null) continue;
       const crop = crops.find((c) => c.id === h.crop_id);
-      const cropName = crop?.variety ?? `Cultivo #${h.crop_id}`;
+      const cropName = (crop?.variety ?? `Cultivo #${h.crop_id}`).length > 18 
+        ? (crop?.variety ?? `Cultivo #${h.crop_id}`).slice(0, 18) + "…"
+        : (crop?.variety ?? `Cultivo #${h.crop_id}`);
       const prev = grouped.get(h.crop_id) ?? {
         name: cropName,
         total: 0,
@@ -175,49 +178,12 @@ export function DashboardPage() {
 
       {/* Stats grid */}
       <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          icon="🌾"
-          value={parcels.length}
-          label="Parcelas"
-          color="emerald"
-          accent={true}
-          onClick={() => navigate("/parcels")}
-        />
-        <StatCard
-          icon="🌱"
-          value={cultivosActivos}
-          label="Cultivos activos"
-          color="indigo"
-          onClick={() => navigate("/crops")}
-        />
-        <StatCard
-          icon="💧"
-          value={riegosEsteMes}
-          label="Riegos este mes"
-          color="blue"
-          onClick={() => navigate("/irrigations")}
-        />
-        <StatCard
-          icon="🐛"
-          value={plagasActivas}
-          label="Plagas activas"
-          color="red"
-          onClick={() => navigate("/pests")}
-        />
-        <StatCard
-          icon="🌽"
-          value={harvests.length}
-          label="Cosechas totales"
-          color="amber"
-          onClick={() => navigate("/harvests")}
-        />
-        <StatCard
-          icon="📦"
-          value={inventarioCritico}
-          label="Inventario crítico"
-          color="purple"
-          onClick={() => navigate("/inventory")}
-        />
+        <StatCard icon={Wheat} value={parcels.length} label="Parcelas" color="emerald" accent={true} onClick={() => navigate("/parcels")} />
+        <StatCard icon={Sprout} value={cultivosActivos} label="Cultivos activos" color="indigo" onClick={() => navigate("/crops")} />
+        <StatCard icon={Droplets} value={riegosEsteMes} label="Riegos este mes" color="blue" onClick={() => navigate("/irrigations")} />
+        <StatCard icon={Bug} value={plagasActivas} label="Plagas activas" color="red" onClick={() => navigate("/pests")} />
+        <StatCard icon={Pizza} value={harvests.length} label="Cosechas totales" color="amber" onClick={() => navigate("/harvests")} />
+        <StatCard icon={Package} value={inventarioCritico} label="Inventario crítico" color="purple" onClick={() => navigate("/inventory")} />
       </div>
 
       {/* Charts grid */}

@@ -12,7 +12,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { BarChart3, PieChart as PieChartIcon } from "lucide-react";
+import { BarChart3, PieChart as PieChartIcon, Wheat, Sprout, Pizza, DollarSign } from "lucide-react";
 import { useParcelsStore } from "../../stores/parcels";
 import { useCropsStore } from "../../stores/crops";
 import { useHarvestsStore } from "../../stores/harvests";
@@ -235,31 +235,10 @@ export function ReportsPage() {
         Resumen General
       </h2>
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon="🌾"
-          value={parcels.length}
-          label="Total parcelas"
-          color="emerald"
-          accent
-        />
-        <StatCard
-          icon="🌱"
-          value={cultivosActivos}
-          label="Cultivos activos"
-          color="indigo"
-        />
-        <StatCard
-          icon="🌽"
-          value={harvests.length}
-          label="Cosechas totales"
-          color="amber"
-        />
-        <StatCard
-          icon="💰"
-          value={totalInversion}
-          label="Inversión total"
-          color="blue"
-        />
+        <StatCard icon={Wheat} value={parcels.length} label="Total parcelas" color="emerald" accent />
+        <StatCard icon={Sprout} value={cultivosActivos} label="Cultivos activos" color="indigo" />
+        <StatCard icon={Pizza} value={harvests.length} label="Cosechas totales" color="amber" />
+        <StatCard icon={DollarSign} value={totalInversion} label="Inversión total" color="blue" />
       </div>
 
       {/* Section 2: Rendimiento por Cultivo */}

@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { to: "/harvests", label: "Cosechas" },
   { to: "/pests", label: "Plagas" },
   { to: "/inventory", label: "Inventario" },
-  { to: "/costs", label: "Costos" },
+  { to: "/costs", label: "Costos", short: "Cst" },
   { to: "/map", label: "Mapa" },
   { to: "/reports", label: "Reportes" },
   { to: "/legal", label: "Cuaderno" },
@@ -106,7 +106,7 @@ export function Sidebar() {
               }
             >
               <span className={isDesktopExpanded ? "" : "lg:hidden"}>{item.label}</span>
-              <span className={isDesktopExpanded ? "hidden" : "hidden lg:inline text-xs"}>{item.label.slice(0, 3)}</span>
+              <span className={isDesktopExpanded ? "hidden" : "hidden lg:inline text-xs"}>{(item as any).short ?? item.label.slice(0, 3)}</span>
             </NavLink>
           ))}
         </nav>
