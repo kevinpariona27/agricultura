@@ -5,6 +5,7 @@ import { MapPin, Ruler } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-draw";
 import { useParcelsStore } from "../../stores/parcels";
 import { geocodeLocation, spreadCoords } from "../../shared/utils/geocode";
 

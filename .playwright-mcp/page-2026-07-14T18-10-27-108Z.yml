@@ -1,0 +1,147 @@
+- generic [ref=e16]:
+  - complementary "Sidebar navigation" [ref=e17]:
+    - generic [ref=e18]: GA
+    - navigation [ref=e19]:
+      - link "Das" [ref=e20] [cursor=pointer]:
+        - /url: /dashboard
+      - link "Par" [ref=e21] [cursor=pointer]:
+        - /url: /parcels
+      - link "Cul" [ref=e22] [cursor=pointer]:
+        - /url: /crops
+      - link "Rie" [ref=e23] [cursor=pointer]:
+        - /url: /irrigations
+      - link "Cos" [ref=e24] [cursor=pointer]:
+        - /url: /harvests
+      - link "Pla" [ref=e25] [cursor=pointer]:
+        - /url: /pests
+      - link "Inv" [ref=e26] [cursor=pointer]:
+        - /url: /inventory
+      - link "Cos" [ref=e27] [cursor=pointer]:
+        - /url: /costs
+      - link "Map" [ref=e28] [cursor=pointer]:
+        - /url: /map
+      - link "Rep" [ref=e29] [cursor=pointer]:
+        - /url: /reports
+      - link "Cua" [ref=e30] [cursor=pointer]:
+        - /url: /legal
+      - link "Per" [ref=e31] [cursor=pointer]:
+        - /url: /profile
+    - generic [ref=e32]:
+      - button "Nuevo Reporte" [ref=e33] [cursor=pointer]
+      - button "Salir" [ref=e37] [cursor=pointer]
+  - generic [ref=e38]:
+    - banner [ref=e39]:
+      - button "Descargar PDF" [ref=e40] [cursor=pointer]
+      - button "Ir al perfil" [ref=e44] [cursor=pointer]:
+        - img "Avatar de usuario" [ref=e45]
+      - button "Notificaciones" [ref=e50] [cursor=pointer]
+    - main [ref=e54]:
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - heading "Parcelas" [level=1] [ref=e58]
+          - generic [ref=e59]:
+            - button "Exportar Excel" [ref=e60] [cursor=pointer]
+            - button "Exportar PDF" [ref=e64] [cursor=pointer]
+            - button "+ Nueva parcela" [ref=e68]
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - generic [ref=e72]:
+              - generic [ref=e73]: Buscar por nombre
+              - textbox "Buscar por nombre" [ref=e75]:
+                - /placeholder: Buscar lote...
+            - generic [ref=e76]:
+              - generic [ref=e77]: Tipo de suelo
+              - combobox "Tipo de suelo" [ref=e78]:
+                - option "Todos" [selected]
+                - option "arcilloso"
+                - option "arenoso"
+                - option "franco"
+                - option "calcáreo"
+                - option "pedregoso"
+                - option "orgánico"
+          - table [ref=e80]:
+            - rowgroup [ref=e81]:
+              - row [ref=e82]:
+                - columnheader [ref=e83]
+                - columnheader "Nombre" [ref=e84]
+                - columnheader "Área (ha)" [ref=e85]
+                - columnheader "Ubicación" [ref=e86]
+                - columnheader "Tipo de suelo" [ref=e87]
+            - rowgroup [ref=e88]:
+              - row [ref=e89] [cursor=pointer]:
+                - cell [ref=e90]:
+                  - img "Lote El Triángulo" [ref=e91]
+                - cell "Lote El Triángulo" [ref=e99]
+                - cell "5.5" [ref=e100]
+                - cell "Esquina NW, forma triangular" [ref=e101]
+                - cell "arenoso" [ref=e102]
+              - row [ref=e104] [cursor=pointer]:
+                - cell [ref=e105]:
+                  - img "Lote El Bosque" [ref=e106]
+                - cell "Lote El Bosque" [ref=e114]
+                - cell "3.2" [ref=e115]
+                - cell "Lindero a monte nativo" [ref=e116]
+                - cell "franco" [ref=e117]
+              - row [ref=e119] [cursor=pointer]:
+                - cell [ref=e120]:
+                  - img "Lote La Tranquera" [ref=e121]
+                - cell "Lote La Tranquera" [ref=e129]
+                - cell "13.7" [ref=e130]
+                - cell "Entrada principal del campo" [ref=e131]
+                - cell "franco" [ref=e132]
+              - row [ref=e134] [cursor=pointer]:
+                - cell [ref=e135]:
+                  - img "Lote Invernadero" [ref=e136]
+                - cell "Lote Invernadero" [ref=e144]
+                - cell "1.8" [ref=e145]
+                - cell "Bajo cubierta" [ref=e146]
+                - cell "tierra-negra" [ref=e147]
+              - row [ref=e149] [cursor=pointer]:
+                - cell [ref=e150]:
+                  - img "Lote La Loma" [ref=e151]
+                - cell "Lote La Loma" [ref=e159]
+                - cell "11" [ref=e160]
+                - cell "Loma con pendiente suave" [ref=e161]
+                - cell "franco-limoso" [ref=e162]
+              - row [ref=e164] [cursor=pointer]:
+                - cell [ref=e165]:
+                  - img "Lote La Esquina" [ref=e166]
+                - cell "Lote La Esquina" [ref=e174]
+                - cell "4.5" [ref=e175]
+                - cell "Esquina SE, media sombra" [ref=e176]
+                - cell "franco" [ref=e177]
+              - row [ref=e179] [cursor=pointer]:
+                - cell [ref=e180]:
+                  - img "Lote La Laguna" [ref=e181]
+                - cell "Lote La Laguna" [ref=e189]
+                - cell "6.3" [ref=e190]
+                - cell "Cercano a reservorio de agua" [ref=e191]
+                - cell "arcilloso" [ref=e192]
+              - row [ref=e194] [cursor=pointer]:
+                - cell [ref=e195]:
+                  - img "Lote Central" [ref=e196]
+                - cell "Lote Central" [ref=e204]
+                - cell "7.4" [ref=e205]
+                - cell "Centro del campo" [ref=e206]
+                - cell "franco-arcilloso" [ref=e207]
+              - row [ref=e209] [cursor=pointer]:
+                - cell [ref=e210]:
+                  - img "Lote Los Álamos" [ref=e211]
+                - cell "Lote Los Álamos" [ref=e219]
+                - cell "8" [ref=e220]
+                - cell "Cortina de álamos al oeste" [ref=e221]
+                - cell "franco-arcilloso" [ref=e222]
+              - row [ref=e224] [cursor=pointer]:
+                - cell [ref=e225]:
+                  - img "Lote Este" [ref=e226]
+                - cell "Lote Este" [ref=e234]
+                - cell "9.8" [ref=e235]
+                - cell "Sector Este, zona alta" [ref=e236]
+                - cell "franco" [ref=e237]
+          - generic [ref=e239]:
+            - generic [ref=e240]: Mostrando 1-10 de 14 resultados
+            - generic [ref=e241]:
+              - button "Página anterior" [disabled] [ref=e242]
+              - button "1" [ref=e245]
+              - button "2" [ref=e246]
+              - button "Página siguiente" [ref=e247]
