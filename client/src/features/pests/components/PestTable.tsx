@@ -5,6 +5,7 @@ import type { Pest } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
 import { Badge } from "../../../shared/components/Badge";
 import { ImageDisplay } from "../../../shared/components/ImageDisplay";
+import { SearchInput } from "../../../shared/components/SearchInput";
 
 const TIPO_LABELS: Record<string, string> = {
   plaga: "Plaga",
@@ -104,19 +105,12 @@ export function PestTable({
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
-          <label
-            htmlFor="search"
-            className="mb-1 block text-sm font-medium text-gray-700"
-          >
-            Buscar por nombre
-          </label>
-          <input
+          <SearchInput
             id="search"
-            type="text"
             value={searchValue}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={handleSearch}
             placeholder="Buscar plaga..."
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            label="Buscar por nombre"
           />
         </div>
 

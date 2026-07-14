@@ -9,6 +9,9 @@ import { NotificationDropdown } from "../components/NotificationDropdown";
 
 export function Header() {
   const notifications = useNotificationStore((s) => s.notifications);
+  const computeNotifications = useNotificationStore(
+    (s) => s.computeNotifications
+  );
   const { profile, fetchProfile } = useUserStore();
   const toggle = useSidebarStore((s) => s.toggle);
   const sidebarOpen = useSidebarStore((s) => s.isOpen);
@@ -21,6 +24,13 @@ export function Header() {
       fetchProfile();
     }
   }, [token, profile, fetchProfile]);
+
+  // Compute notifications on mount and periodically
+  useEffect(() => {
+    computeNotifications();
+    const interval = setInterval(computeNotifications, 60000);
+    return () => clearInterval(interval);
+  }, [computeNotifications]);
 
   return (
     <header
@@ -65,7 +75,7 @@ export function Header() {
           aria-label="Notificaciones"
         >
           <Bell className="h-5 w-5 text-primary-dark/70" />
-          {notifications > 0 && (
+          {notifications.length > 0 && (
             <span className="absolute right-1 top-1 h-2.5 w-2.5 rounded-full bg-primary-light" />
           )}
         </button>

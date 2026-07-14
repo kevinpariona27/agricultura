@@ -1,8 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Download } from "lucide-react";
 import { useHarvestsStore } from "../../stores/harvests";
 import { useCropsStore } from "../../stores/crops";
 import { HarvestTable } from "./components/HarvestTable";
+import { HARVEST_UNIT_LABELS } from "./components/HarvestForm";
+import { exportToExcel } from "../../shared/utils/exportExcel";
 
 export function HarvestListPage() {
   const navigate = useNavigate();
@@ -14,6 +17,7 @@ export function HarvestListPage() {
   const [cropId, setCropId] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchCrops();
@@ -26,17 +30,28 @@ export function HarvestListPage() {
       crop_id?: string;
       date_from?: string;
       date_to?: string;
+      search?: string;
     }) => {
       const c = overrides?.crop_id ?? cropId;
       const df = overrides?.date_from ?? dateFrom;
       const dt = overrides?.date_to ?? dateTo;
+      const s = overrides?.search ?? search;
       fetchAll({
         crop_id: c ? Number(c) : undefined,
         date_from: df || undefined,
         date_to: dt || undefined,
-      }).catch(() => {});
+        search: s || undefined,
+      } as any).catch(() => {});
     },
-    [fetchAll, cropId, dateFrom, dateTo]
+    [fetchAll, cropId, dateFrom, dateTo, search]
+  );
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearch(value);
+      applyFilters({ search: value });
+    },
+    [applyFilters]
   );
 
   const selectClass =
@@ -48,12 +63,32 @@ export function HarvestListPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Cosechas</h1>
-        <button
-          onClick={() => navigate("/harvests/new")}
-          className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-        >
-          + Nueva cosecha
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              exportToExcel(
+                harvests.map((h) => ({
+                  "Fecha cosecha": h.fecha_cosecha,
+                  "Cantidad": h.cantidad,
+                  "Unidad": HARVEST_UNIT_LABELS[h.unidad] ?? h.unidad,
+                  "Rendimiento": h.rendimiento ?? "",
+                  "Pérdidas": h.perdidas ?? "",
+                })),
+                "cosechas"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            <Download className="h-4 w-4" />
+            Exportar Excel
+          </button>
+          <button
+            onClick={() => navigate("/harvests/new")}
+            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+          >
+            + Nueva cosecha
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -132,7 +167,7 @@ export function HarvestListPage() {
           Cargando...
         </div>
       ) : (
-        <HarvestTable harvests={harvests} />
+        <HarvestTable harvests={harvests} onSearch={handleSearch} />
       )}
     </div>
   );

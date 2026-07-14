@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { Harvest } from "@agri/shared";
 import { useCropsStore } from "../../../stores/crops";
 import { Badge } from "../../../shared/components/Badge";
+import { SearchInput } from "../../../shared/components/SearchInput";
 import { HARVEST_UNIT_LABELS } from "./HarvestForm";
 
 interface Props {
   harvests: Harvest[];
+  onSearch?: (v: string) => void;
   onCropFilter?: (v: string) => void;
   onDateFrom?: (v: string) => void;
   onDateTo?: (v: string) => void;
@@ -29,11 +31,10 @@ const item = {
 
 export function HarvestTable({
   harvests,
-  onCropFilter: _onCropFilter,
-  onDateFrom: _onDateFrom,
-  onDateTo: _onDateTo,
+  onSearch,
 }: Props) {
   const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
 
   const crops = useCropsStore((s) => s.crops);
   const fetchCrops = useCropsStore((s) => s.fetchAll);
@@ -44,6 +45,11 @@ export function HarvestTable({
     }
   }, [crops.length, fetchCrops]);
 
+  function handleSearch(value: string) {
+    setSearchValue(value);
+    onSearch?.(value);
+  }
+
   function cropName(crop_id: number): string {
     const crop = crops.find((c) => c.id === crop_id);
     return crop?.variety ?? `#${crop_id}`;
@@ -51,6 +57,19 @@ export function HarvestTable({
 
   return (
     <div>
+      {/* Search */}
+      <div className="mb-6 flex flex-wrap gap-4">
+        <div className="flex-1 min-w-[200px]">
+          <SearchInput
+            id="harvest-search"
+            value={searchValue}
+            onChange={handleSearch}
+            placeholder="Buscar cosecha..."
+            label="Buscar por cultivo"
+          />
+        </div>
+      </div>
+
       {/* Table */}
       {harvests.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-200 py-12 text-center text-gray-500">

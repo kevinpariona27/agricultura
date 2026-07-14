@@ -1,7 +1,9 @@
 import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Download } from "lucide-react";
 import { useInventoryStore } from "../../stores/inventory";
 import { InventoryTable } from "./components/InventoryTable";
+import { exportToExcel } from "../../shared/utils/exportExcel";
 
 export function InventoryListPage() {
   const navigate = useNavigate();
@@ -35,12 +37,33 @@ export function InventoryListPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
           Inventario
         </h1>
-        <button
-          onClick={() => navigate("/inventory/new")}
-          className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-        >
-          + Nuevo ítem
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              exportToExcel(
+                items.map((i) => ({
+                  Nombre: i.nombre,
+                  Categoría: i.categoria,
+                  Cantidad: i.cantidad,
+                  Unidad: i.unidad,
+                  "Costo unitario": i.costo_unitario ?? "",
+                  Vencimiento: i.fecha_vencimiento ?? "",
+                })),
+                "inventario"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            <Download className="h-4 w-4" />
+            Exportar Excel
+          </button>
+          <button
+            onClick={() => navigate("/inventory/new")}
+            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+          >
+            + Nuevo ítem
+          </button>
+        </div>
       </div>
 
       {error && (

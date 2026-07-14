@@ -1,7 +1,10 @@
 import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Download } from "lucide-react";
 import { useCropsStore } from "../../stores/crops.js";
 import { CropTable } from "./components/CropTable.js";
+import { CROP_STATUS_LABELS } from "./components/CropForm.js";
+import { exportToExcel } from "../../shared/utils/exportExcel.js";
 
 export function CropListPage() {
   const navigate = useNavigate();
@@ -39,12 +42,33 @@ export function CropListPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Cultivos</h1>
-        <button
-          onClick={() => navigate("/crops/new")}
-          className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-        >
-          + Nuevo cultivo
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              exportToExcel(
+                crops.map((c) => ({
+                  Variedad: c.variety,
+                  Estado:
+                    CROP_STATUS_LABELS[c.status as keyof typeof CROP_STATUS_LABELS] ?? c.status,
+                  "Fecha siembra": c.planting_date,
+                  "Fecha estimada cosecha": c.estimated_harvest_date ?? "",
+                  "Densidad siembra": c.planting_density ?? "",
+                })),
+                "cultivos"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            <Download className="h-4 w-4" />
+            Exportar Excel
+          </button>
+          <button
+            onClick={() => navigate("/crops/new")}
+            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+          >
+            + Nuevo cultivo
+          </button>
+        </div>
       </div>
 
       {error && (

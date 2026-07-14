@@ -11,6 +11,7 @@ interface StatCardProps {
   label: string;
   color?: string;
   accent?: boolean;
+  onClick?: () => void;
 }
 
 const COLOR_MAP: Record<string, { border: string; bg: string; text: string }> = {
@@ -51,7 +52,7 @@ const COLOR_MAP: Record<string, { border: string; bg: string; text: string }> = 
   },
 };
 
-export function StatCard({ icon, value, label, color, accent = false }: StatCardProps) {
+export function StatCard({ icon, value, label, color, accent = false, onClick }: StatCardProps) {
   const c = color ? COLOR_MAP[color] ?? COLOR_MAP.blue : null;
 
   const containerClass =
@@ -64,6 +65,7 @@ export function StatCard({ icon, value, label, color, accent = false }: StatCard
       whileHover={{ scale: 1.05 }}
       transition={{ duration: 0.15 }}
       className={containerClass}
+      onClick={onClick}
     >
       <div className="flex items-center justify-between">
         <div>

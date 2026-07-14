@@ -1,7 +1,9 @@
 import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Download } from "lucide-react";
 import { usePestsStore } from "../../stores/pests";
 import { PestTable } from "./components/PestTable";
+import { exportToExcel } from "../../shared/utils/exportExcel";
 
 export function PestListPage() {
   const navigate = useNavigate();
@@ -53,12 +55,33 @@ export function PestListPage() {
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
           Plagas y Enfermedades
         </h1>
-        <button
-          onClick={() => navigate("/pests/new")}
-          className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-        >
-          + Nueva plaga
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              exportToExcel(
+                pests.map((p) => ({
+                  Nombre: p.nombre,
+                  Tipo: p.tipo,
+                  Severidad: p.severidad,
+                  Estado: p.estado,
+                  "Fecha detección": p.fecha_deteccion,
+                  Tratamiento: p.tratamiento ?? "",
+                })),
+                "plagas"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            <Download className="h-4 w-4" />
+            Exportar Excel
+          </button>
+          <button
+            onClick={() => navigate("/pests/new")}
+            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+          >
+            + Nueva plaga
+          </button>
+        </div>
       </div>
 
       {error && (

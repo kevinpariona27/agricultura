@@ -1,16 +1,19 @@
 import { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParcelsStore } from "../../stores/parcels";
 import { useCropsStore } from "../../stores/crops";
 import { useIrrigationsStore } from "../../stores/irrigations";
 import { usePestsStore } from "../../stores/pests";
 import { useHarvestsStore } from "../../stores/harvests";
 import { useInventoryStore } from "../../stores/inventory";
+import { useNotificationStore } from "../../stores/notificationStore";
 import { StatCard } from "../../shared/components/StatCard";
 import { ImageDisplay } from "../../shared/components/ImageDisplay";
 import { DonutChart } from "./components/DonutChart";
 import { EvolutionBarChart } from "./components/EvolutionBarChart";
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const { parcels, fetchAll: fetchParcels, loading: loadingParcels } =
     useParcelsStore();
   const { crops, fetchAll: fetchCrops, loading: loadingCrops } =
@@ -23,6 +26,9 @@ export function DashboardPage() {
     useHarvestsStore();
   const { items, fetchAll: fetchInventory, loading: loadingInv } =
     useInventoryStore();
+  const computeNotifications = useNotificationStore(
+    (s) => s.computeNotifications
+  );
 
   useEffect(() => {
     fetchParcels();
@@ -31,10 +37,68 @@ export function DashboardPage() {
     fetchPests({ estado: "activo" });
     fetchHarvests();
     fetchInventory();
-  }, [fetchParcels, fetchCrops, fetchIrrigations, fetchPests, fetchHarvests, fetchInventory]);
+  }, [
+    fetchParcels,
+    fetchCrops,
+    fetchIrrigations,
+    fetchPests,
+    fetchHarvests,
+    fetchInventory,
+  ]);
+
+  // Compute real-time notifications after data loads
+  useEffect(() => {
+    if (!loadingParcels && !loadingCrops && !loadingIrrig && !loadingPests && !loadingHarv && !loadingInv) {
+      computeNotifications();
+    }
+  }, [
+    crops,
+    parcels,
+    irrigations,
+    pests,
+    harvests,
+    items,
+    loadingParcels,
+    loadingCrops,
+    loadingIrrig,
+    loadingPests,
+    loadingHarv,
+    loadingInv,
+    computeNotifications,
+  ]);
 
   const loading =
     loadingParcels || loadingCrops || loadingIrrig || loadingPests || loadingHarv || loadingInv;
+
+  // Real metrics
+  const cultivosActivos = useMemo(
+    () =>
+      crops.filter(
+        (c) => c.status !== "cosechado" && c.status !== "cancelado"
+      ).length,
+    [crops]
+  );
+
+  const riegosEsteMes = useMemo(() => {
+    const now = new Date();
+    return irrigations.filter((i) => {
+      const d = new Date(i.irrigation_date);
+      return (
+        d.getMonth() === now.getMonth() &&
+        d.getFullYear() === now.getFullYear()
+      );
+    }).length;
+  }, [irrigations]);
+
+  const plagasActivas = useMemo(
+    () => pests.filter((p) => p.estado === "activo").length,
+    [pests]
+  );
+
+  const inventarioCritico = useMemo(
+    () => items.filter((i) => i.cantidad <= 5).length,
+    [items]
+  );
 
   const expiringItems = useMemo(() => {
     if (!items.length) return [];
@@ -79,36 +143,42 @@ export function DashboardPage() {
           label="Parcelas"
           color="emerald"
           accent={true}
+          onClick={() => navigate("/parcels")}
         />
         <StatCard
           icon="🌱"
-          value={crops.length}
+          value={cultivosActivos}
           label="Cultivos activos"
           color="indigo"
+          onClick={() => navigate("/crops")}
         />
         <StatCard
           icon="💧"
-          value={irrigations.length}
-          label="Riegos"
+          value={riegosEsteMes}
+          label="Riegos este mes"
           color="blue"
+          onClick={() => navigate("/irrigations")}
         />
         <StatCard
           icon="🐛"
-          value={pests.length}
+          value={plagasActivas}
           label="Plagas activas"
           color="red"
+          onClick={() => navigate("/pests")}
         />
         <StatCard
           icon="🌽"
           value={harvests.length}
-          label="Cosechas"
+          label="Cosechas totales"
           color="amber"
+          onClick={() => navigate("/harvests")}
         />
         <StatCard
           icon="📦"
-          value={items.length}
-          label="Insumos"
+          value={inventarioCritico}
+          label="Inventario crítico"
           color="purple"
+          onClick={() => navigate("/inventory")}
         />
       </div>
 

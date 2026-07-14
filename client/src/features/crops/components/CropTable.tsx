@@ -5,6 +5,7 @@ import type { Crop } from "@agri/shared";
 import { useParcelsStore } from "../../../stores/parcels.js";
 import { Badge } from "../../../shared/components/Badge";
 import { ImageDisplay } from "../../../shared/components/ImageDisplay";
+import { SearchInput } from "../../../shared/components/SearchInput";
 import { CROP_STATUS_LABELS, CROP_STATUS_OPTIONS } from "./CropForm.js";
 
 interface CropTableProps {
@@ -82,19 +83,12 @@ export function CropTable({
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-4">
         <div className="flex-1 min-w-[200px]">
-          <label
-            htmlFor="search"
-            className="mb-1 block text-sm font-medium text-gray-700"
-          >
-            Buscar por variedad
-          </label>
-          <input
+          <SearchInput
             id="search"
-            type="text"
             value={searchValue}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={handleSearch}
             placeholder="Buscar cultivo..."
-            className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+            label="Buscar por variedad"
           />
         </div>
 

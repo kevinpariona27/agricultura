@@ -1,11 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Download } from "lucide-react";
 import { useIrrigationsStore } from "../../stores/irrigations";
 import { useCropsStore } from "../../stores/crops";
 import { IrrigationTable } from "./components/IrrigationTable";
 import {
   IRRIGATION_METHOD_OPTIONS,
+  IRRIGATION_METHOD_LABELS,
 } from "./components/IrrigationForm";
+import { exportToExcel } from "../../shared/utils/exportExcel";
 
 export function IrrigationListPage() {
   const navigate = useNavigate();
@@ -18,6 +21,7 @@ export function IrrigationListPage() {
   const [method, setMethod] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchCrops();
@@ -31,19 +35,30 @@ export function IrrigationListPage() {
       method?: string;
       date_from?: string;
       date_to?: string;
+      search?: string;
     }) => {
       const c = overrides?.crop_id ?? cropId;
       const m = overrides?.method ?? method;
       const df = overrides?.date_from ?? dateFrom;
       const dt = overrides?.date_to ?? dateTo;
+      const s = overrides?.search ?? search;
       fetchAll({
         crop_id: c ? Number(c) : undefined,
         method: (m || undefined) as any,
         date_from: df || undefined,
         date_to: dt || undefined,
-      }).catch(() => {});
+        search: s || undefined,
+      } as any).catch(() => {});
     },
-    [fetchAll, cropId, method, dateFrom, dateTo]
+    [fetchAll, cropId, method, dateFrom, dateTo, search]
+  );
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearch(value);
+      applyFilters({ search: value });
+    },
+    [applyFilters]
   );
 
   const selectClass =
@@ -55,12 +70,31 @@ export function IrrigationListPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Riegos</h1>
-        <button
-          onClick={() => navigate("/irrigations/new")}
-          className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-        >
-          + Nuevo riego
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              exportToExcel(
+                irrigations.map((i) => ({
+                  "Fecha": i.irrigation_date,
+                  "Cantidad (L)": i.amount,
+                  "Método": IRRIGATION_METHOD_LABELS[i.method] ?? i.method,
+                  "Duración (min)": i.duration ?? "",
+                })),
+                "riegos"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            <Download className="h-4 w-4" />
+            Exportar Excel
+          </button>
+          <button
+            onClick={() => navigate("/irrigations/new")}
+            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+          >
+            + Nuevo riego
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -164,7 +198,7 @@ export function IrrigationListPage() {
           Cargando...
         </div>
       ) : (
-        <IrrigationTable irrigations={irrigations} />
+        <IrrigationTable irrigations={irrigations} onSearch={handleSearch} />
       )}
     </div>
   );
