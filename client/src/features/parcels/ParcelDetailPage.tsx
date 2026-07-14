@@ -4,6 +4,7 @@ import { MapPin } from "lucide-react";
 import { useParcelsStore } from "../../stores/parcels.js";
 import { DeleteDialog } from "../../shared/components/DeleteDialog.js";
 import { ImageDisplay } from "../../shared/components/ImageDisplay.js";
+import { ProtectedAction } from "../../shared/components/ProtectedAction.js";
 
 export function ParcelDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -81,18 +82,22 @@ export function ParcelDetailPage() {
       <div className="mb-6 flex items-start justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{current.name}</h1>
         <div className="flex gap-2">
-          <button
-            onClick={() => navigate(`/parcels/${current.id}/edit`)}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-          >
-            Editar
-          </button>
-          <button
-            onClick={() => setShowDelete(true)}
-            className="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
-          >
-            Eliminar
-          </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate(`/parcels/${current.id}/edit`)}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              Editar
+            </button>
+          </ProtectedAction>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => setShowDelete(true)}
+              className="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
+            >
+              Eliminar
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 

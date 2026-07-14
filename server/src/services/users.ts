@@ -5,7 +5,7 @@ export interface UserRow {
   email: string;
   password_hash: string;
   nombre?: string | null;
-  rol: string;
+  role: string;
   avatar_url?: string | null;
   created_at: string;
   updated_at?: string | null;
@@ -15,7 +15,7 @@ export interface UserProfileResponse {
   id: number;
   email: string;
   nombre?: string | null;
-  rol: string;
+  role: string;
   avatar_url?: string | null;
   fecha_registro: string;
   updated_at?: string | null;
@@ -26,7 +26,7 @@ function toProfile(row: UserRow): UserProfileResponse {
     id: row.id,
     email: row.email,
     nombre: row.nombre ?? null,
-    rol: row.rol ?? "operador",
+    role: row.role ?? "operator",
     avatar_url: row.avatar_url ?? null,
     fecha_registro: row.created_at,
     updated_at: row.updated_at ?? null,
@@ -47,7 +47,7 @@ export async function getProfile(
 
 export type UpdateProfileData = {
   nombre?: string;
-  rol?: string;
+  role?: string;
 };
 
 /**
@@ -63,7 +63,7 @@ export async function updateProfile(
 
   const updateFields: Record<string, unknown> = {};
   if (data.nombre !== undefined) updateFields.nombre = data.nombre || null;
-  if (data.rol !== undefined) updateFields.rol = data.rol;
+  if (data.role !== undefined) updateFields.role = data.role;
   updateFields.updated_at = db.fn.now();
 
   await db("users").where({ id: userId }).update(updateFields);

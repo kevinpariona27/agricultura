@@ -1,9 +1,11 @@
 import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useInventoryStore } from "../../stores/inventory";
 import { InventoryTable } from "./components/InventoryTable";
 import { exportToExcel } from "../../shared/utils/exportExcel";
+import { exportTableToPDF } from "../../shared/utils/exportPDF";
+import { ProtectedAction } from "../../shared/components/ProtectedAction";
 
 export function InventoryListPage() {
   const navigate = useNavigate();
@@ -83,11 +85,34 @@ export function InventoryListPage() {
             Exportar Excel
           </button>
           <button
-            onClick={() => navigate("/inventory/new")}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            onClick={() =>
+              exportTableToPDF(
+                "Inventario",
+                [
+                  { header: "Nombre", dataKey: "nombre" },
+                  { header: "Categoría", dataKey: "categoria" },
+                  { header: "Cantidad", dataKey: "cantidad" },
+                  { header: "Unidad", dataKey: "unidad" },
+                  { header: "Costo unitario", dataKey: "costo_unitario" },
+                  { header: "Vencimiento", dataKey: "fecha_vencimiento" },
+                ],
+                items as any,
+                "inventario"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
           >
-            + Nuevo ítem
+            <FileText className="h-4 w-4" />
+            Exportar PDF
           </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate("/inventory/new")}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              + Nuevo ítem
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 

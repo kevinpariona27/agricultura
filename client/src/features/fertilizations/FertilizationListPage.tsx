@@ -1,9 +1,11 @@
 import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useFertilizationsStore } from "../../stores/fertilizations";
 import { FertilizationTable } from "./components/FertilizationTable";
 import { exportToExcel } from "../../shared/utils/exportExcel";
+import { exportTableToPDF } from "../../shared/utils/exportPDF";
+import { ProtectedAction } from "../../shared/components/ProtectedAction";
 
 export function FertilizationListPage() {
   const navigate = useNavigate();
@@ -61,11 +63,33 @@ export function FertilizationListPage() {
             Exportar Excel
           </button>
           <button
-            onClick={() => navigate("/fertilizations/new")}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            onClick={() =>
+              exportTableToPDF(
+                "Fertilizaciones",
+                [
+                  { header: "Producto", dataKey: "producto" },
+                  { header: "Dosis", dataKey: "dosis" },
+                  { header: "Unidad", dataKey: "unidad" },
+                  { header: "Fecha aplicación", dataKey: "fecha_aplicacion" },
+                  { header: "Costo", dataKey: "costo" },
+                ],
+                fertilizations as any,
+                "fertilizaciones"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
           >
-            + Nueva fertilización
+            <FileText className="h-4 w-4" />
+            Exportar PDF
           </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate("/fertilizations/new")}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              + Nueva fertilización
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 

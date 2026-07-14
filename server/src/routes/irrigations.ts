@@ -1,12 +1,16 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import * as irrigationsService from "../services/irrigations.js";
 
 const router = Router();
 
 // All irrigation routes require authentication
 router.use(authMiddleware);
+
+// Write operations require admin or manager role
+const requireWrite = requireRole("admin", "manager");
 
 const methodEnum = z.enum(["aspersion", "goteo", "inundacion", "manual"]);
 
@@ -87,7 +91,7 @@ router.get("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 // POST /api/irrigations — create irrigation
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+router.post("/", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const result = createIrrigationSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -115,7 +119,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
 });
 
 // PUT /api/irrigations/:id — update irrigation
-router.put("/:id", async (req: Request, res: Response): Promise<void> => {
+router.put("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const id = Number(req.params.id);
 
   if (isNaN(id)) {
@@ -159,7 +163,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 // DELETE /api/irrigations/:id — delete irrigation
-router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
+router.delete("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.userId!;
     const id = Number(req.params.id);

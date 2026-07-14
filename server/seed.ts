@@ -30,7 +30,7 @@ async function seed() {
       uid = adminRow.id;
     } else {
       const hash = bcrypt.hashSync('admin123456', 10);
-      const [inserted] = await db('users').insert({ email: 'admin@agroexec.com', password_hash: hash }).returning('id');
+      const [inserted] = await db('users').insert({ email: 'admin@agroexec.com', password_hash: hash, role: 'admin' }).returning('id');
       uid = typeof inserted === 'object' ? (inserted as { id: number }).id : inserted;
       console.log(`  Created admin user (id=${uid})`);
     }

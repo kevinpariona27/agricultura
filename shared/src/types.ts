@@ -1,15 +1,23 @@
-export interface User { id: number; email: string; }
-export type UserRole = "admin" | "operador";
+export interface User { id: number; email: string; role?: string; }
+export type UserRole = "admin" | "manager" | "operator";
 export interface UserProfile {
   id: number;
   email: string;
   nombre?: string | null;
-  rol: UserRole;
+  role: UserRole;
   avatar_url?: string | null;
   fecha_registro: string;
   updated_at?: string | null;
 }
-export interface UpdateProfilePayload { nombre?: string; rol?: UserRole; }
+export interface UpdateProfilePayload { nombre?: string; role?: UserRole; }
+
+/** Audit fields (available on entities when joined with users) */
+export interface AuditInfo {
+  created_by?: number | null;
+  created_by_email?: string | null;
+  updated_by?: number | null;
+  updated_by_email?: string | null;
+}
 export interface Parcel { id: number; user_id: number; name: string; area: number; location: string; soil_type: string; image_url?: string | null; created_at: string; updated_at: string; }
 
 export type CropStatus = "planificado" | "en_crecimiento" | "floracion" | "en_cosecha" | "cosechado" | "cancelado";

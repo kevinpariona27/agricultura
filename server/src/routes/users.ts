@@ -10,7 +10,7 @@ router.use(authMiddleware);
 
 const updateProfileSchema = z.object({
   nombre: z.string().min(1, "Name cannot be empty").optional(),
-  rol: z.enum(["admin", "operador"]).optional(),
+  role: z.enum(["admin", "manager", "operator"]).optional(),
 });
 
 // GET /api/users/me — get current user profile

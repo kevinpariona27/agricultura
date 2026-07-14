@@ -1,12 +1,16 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import * as harvestsService from "../services/harvests.js";
 
 const router = Router();
 
 // All harvest routes require authentication
 router.use(authMiddleware);
+
+// Write operations require admin or manager role
+const requireWrite = requireRole("admin", "manager");
 
 const unidadEnum = z.enum(["kg", "ton"]);
 
@@ -87,7 +91,7 @@ router.get("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 // POST /api/harvests — create harvest
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+router.post("/", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const result = createHarvestSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -115,7 +119,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
 });
 
 // PUT /api/harvests/:id — update harvest
-router.put("/:id", async (req: Request, res: Response): Promise<void> => {
+router.put("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const id = Number(req.params.id);
 
   if (isNaN(id)) {
@@ -159,7 +163,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 // DELETE /api/harvests/:id — delete harvest
-router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
+router.delete("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.userId!;
     const id = Number(req.params.id);

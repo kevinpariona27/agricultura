@@ -1,11 +1,15 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import * as inventoryService from "../services/inventory.js";
 
 const router = Router();
 
 router.use(authMiddleware);
+
+// Write operations require admin or manager role
+const requireWrite = requireRole("admin", "manager");
 
 const categoriaEnum = z.enum([
   "fertilizante",
@@ -96,7 +100,7 @@ router.get("/:id", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+router.post("/", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const result = createInventorySchema.safeParse(req.body);
 
   if (!result.success) {
@@ -118,7 +122,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-router.put("/:id", async (req: Request, res: Response): Promise<void> => {
+router.put("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const id = Number(req.params.id);
 
   if (isNaN(id)) {
@@ -157,7 +161,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
+router.delete("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.userId!;
     const id = Number(req.params.id);

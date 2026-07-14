@@ -14,6 +14,7 @@ import inventoryRoutes from "./routes/inventory.js";
 import userRoutes from "./routes/users.js";
 import uploadRoutes from "./routes/upload.js";
 import { errorHandler } from "./middleware/error.js";
+import { auditMiddleware } from "./middleware/audit.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const uploadsDir = resolve(__dirname, "..", "uploads");
@@ -42,6 +43,9 @@ export function createApp() {
   const app = express();
   app.use(cors({ origin: corsOrigin }));
   app.use(express.json());
+
+  // Auto-set audit fields (created_by/updated_by) on write operations
+  app.use(auditMiddleware);
 
   // Serve uploaded files as static assets
   app.use("/uploads", express.static(uploadsDir));

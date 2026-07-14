@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useIrrigationsStore } from "../../stores/irrigations";
 import { useCropsStore } from "../../stores/crops";
 import { IrrigationTable } from "./components/IrrigationTable";
@@ -9,6 +9,8 @@ import {
   IRRIGATION_METHOD_LABELS,
 } from "./components/IrrigationForm";
 import { exportToExcel } from "../../shared/utils/exportExcel";
+import { exportTableToPDF } from "../../shared/utils/exportPDF";
+import { ProtectedAction } from "../../shared/components/ProtectedAction";
 
 export function IrrigationListPage() {
   const navigate = useNavigate();
@@ -92,11 +94,32 @@ export function IrrigationListPage() {
             Exportar Excel
           </button>
           <button
-            onClick={() => navigate("/irrigations/new")}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            onClick={() =>
+              exportTableToPDF(
+                "Riegos",
+                [
+                  { header: "Fecha", dataKey: "irrigation_date" },
+                  { header: "Cantidad (L)", dataKey: "amount" },
+                  { header: "Método", dataKey: "method" },
+                  { header: "Duración (min)", dataKey: "duration" },
+                ],
+                irrigations as any,
+                "riegos"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
           >
-            + Nuevo riego
+            <FileText className="h-4 w-4" />
+            Exportar PDF
           </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate("/irrigations/new")}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              + Nuevo riego
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 

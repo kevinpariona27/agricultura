@@ -23,6 +23,7 @@ beforeAll(async () => {
       table.increments("id").primary();
       table.text("email").notNullable().unique();
       table.text("password_hash").notNullable();
+      table.text("role").defaultTo("operator");
       table.text("created_at").notNullable().defaultTo(db.fn.now());
     });
   }
@@ -99,7 +100,7 @@ describe("POST /api/auth/login", () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("token");
     expect(typeof res.body.token).toBe("string");
-    expect(res.body.user).toEqual({ id: expect.any(Number), email });
+    expect(res.body.user).toEqual({ id: expect.any(Number), email, role: "operator" });
   });
 
   it("returns 401 for invalid password", async () => {

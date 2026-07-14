@@ -5,6 +5,7 @@ import { usePestsStore } from "../../stores/pests";
 import { useCropsStore } from "../../stores/crops";
 import { DeleteDialog } from "../../shared/components/DeleteDialog";
 import { ImageDisplay } from "../../shared/components/ImageDisplay";
+import { ProtectedAction } from "../../shared/components/ProtectedAction";
 
 const TIPO_LABELS: Record<string, string> = {
   plaga: "Plaga",
@@ -125,18 +126,22 @@ export function PestDetailPage() {
           {TIPO_LABELS[current.tipo] ?? current.tipo}: {current.nombre}
         </h1>
         <div className="flex gap-2">
-          <button
-            onClick={() => navigate(`/pests/${current.id}/edit`)}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-          >
-            Editar
-          </button>
-          <button
-            onClick={() => setShowDelete(true)}
-            className="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
-          >
-            Eliminar
-          </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate(`/pests/${current.id}/edit`)}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              Editar
+            </button>
+          </ProtectedAction>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => setShowDelete(true)}
+              className="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
+            >
+              Eliminar
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 

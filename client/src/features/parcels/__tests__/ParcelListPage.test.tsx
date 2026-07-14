@@ -2,6 +2,15 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
+// Mock the auth store to provide admin role for ProtectedAction
+vi.mock("../../../stores/auth.js", () => ({
+  useUserRole: () => "admin",
+  useAuthStore: (selector?: (s: any) => any) => {
+    const state = { user: null, token: null, role: "admin" };
+    return selector ? selector(state) : state;
+  },
+}));
+
 // Mock the parcels store
 const mockFetchAll = vi.fn().mockResolvedValue(undefined);
 const mockClearError = vi.fn();

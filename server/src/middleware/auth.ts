@@ -1,18 +1,25 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-// Extend Express Request to include userId
+// Extend Express Request to include userId and user info
 declare global {
   namespace Express {
     interface Request {
       userId?: number;
+      user?: JwtUserPayload;
     }
   }
 }
 
-interface JwtPayload {
+export interface JwtUserPayload {
   id: number;
   email: string;
+  role: string;
+}
+
+interface JwtPayload extends JwtUserPayload {
+  iat?: number;
+  exp?: number;
 }
 
 function getJwtSecret(): string {
@@ -40,6 +47,7 @@ export function authMiddleware(
   try {
     const payload = jwt.verify(token, getJwtSecret()) as JwtPayload;
     req.userId = payload.id;
+    req.user = { id: payload.id, email: payload.email, role: payload.role ?? "operator" };
     next();
   } catch (err: unknown) {
     const error = err as Error;

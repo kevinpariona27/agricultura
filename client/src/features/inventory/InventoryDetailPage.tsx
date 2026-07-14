@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useInventoryStore } from "../../stores/inventory";
 import { DeleteDialog } from "../../shared/components/DeleteDialog";
+import { ProtectedAction } from "../../shared/components/ProtectedAction";
 
 const CATEGORIA_LABELS: Record<string, string> = {
   fertilizante: "Fertilizante",
@@ -130,18 +131,22 @@ export function InventoryDetailPage() {
       <div className="mb-6 flex items-start justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-gray-900">{current.nombre}</h1>
         <div className="flex gap-2">
-          <button
-            onClick={() => navigate(`/inventory/${current.id}/edit`)}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
-          >
-            Editar
-          </button>
-          <button
-            onClick={() => setShowDelete(true)}
-            className="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
-          >
-            Eliminar
-          </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate(`/inventory/${current.id}/edit`)}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              Editar
+            </button>
+          </ProtectedAction>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => setShowDelete(true)}
+              className="rounded border border-red-300 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-50"
+            >
+              Eliminar
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 

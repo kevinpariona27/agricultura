@@ -9,7 +9,7 @@ export function ProfilePage() {
   const { profile, loading, error, fetchProfile, updateProfile, clearError, uploadAvatar, removeAvatar } =
     useUserStore();
   const [nombre, setNombre] = useState("");
-  const [rol, setRol] = useState<UserRole>("operador");
+  const [role, setRole] = useState<UserRole>("operator");
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
 
@@ -21,7 +21,7 @@ export function ProfilePage() {
   useEffect(() => {
     if (profile) {
       setNombre(profile.nombre ?? "");
-      setRol(profile.rol as UserRole);
+      setRole(profile.role as UserRole);
     }
   }, [profile]);
 
@@ -30,7 +30,7 @@ export function ProfilePage() {
     setSaving(true);
     setSuccessMsg("");
     try {
-      await updateProfile({ nombre: nombre || undefined, rol });
+      await updateProfile({ nombre: nombre || undefined, role });
       setSuccessMsg("Perfil actualizado correctamente");
     } catch {
       // error is set by store
@@ -116,11 +116,12 @@ export function ProfilePage() {
               Rol
             </label>
             <select
-              value={rol}
-              onChange={(e) => setRol(e.target.value as UserRole)}
+              value={role}
+              onChange={(e) => setRole(e.target.value as UserRole)}
               className="w-full rounded border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
             >
-              <option value="operador">Operador</option>
+              <option value="operator">Operador</option>
+              <option value="manager">Manager</option>
               <option value="admin">Admin</option>
             </select>
           </div>

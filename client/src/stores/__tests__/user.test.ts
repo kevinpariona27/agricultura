@@ -36,7 +36,7 @@ describe("User store", () => {
         id: 1,
         email: "test@farm.com",
         nombre: "Test User",
-        rol: "operador",
+        role: "operator",
         fecha_registro: "2026-01-15",
       };
 
@@ -84,7 +84,7 @@ describe("User store", () => {
         id: 1,
         email: "test@farm.com",
         nombre: "New Name",
-        rol: "admin",
+        role: "admin",
         fecha_registro: "2026-01-15",
       };
 
@@ -94,7 +94,7 @@ describe("User store", () => {
       });
 
       const store = useUserStore.getState();
-      await store.updateProfile({ nombre: "New Name", rol: "admin" });
+      await store.updateProfile({ nombre: "New Name", role: "admin" });
 
       const state = useUserStore.getState();
       expect(state.profile).toEqual(updatedProfile);
@@ -105,7 +105,7 @@ describe("User store", () => {
         "/api/users/me",
         expect.objectContaining({
           method: "PUT",
-          body: JSON.stringify({ nombre: "New Name", rol: "admin" }),
+          body: JSON.stringify({ nombre: "New Name", role: "admin" }),
         })
       );
     });

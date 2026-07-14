@@ -1,4 +1,4 @@
-import { Bell, Download, Menu, User } from "lucide-react";
+import { Bell, Download, FileText, Menu, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotificationStore } from "../../stores/notificationStore";
@@ -6,6 +6,7 @@ import { useUserStore } from "../../stores/user";
 import { useSidebarStore } from "../../stores/sidebar";
 import { ImageDisplay } from "../components/ImageDisplay";
 import { NotificationDropdown } from "../components/NotificationDropdown";
+import { exportTableToPDF } from "../utils/exportPDF";
 
 export function Header() {
   const notifications = useNotificationStore((s) => s.notifications);
@@ -49,8 +50,26 @@ export function Header() {
       </button>
 
       <div className="flex-1" />
-      <button onClick={() => window.print()} className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm text-primary-dark transition-colors duration-200 hover:bg-primary-50">
-        <Download className="h-4 w-4" />
+      <button
+        onClick={() =>
+          exportTableToPDF(
+            "Panel General",
+            [
+              { header: "Notificación", dataKey: "title" },
+              { header: "Tipo", dataKey: "type" },
+              { header: "Mensaje", dataKey: "message" },
+            ],
+            notifications.map((n) => ({
+              title: n.title ?? "",
+              type: n.type ?? "",
+              message: n.message ?? "",
+            })),
+            "dashboard"
+          )
+        }
+        className="flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm text-primary-dark transition-colors duration-200 hover:bg-primary-50"
+      >
+        <FileText className="h-4 w-4" />
         Descargar PDF
       </button>
       {token && (

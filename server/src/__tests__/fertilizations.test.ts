@@ -20,7 +20,7 @@ const JWT_SECRET = process.env.JWT_SECRET!;
  */
 
 function tokenFor(userId: number, email: string): string {
-  return jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign({ id: userId, email, role: "admin" }, JWT_SECRET, { expiresIn: "7d" });
 }
 
 function authHeader(userId: number, email: string): string {

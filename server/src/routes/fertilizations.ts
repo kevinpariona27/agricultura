@@ -1,12 +1,16 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import * as fertilizationsService from "../services/fertilizations.js";
 
 const router = Router();
 
 // All fertilization routes require authentication
 router.use(authMiddleware);
+
+// Write operations require admin or manager role
+const requireWrite = requireRole("admin", "manager");
 
 const unidadEnum = z.enum(["kg/ha", "L/ha"]);
 
@@ -84,7 +88,7 @@ router.get("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 // POST /api/fertilizations — create fertilization
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+router.post("/", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const result = createFertilizationSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -115,7 +119,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
 });
 
 // PUT /api/fertilizations/:id — update fertilization
-router.put("/:id", async (req: Request, res: Response): Promise<void> => {
+router.put("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const id = Number(req.params.id);
 
   if (isNaN(id)) {
@@ -159,7 +163,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 // DELETE /api/fertilizations/:id — delete fertilization
-router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
+router.delete("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.userId!;
     const id = Number(req.params.id);

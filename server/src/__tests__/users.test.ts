@@ -15,9 +15,9 @@ const JWT_SECRET = process.env.JWT_SECRET!;
  * - GET /api/users/me without auth (401)
  * - GET /api/users/me for non-existent user (404)
  * - PUT /api/users/me updates nombre (200)
- * - PUT /api/users/me updates rol (200)
+ * - PUT /api/users/me updates role (200)
  * - PUT /api/users/me without auth (401)
- * - PUT /api/users/me with invalid rol (400)
+ * - PUT /api/users/me with invalid role (400)
  * - PUT /api/users/me with empty name (400)
  * - PUT /api/users/me with empty body — no fields (400)
  * - PUT /api/users/me for non-existent user (404)
@@ -34,13 +34,13 @@ function authHeader(userId: number, email: string): string {
 /** Insert a user and return [id, email] */
 async function insertUser(
   email: string,
-  overrides: Partial<{ nombre: string; rol: string }> = {}
+  overrides: Partial<{ nombre: string; role: string }> = {}
 ): Promise<[number, string]> {
   const [id] = await db("users").insert({
     email,
     password_hash: "ignored-in-tests",
     nombre: overrides.nombre ?? null,
-    rol: overrides.rol ?? "operador",
+    role: overrides.role ?? "operator",
   });
   return [id, email];
 }
@@ -54,7 +54,7 @@ beforeAll(async () => {
       table.text("password_hash").notNullable();
       table.text("created_at").notNullable().defaultTo(db.fn.now());
       table.text("nombre");
-      table.text("rol").defaultTo("operador");
+      table.text("role").defaultTo("operator");
       table.text("updated_at").defaultTo(db.fn.now());
     });
   }
@@ -68,7 +68,7 @@ describe("GET /api/users/me", () => {
   it("returns the current user profile (200)", async () => {
     const [userId, email] = await insertUser("profile@test.com", {
       nombre: "Test User",
-      rol: "admin",
+      role: "admin",
     });
 
     const res = await request(app)
@@ -80,7 +80,7 @@ describe("GET /api/users/me", () => {
       id: userId,
       email: "profile@test.com",
       nombre: "Test User",
-      rol: "admin",
+      role: "admin",
     });
     expect(res.body).toHaveProperty("fecha_registro");
     // Password must NOT be exposed
@@ -94,7 +94,7 @@ describe("GET /api/users/me", () => {
     expect(res.body.error).toBe("Authentication required");
   });
 
-  it("returns rol=operador as default when not set", async () => {
+  it("returns role=operator as default when not set", async () => {
     const [userId, email] = await insertUser("new@test.com");
 
     const res = await request(app)
@@ -102,7 +102,7 @@ describe("GET /api/users/me", () => {
       .set("Authorization", authHeader(userId, email));
 
     expect(res.status).toBe(200);
-    expect(res.body.rol).toBe("operador");
+    expect(res.body.role).toBe("operator");
     expect(res.body.nombre).toBeNull();
   });
 });
@@ -121,29 +121,29 @@ describe("PUT /api/users/me", () => {
     expect(res.body.email).toBe("edit@test.com");
   });
 
-  it("updates rol and returns updated profile (200)", async () => {
+  it("updates role and returns updated profile (200)", async () => {
     const [userId, email] = await insertUser("role@test.com");
 
     const res = await request(app)
       .put("/api/users/me")
       .set("Authorization", authHeader(userId, email))
-      .send({ rol: "admin" });
+      .send({ role: "admin" });
 
     expect(res.status).toBe(200);
-    expect(res.body.rol).toBe("admin");
+    expect(res.body.role).toBe("admin");
   });
 
-  it("updates both nombre and rol together (200)", async () => {
+  it("updates both nombre and role together (200)", async () => {
     const [userId, email] = await insertUser("both@test.com");
 
     const res = await request(app)
       .put("/api/users/me")
       .set("Authorization", authHeader(userId, email))
-      .send({ nombre: "Full User", rol: "admin" });
+      .send({ nombre: "Full User", role: "admin" });
 
     expect(res.status).toBe(200);
     expect(res.body.nombre).toBe("Full User");
-    expect(res.body.rol).toBe("admin");
+    expect(res.body.role).toBe("admin");
   });
 
   it("returns 401 without authentication", async () => {
@@ -155,13 +155,13 @@ describe("PUT /api/users/me", () => {
     expect(res.body.error).toBe("Authentication required");
   });
 
-  it("returns 400 for invalid rol value", async () => {
+  it("returns 400 for invalid role value", async () => {
     const [userId, email] = await insertUser("badrol@test.com");
 
     const res = await request(app)
       .put("/api/users/me")
       .set("Authorization", authHeader(userId, email))
-      .send({ rol: "superadmin" });
+      .send({ role: "superadmin" });
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("error");

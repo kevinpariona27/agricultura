@@ -14,8 +14,9 @@ function getJwtSecret(): string {
 
 export async function register(
   email: string,
-  password: string
-): Promise<{ id: number; email: string }> {
+  password: string,
+  role: string = "operator"
+): Promise<{ id: number; email: string; role: string }> {
   const existing = await db("users").where({ email }).first();
 
   if (existing) {
@@ -26,15 +27,15 @@ export async function register(
 
   const password_hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
-  const [id] = await db("users").insert({ email, password_hash });
+  const [id] = await db("users").insert({ email, password_hash, role });
 
-  return { id, email };
+  return { id, email, role };
 }
 
 export async function login(
   email: string,
   password: string
-): Promise<{ token: string; user: { id: number; email: string } }> {
+): Promise<{ token: string; user: { id: number; email: string; role: string } }> {
   const user = await db("users").where({ email }).first();
 
   if (!user) {
@@ -47,14 +48,16 @@ export async function login(
     throw Object.assign(new Error("Invalid credentials"), { status: 401 });
   }
 
+  const userRole = user.role ?? "operator";
+
   const token = jwt.sign(
-    { id: user.id, email: user.email },
+    { id: user.id, email: user.email, role: userRole },
     getJwtSecret(),
     { expiresIn: "7d" }
   );
 
   return {
     token,
-    user: { id: user.id, email: user.email },
+    user: { id: user.id, email: user.email, role: userRole },
   };
 }

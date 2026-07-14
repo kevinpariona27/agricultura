@@ -1,9 +1,11 @@
 import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useParcelsStore } from "../../stores/parcels.js";
 import { ParcelTable } from "./components/ParcelTable.js";
 import { exportToExcel } from "../../shared/utils/exportExcel.js";
+import { exportTableToPDF } from "../../shared/utils/exportPDF.js";
+import { ProtectedAction } from "../../shared/components/ProtectedAction.js";
 
 export function ParcelListPage() {
   const navigate = useNavigate();
@@ -57,11 +59,32 @@ export function ParcelListPage() {
             Exportar Excel
           </button>
           <button
-            onClick={() => navigate("/parcels/new")}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            onClick={() =>
+              exportTableToPDF(
+                "Parcelas",
+                [
+                  { header: "Nombre", dataKey: "name" },
+                  { header: "Área (ha)", dataKey: "area" },
+                  { header: "Ubicación", dataKey: "location" },
+                  { header: "Tipo de suelo", dataKey: "soil_type" },
+                ],
+                parcels as any,
+                "parcelas"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
           >
-            + Nueva parcela
+            <FileText className="h-4 w-4" />
+            Exportar PDF
           </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate("/parcels/new")}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              + Nueva parcela
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 

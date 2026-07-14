@@ -1,12 +1,16 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import * as cropsService from "../services/crops.js";
 
 const router = Router();
 
 // All crop routes require authentication
 router.use(authMiddleware);
+
+// Write operations require admin or manager role
+const requireWrite = requireRole("admin", "manager");
 
 const statusEnum = z.enum([
   "planificado",
@@ -99,7 +103,7 @@ router.get("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 // POST /api/crops — create crop
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+router.post("/", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const result = createCropSchema.safeParse(req.body);
 
   if (!result.success) {
@@ -127,7 +131,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
 });
 
 // PUT /api/crops/:id — update crop
-router.put("/:id", async (req: Request, res: Response): Promise<void> => {
+router.put("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   const id = Number(req.params.id);
 
   if (isNaN(id)) {
@@ -167,7 +171,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 // DELETE /api/crops/:id — delete crop
-router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
+router.delete("/:id", requireWrite, async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.userId!;
     const id = Number(req.params.id);

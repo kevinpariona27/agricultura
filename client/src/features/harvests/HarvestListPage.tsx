@@ -1,11 +1,13 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useHarvestsStore } from "../../stores/harvests";
 import { useCropsStore } from "../../stores/crops";
 import { HarvestTable } from "./components/HarvestTable";
 import { HARVEST_UNIT_LABELS } from "./components/HarvestForm";
 import { exportToExcel } from "../../shared/utils/exportExcel";
+import { exportTableToPDF } from "../../shared/utils/exportPDF";
+import { ProtectedAction } from "../../shared/components/ProtectedAction";
 
 export function HarvestListPage() {
   const navigate = useNavigate();
@@ -86,11 +88,33 @@ export function HarvestListPage() {
             Exportar Excel
           </button>
           <button
-            onClick={() => navigate("/harvests/new")}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            onClick={() =>
+              exportTableToPDF(
+                "Cosechas",
+                [
+                  { header: "Fecha cosecha", dataKey: "fecha_cosecha" },
+                  { header: "Cantidad", dataKey: "cantidad" },
+                  { header: "Unidad", dataKey: "unidad" },
+                  { header: "Rendimiento", dataKey: "rendimiento" },
+                  { header: "Pérdidas", dataKey: "perdidas" },
+                ],
+                harvests as any,
+                "cosechas"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
           >
-            + Nueva cosecha
+            <FileText className="h-4 w-4" />
+            Exportar PDF
           </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate("/harvests/new")}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              + Nueva cosecha
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 

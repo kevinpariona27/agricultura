@@ -1,10 +1,12 @@
 import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useCropsStore } from "../../stores/crops.js";
 import { CropTable } from "./components/CropTable.js";
 import { CROP_STATUS_LABELS } from "./components/CropForm.js";
 import { exportToExcel } from "../../shared/utils/exportExcel.js";
+import { exportTableToPDF } from "../../shared/utils/exportPDF.js";
+import { ProtectedAction } from "../../shared/components/ProtectedAction.js";
 
 export function CropListPage() {
   const navigate = useNavigate();
@@ -70,11 +72,33 @@ export function CropListPage() {
             Exportar Excel
           </button>
           <button
-            onClick={() => navigate("/crops/new")}
-            className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            onClick={() =>
+              exportTableToPDF(
+                "Cultivos",
+                [
+                  { header: "Variedad", dataKey: "variety" },
+                  { header: "Estado", dataKey: "status" },
+                  { header: "Fecha siembra", dataKey: "planting_date" },
+                  { header: "Fecha est. cosecha", dataKey: "estimated_harvest_date" },
+                  { header: "Densidad", dataKey: "planting_density" },
+                ],
+                crops as any,
+                "cultivos"
+              )
+            }
+            className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
           >
-            + Nuevo cultivo
+            <FileText className="h-4 w-4" />
+            Exportar PDF
           </button>
+          <ProtectedAction roles={["admin", "manager"]}>
+            <button
+              onClick={() => navigate("/crops/new")}
+              className="rounded bg-green-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-800"
+            >
+              + Nuevo cultivo
+            </button>
+          </ProtectedAction>
         </div>
       </div>
 
