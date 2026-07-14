@@ -27,9 +27,9 @@ const COLOR_MAP: Record<string, { border: string; bg: string; text: string }> = 
     text: "text-blue-700",
   },
   amber: {
-    border: "border-l-amber-500",
-    bg: "bg-amber-50",
-    text: "text-amber-700",
+    border: "border-l-accent",
+    bg: "bg-accent-light",
+    text: "text-accent-dark",
   },
   purple: {
     border: "border-l-purple-500",

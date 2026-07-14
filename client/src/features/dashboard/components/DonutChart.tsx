@@ -13,12 +13,12 @@ import { CROP_STATUS_LABELS } from "../../crops/components/CropForm";
 import { EmptyState } from "../../../shared/components/EmptyState";
 
 const STATUS_COLORS: Record<string, string> = {
-  planificado: "#059669",
-  en_crecimiento: "#d97706",
-  floracion: "#2563eb",
-  en_cosecha: "#10b981",
-  cosechado: "#16a34a",
-  cancelado: "#dc2626",
+  planificado: "#D4A017",
+  en_crecimiento: "#22C55E",
+  floracion: "#B8860B",
+  en_cosecha: "#15803D",
+  cosechado: "#0F2E1A",
+  cancelado: "#8B6914",
 };
 
 export function DonutChart() {

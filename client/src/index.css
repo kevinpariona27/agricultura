@@ -5,21 +5,23 @@
   --font-sans: "Fira Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Fira Code", ui-monospace, monospace;
 
-  /* Organic Biophilic palette */
+  /* Organic Biophilic + Earth palette */
   --color-primary: #15803D;
-  --color-primary-dark: #14532D;
+  --color-primary-dark: #0F2E1A;
   --color-primary-light: #22C55E;
   --color-primary-50: #F0FDF4;
   --color-primary-100: #BBF7D0;
 
-  --color-accent: #A16207;
+  --color-accent: #B8860B;
+  --color-accent-light: #FEF3C7;
+  --color-accent-dark: #92400E;
 
   --color-surface: #ffffff;
   --color-app-bg: #F0FDF4;
-  --color-muted: #E8F0F1;
+  --color-muted: #FEF9E7;
   --color-muted-foreground: #6B7280;
-  --color-border: #BBF7D0;
-  --color-border-strong: #86EFAC;
+  --color-border: #D9E8D5;
+  --color-border-strong: #A8C8A0;
 
   --color-destructive: #DC2626;
   --color-destructive-light: #FEE2E2;
@@ -34,5 +36,11 @@
   html,
   body {
     font-family: "Fira Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* Warm table row hover */
+  tbody tr:hover {
+    background-color: #FEF9E7;
+    transition: background-color 150ms ease;
   }
 }

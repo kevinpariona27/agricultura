@@ -94,14 +94,14 @@ export function EvolutionBarChart() {
           yAxisId="left"
           dataKey="riego"
           name="Riego (L)"
-          fill="#60a5fa"
+          fill="#D4A017"
           radius={[4, 4, 0, 0]}
         />
         <Bar
           yAxisId="right"
           dataKey="cosecha"
           name="Cosecha (kg)"
-          fill="#059669"
+          fill="#15803D"
           radius={[4, 4, 0, 0]}
         />
       </BarChart>

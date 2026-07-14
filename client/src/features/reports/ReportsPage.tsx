@@ -22,9 +22,9 @@ import { StatCard } from "../../shared/components/StatCard";
 import { EmptyState } from "../../shared/components/EmptyState";
 
 const SEVERITY_COLORS: Record<string, string> = {
-  baja: "#22c55e",
-  media: "#f59e0b",
-  alta: "#ef4444",
+  baja: "#22C55E",
+  media: "#D4A017",
+  alta: "#B45309",
 };
 
 const SEVERITY_LABELS: Record<string, string> = {
@@ -152,13 +152,13 @@ export function ReportsPage() {
   // --- Section 5: Comparativa de Rendimiento entre Campañas ---
   const HARVEST_COLORS = [
     "#15803D",
-    "#2563EB",
-    "#D97706",
-    "#7C3AED",
-    "#DC2626",
-    "#0891B2",
-    "#4F46E5",
-    "#B45309",
+    "#D4A017",
+    "#B8860B",
+    "#22C55E",
+    "#8B6914",
+    "#C4953A",
+    "#0F2E1A",
+    "#A16207",
   ];
 
   const yieldComparison = useMemo(() => {
@@ -316,7 +316,7 @@ export function ReportsPage() {
                 dataKey="costos"
                 name="Costos"
                 stackId="a"
-                fill="#ef4444"
+                fill="#D4A017"
                 radius={[0, 0, 0, 0]}
               />
               <Bar
