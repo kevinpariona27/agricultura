@@ -1,249 +1,324 @@
-# AgroExec — Sistema de Gestión Agrícola
+# 🌾 AgroExec — Sistema de Gestión Agrícola
 
-Plataforma integral para la gestión de explotaciones agrícolas. Registro de parcelas, cultivos, riegos, fertilizaciones, plagas, cosechas e inventario con soporte de imágenes y dashboard analítico.
+Plataforma integral profesional para la gestión de explotaciones agrícolas. Registro de parcelas, cultivos, riegos, fertilizaciones, plagas, cosechas e inventario con dashboard analítico, mapa interactivo, calendario, roles de usuario, y exportación a Excel/PDF.
 
-## Stack Tecnológico
+**📍 Región:** Ayacucho, Perú
 
-| Capa        | Tecnología                                                     |
-|-------------|----------------------------------------------------------------|
-| Frontend    | React 19, TypeScript, Tailwind CSS v4, Zustand, Framer Motion, Recharts |
-| Backend     | Express 4, TypeScript, better-sqlite3, Knex, Multer           |
-| Testing     | Vitest, React Testing Library, Supertest                       |
-| DevOps      | Docker, Docker Compose, Nginx                                  |
-| Tooling     | npm workspaces, tsx, Vite                                      |
+---
 
-## Arquitectura
+## 🚀 Demo en Vivo
+
+| Ambiente | URL |
+|---|---|
+| **Producción** | [agroex-production.up.railway.app](https://agroex-production.up.railway.app) |
+| **Desarrollo** | [agricultura-dev-production.up.railway.app](https://agricultura-dev-production.up.railway.app) |
+
+### Credenciales de prueba
+
+| Rol | Email | Contraseña | Permisos |
+|---|---|---|---|
+| 👑 Admin | `admin@agroexec.com` | `admin123456` | Todo |
+| 📋 Manager | `manager@agroexec.com` | `manager123` | Crear, editar, eliminar |
+| 👷 Operador | `operario@agroexec.com` | `operario12` | Solo lectura + crear |
+
+---
+
+## ✨ Funcionalidades
+
+### 📊 Dashboard & Analítica
+- Dashboard con 3 tabs: **General**, **Financiero**, **Operativo**
+- 6 KPIs en tiempo real con navegación a secciones
+- Gráficos interactivos: distribución de cultivos, evolución riegos/cosechas, top rendimiento
+- Widget de clima para Ayacucho
+- Timeline de actividad reciente
+- Alertas de stock bajo, cosechas próximas y plagas activas
+
+### 🌱 Gestión Agrícola
+- **Parcelas**: CRUD completo con geolocalización en mapa
+- **Cultivos**: Siembra, estado, densidad, fechas estimadas
+- **Riegos**: Método, cantidad, duración, fechas
+- **Fertilizaciones**: Producto, dosis, costo, fechas
+- **Plagas**: Tipo, severidad, tratamiento, estado
+- **Cosechas**: Cantidad, rendimiento (kg/ha), pérdidas
+- **Inventario**: Stock, categoría, vencimiento, costo unitario
+
+### 💰 Finanzas
+- Página de **Costos** con margen por cultivo
+- Cálculo de **€/kg** (ingreso estimado - costo ÷ cantidad)
+- Resumen: total invertido, margen promedio, mejor cultivo
+- Exportación de reportes financieros
+
+### 🗺️ Visualización
+- **Mapa interactivo** con Leaflet centrado en Ayacucho
+- **Dibujo de polígonos** para delimitar parcelas sobre el mapa
+- Cálculo automático de área en hectáreas
+- **Calendario** de siembras, riegos, cosechas y fertilizaciones
+- **Vista de calendario** con eventos color-coded
+
+### 📄 Reportes & Exportación
+- **Reportes** con 5 secciones de gráficos (rendimiento, costos, plagas, comparativas)
+- **Exportar a Excel** (.xlsx) en todas las tablas
+- **Exportar a PDF** con formato profesional
+- **Cuaderno de Campo** — exportación legal con hojas de aplicaciones, cosechas y riegos
+- **Importar CSV** — carga masiva de parcelas, cultivos e inventario
+
+### 🔐 Seguridad & Control
+- **Roles de usuario**: admin, manager, operator
+- **Auditoría**: created_by y updated_by en todos los registros
+- **Autenticación JWT** con tokens de 7 días
+- **Middleware de roles** en backend (protección de rutas)
+- Componente **ProtectedAction** — oculta botones según rol
+
+### 📱 Experiencia de Usuario
+- **Diseño profesional** con sidebar claro + breadcrumbs
+- **Modo oscuro/claro** automático (por hora) + toggle manual
+- **PWA** — instalable como app nativa
+- **Soporte offline** — cola de cambios en localStorage
+- **Skeleton loaders** en todas las páginas
+- **Tooltips** en botones de acción
+- **Atajos de teclado** (Ctrl+N, Ctrl+D, Ctrl+R)
+- **Landing page** pública con CTA
+- **Página 404** personalizada
+- **Splash screen** al cargar
+- **Favicon** personalizado
+- **Footer** con versión y ubicación
+
+### 📡 IoT & Automatización
+- **API de telemetría** (`/api/telemetry`) para sensores IoT
+- Soporte para: humedad del suelo, temperatura, lluvia, evapotranspiración
+- **Fotos con GPS** — captura coordenadas al subir imágenes
+- **Notificaciones** en tiempo real de stock bajo, cosechas y plagas
+
+---
+
+## 🛠 Stack Tecnológico
+
+| Capa | Tecnología |
+|---|---|
+| **Frontend** | React 19, TypeScript, Tailwind CSS v4, Zustand, Framer Motion, Recharts, Leaflet, react-big-calendar |
+| **Backend** | Express 4, TypeScript, better-sqlite3, Knex, Multer, JWT, bcrypt, Zod |
+| **Testing** | Vitest, React Testing Library, Supertest — **353 tests** (122 client + 231 server) |
+| **DevOps** | Railway (deploy), Docker, Docker Compose, Nginx |
+| **Tooling** | npm workspaces, tsx, Vite, PWA, xlsx, jsPDF, PapaParse |
+
+---
+
+## 🏗 Arquitectura
 
 ```
-Browser :80
-    │
-    ▼
-┌──────────────────────────────────────┐
-│              Nginx :80               │
-│                                      │
-│  /api/*     → server:3001  (Express) │
-│  /uploads/* → server:3001  (Static)  │
-│  /*         → client:80    (SPA)     │
-└──────────────────────────────────────┘
-         │                    │
-         ▼                    ▼
-┌─────────────────┐  ┌──────────────────┐
-│  Server :3001   │  │   Client :80     │
-│  Express +      │  │   React SPA      │
-│  better-sqlite3 │  │   Nginx static   │
-│                 │  │                  │
-│  Vol: /app/data │  └──────────────────┘
-└─────────────────┘
+┌──────────────────────────────────────────────┐
+│                 Railway Cloud                 │
+│                                              │
+│  ┌─────────────┐     ┌──────────────────────┐│
+│  │   Nginx     │────▶│  Express Server :3001 ││
+│  │   SPA :80   │     │  /api/*     REST API  ││
+│  │   Static    │     │  /uploads/* Imágenes  ││
+│  └─────────────┘     │  /*         React SPA ││
+│                      └──────────────────────┘│
+│                              │               │
+│                      ┌───────▼──────────┐    │
+│                      │  SQLite + Volume  │    │
+│                      │  (datos persisten)│    │
+│                      └──────────────────┘    │
+└──────────────────────────────────────────────┘
 ```
 
-## Metodología SDD (Spec-Driven Development)
+---
 
-El proyecto sigue la metodología SDD — cada feature pasa por proposal → specs → design → tasks → apply → verify → archive.
+## 📊 Tests
 
-| Cambio | Fase | Artefactos |
-|--------|------|------------|
-| `gestion-agricola` | Bootstrap del proyecto | [Proposal](openspec/changes/archive/2026-07-08-gestion-agricola/proposal.md) · [Specs](openspec/changes/archive/2026-07-08-gestion-agricola/specs/) · [Archive](openspec/changes/archive/2026-07-08-gestion-agricola/archive-report.md) |
-| `crop-management` | Gestión de cultivos | [Design](openspec/changes/archive/2026-07-08-crop-management/design.md) · [Archive](openspec/changes/archive/2026-07-08-crop-management/archive-report.md) |
-| `irrigation-management` | Gestión de riegos | [Archive](openspec/changes/archive/2026-07-08-irrigation-management/archive-report.md) |
-| `fertilization-management` | Gestión de fertilizaciones | [Design](openspec/changes/archive/2026-07-08-fertilization-management/design.md) · [Archive](openspec/changes/archive/2026-07-08-fertilization-management/archive-report.md) |
-| `image-support` | Soporte de imágenes y subida de archivos | [Explore](openspec/changes/archive/2026-07-09-image-support/explore.md) · [Specs](openspec/changes/archive/2026-07-09-image-support/specs/) · [Archive](openspec/changes/archive/2026-07-09-image-support/archive-report.md) |
-| `enterprise-ui-polish-v2` | Refactor UI enterprise | [Design](openspec/changes/archive/2026-07-09-enterprise-ui-polish-v2/design.md) · [Archive](openspec/changes/archive/2026-07-09-enterprise-ui-polish-v2/archive-report.md) |
-| `delivery-readiness` | Docker, README, entrega | [Design](openspec/changes/delivery-readiness/design.md) · [Tasks](openspec/changes/delivery-readiness/tasks.md) |
-
-## Tests
-
-| Tipo                    | Framework            | Archivos | Tests  |
-|-------------------------|----------------------|----------|--------|
-| Unitarios (Frontend)    | Vitest + RTL + jsdom | 19       | 104    |
-| Integración (Backend)   | Vitest + Supertest   | 10       | 227    |
-| **Total**               |                      | **29**   | **331** |
+| Tipo | Framework | Archivos | Tests |
+|---|---|---|---|
+| Unitarios (Frontend) | Vitest + RTL + jsdom | 22 | 122 |
+| Integración (Backend) | Vitest + Supertest | 11 | 231 |
+| **Total** | | **33** | **353** |
 
 ```bash
-# Ejecutar todos los tests
-npm test -w client   # 104 tests unitarios
-npm test -w server   # 227 tests de integración (SQLite en memoria)
+npm test -w client   # 122 tests
+npm test -w server   # 231 tests
 ```
 
-## Inicio Rápido
+---
 
-### Con Docker (recomendado)
+## 🚀 Inicio Rápido
 
-```bash
-# Construir y levantar todos los servicios
-docker compose up --build
-
-# Abrir en el navegador
-# http://localhost
-
-# Detener y limpiar (incluye datos)
-docker compose down -v
-```
-
-El comando levanta:
-- **server**: Express en puerto 3001 con SQLite en volumen persistente
-- **client**: React SPA servido por Nginx en puerto 80 interno
-- **nginx**: Proxy reverso en puerto 80 expuesto al host
-
-El seed de datos demo se ejecuta automáticamente al primer arranque.
-
-### Configuración Manual (desarrollo)
+### Desarrollo local
 
 ```bash
-# Instalar dependencias (npm workspaces)
 npm install
 
-# Backend
-cd server
-cp ../.env.example .env    # Configurar variables de entorno
-npm run dev                # http://localhost:3001
+# Terminal 1 — Backend
+cd server && npm run dev    # http://localhost:3001
 
-# Frontend (otra terminal)
-cd client
-npm run dev                # http://localhost:5173
+# Terminal 2 — Frontend
+cd client && npm run dev    # http://localhost:5173
 ```
 
-### Variables de Entorno (server/.env)
+### Docker
 
-| Variable      | Default                         | Descripción                     |
-|---------------|---------------------------------|---------------------------------|
-| `CORS_ORIGIN` | `http://localhost:5173`         | Origen permitido para CORS      |
-| `JWT_SECRET`  | `agroexec-dev-secret-change-me` | Secreto para firma de tokens    |
-| `PORT`        | `3001`                          | Puerto del servidor Express     |
-| `DB_PATH`     | `./data.db`                     | Ruta del archivo SQLite         |
+```bash
+docker compose up --build   # http://localhost
+```
 
-## API Endpoints
+### Deploy en Railway
+
+```bash
+railway up                  # Producción
+railway up --service agricultura-dev  # Desarrollo
+```
+
+Ver [`docs/deploy-railway.md`](docs/deploy-railway.md) para guía completa de deploy.
+
+---
+
+## 📋 Variables de Entorno
+
+| Variable | Descripción |
+|---|---|
+| `CORS_ORIGIN` | Origen permitido para CORS |
+| `JWT_SECRET` | Secreto para firma de tokens JWT |
+| `NODE_ENV` | `production` / `development` / `test` |
+| `PORT` | Puerto del servidor Express |
+| `SERVE_CLIENT` | `true` para servir SPA desde Express |
+| `FORCE_RESEED` | `true` para regenerar datos demo al deployar |
+| `IOT_API_KEY` | API key para endpoint de telemetría IoT |
+
+---
+
+## 🔌 API Endpoints
 
 ### Autenticación
-| Método | Ruta                | Descripción              |
-|--------|---------------------|--------------------------|
-| POST   | `/api/auth/register`| Registro de usuario      |
-| POST   | `/api/auth/login`   | Inicio de sesión (JWT)   |
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/auth/register` | Registro (acepta `role`) |
+| POST | `/api/auth/login` | Login (devuelve JWT + user con role) |
 
-### Parcelas
-| Método | Ruta                | Descripción              |
-|--------|---------------------|--------------------------|
-| GET    | `/api/parcels`      | Listar parcelas          |
-| POST   | `/api/parcels`      | Crear parcela            |
-| GET    | `/api/parcels/:id`  | Detalle de parcela       |
-| PUT    | `/api/parcels/:id`  | Actualizar parcela       |
-| DELETE | `/api/parcels/:id`  | Eliminar parcela         |
-
-### Cultivos
-| Método | Ruta                | Descripción              |
-|--------|---------------------|--------------------------|
-| GET    | `/api/crops`        | Listar cultivos          |
-| POST   | `/api/crops`        | Crear cultivo            |
-| GET    | `/api/crops/:id`    | Detalle de cultivo       |
-| PUT    | `/api/crops/:id`    | Actualizar cultivo       |
-| DELETE | `/api/crops/:id`    | Eliminar cultivo         |
-
-### Riegos
-| Método | Ruta                    | Descripción          |
-|--------|-------------------------|----------------------|
-| GET    | `/api/irrigations`      | Listar riegos        |
-| POST   | `/api/irrigations`      | Crear riego          |
-| GET    | `/api/irrigations/:id`  | Detalle de riego     |
-| PUT    | `/api/irrigations/:id`  | Actualizar riego     |
-| DELETE | `/api/irrigations/:id`  | Eliminar riego       |
-
-### Fertilizaciones
-| Método | Ruta                       | Descripción             |
-|--------|----------------------------|-------------------------|
-| GET    | `/api/fertilizations`      | Listar fertilizaciones  |
-| POST   | `/api/fertilizations`      | Crear fertilización     |
-| GET    | `/api/fertilizations/:id`  | Detalle                 |
-| PUT    | `/api/fertilizations/:id`  | Actualizar              |
-| DELETE | `/api/fertilizations/:id`  | Eliminar                |
-
-### Plagas
-| Método | Ruta                | Descripción              |
-|--------|---------------------|--------------------------|
-| GET    | `/api/pests`        | Listar plagas            |
-| POST   | `/api/pests`        | Crear plaga              |
-| GET    | `/api/pests/:id`    | Detalle de plaga         |
-| PUT    | `/api/pests/:id`    | Actualizar plaga         |
-| DELETE | `/api/pests/:id`    | Eliminar plaga           |
-
-### Cosechas
-| Método | Ruta                  | Descripción            |
-|--------|-----------------------|------------------------|
-| GET    | `/api/harvests`       | Listar cosechas        |
-| POST   | `/api/harvests`       | Crear cosecha          |
-| GET    | `/api/harvests/:id`   | Detalle de cosecha     |
-| PUT    | `/api/harvests/:id`   | Actualizar cosecha     |
-| DELETE | `/api/harvests/:id`   | Eliminar cosecha       |
-
-### Inventario
-| Método | Ruta                  | Descripción            |
-|--------|-----------------------|------------------------|
-| GET    | `/api/inventory`      | Listar inventario      |
-| POST   | `/api/inventory`      | Crear ítem             |
-| GET    | `/api/inventory/:id`  | Detalle de ítem        |
-| PUT    | `/api/inventory/:id`  | Actualizar ítem        |
-| DELETE | `/api/inventory/:id`  | Eliminar ítem          |
-
-### Usuarios
-| Método | Ruta                | Descripción              |
-|--------|---------------------|--------------------------|
-| GET    | `/api/users`        | Listar usuarios          |
-| GET    | `/api/users/:id`    | Detalle de usuario       |
-| PUT    | `/api/users/:id`    | Actualizar perfil        |
+### Módulos CRUD — Parcelas, Cultivos, Riegos, Fertilizaciones, Plagas, Cosechas, Inventario
+| Método | Ruta | Auth |
+|---|---|---|
+| GET | `/api/{entity}` | Token |
+| POST | `/api/{entity}` | Token + admin/manager |
+| GET | `/api/{entity}/:id` | Token |
+| PUT | `/api/{entity}/:id` | Token + admin/manager |
+| DELETE | `/api/{entity}/:id` | Token + admin/manager |
 
 ### Uploads
-| Método | Ruta                        | Descripción              |
-|--------|-----------------------------|--------------------------|
-| POST   | `/api/upload/:entity/:id`   | Subir imagen             |
-| DELETE | `/api/upload/:entity/:id`   | Eliminar imagen          |
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/upload/:entity/:id` | Subir imagen (parcelas, plagas) |
+| DELETE | `/api/upload/:entity/:id` | Eliminar imagen |
+
+### IoT & Alertas
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/telemetry` | Recibir datos de sensores (X-API-KEY) |
+| GET | `/api/telemetry/:parcelId` | Última telemetría de parcela |
+| POST | `/api/alerts/subscribe` | Suscribirse a alertas email |
+| GET | `/api/alerts/check` | Verificar alertas pendientes (admin) |
 
 ### Sistema
-| Método | Ruta            | Descripción     |
-|--------|-----------------|-----------------|
-| GET    | `/api/health`   | Health check    |
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/health` | Health check |
+| GET | `/api/users/me` | Perfil del usuario autenticado |
 
-## Checklist del Profesor
+---
 
-| Requisito              | Evidencia                                                                               |
-|------------------------|------------------------------------------------------------------------------------------|
-| SDD (Spec-Driven Dev)  | [Archivo de cambios](openspec/changes/archive/) — 6 features con proposal, specs, design, tasks, verify, archive |
-| Ciclo de vida completo | Planning → Design → Implementation → Testing → Deploy — documentado en cada archive      |
-| Pruebas unitarias      | 104 tests — Vitest + React Testing Library + jsdom                                       |
-| Pruebas de integración | 227 tests — Supertest con SQLite en memoria (:memory:)                                   |
-| Despliegue             | Docker Compose — `docker compose up` levanta toda la app en un comando                   |
-| GitHub                 | [github.com/maik/apliacacio-agricultura](https://github.com/maik/apliacacio-agricultura)  |
-
-## Estructura del Proyecto
+## 📂 Estructura del Proyecto
 
 ```
-apliacacio-agricultura/
-├── client/                     # Frontend React SPA
+├── client/                        # Frontend React SPA
 │   ├── src/
-│   │   ├── api/               # Cliente HTTP (/api)
-│   │   ├── features/          # Páginas por dominio
-│   │   │   ├── auth/          # Login, registro
-│   │   │   ├── parcels/       # CRUD parcelas
-│   │   │   ├── crops/         # CRUD cultivos
-│   │   │   ├── irrigations/   # CRUD riegos
-│   │   │   ├── fertilizations/# CRUD fertilizaciones
-│   │   │   ├── pests/         # CRUD plagas
-│   │   │   ├── harvests/      # CRUD cosechas
-│   │   │   ├── inventory/     # CRUD inventario
-│   │   │   ├── dashboard/     # Dashboard con gráficos
-│   │   │   └── users/         # Perfil de usuario
-│   │   ├── shared/            # Componentes compartidos
-│   │   └── stores/            # Estado global (Zustand)
+│   │   ├── api/                   # Cliente HTTP
+│   │   ├── features/
+│   │   │   ├── alerts/            # Suscripción a alertas
+│   │   │   ├── auth/              # Login, registro
+│   │   │   ├── calendar/          # Vista de calendario
+│   │   │   ├── costs/             # Costos y márgenes
+│   │   │   ├── crops/             # CRUD cultivos
+│   │   │   ├── dashboard/         # Dashboard con tabs + charts
+│   │   │   ├── errors/            # Página 404
+│   │   │   ├── fertilizations/    # CRUD fertilizaciones
+│   │   │   ├── harvests/          # CRUD cosechas
+│   │   │   ├── import/            # Importar CSV
+│   │   │   ├── inventory/         # CRUD inventario
+│   │   │   ├── irrigations/       # CRUD riegos
+│   │   │   ├── landing/           # Landing page pública
+│   │   │   ├── legal/             # Cuaderno de Campo
+│   │   │   ├── map/               # Mapa con dibujo de polígonos
+│   │   │   ├── parcels/           # CRUD parcelas
+│   │   │   ├── pests/             # CRUD plagas
+│   │   │   └── reports/           # Reportes con gráficos
+│   │   ├── shared/
+│   │   │   ├── components/        # Badge, StatCard, Skeleton, Tooltip, Pagination, etc.
+│   │   │   ├── hooks/             # useKeyboardShortcuts, useUnsavedChanges
+│   │   │   ├── layout/            # AppLayout, Sidebar, Header
+│   │   │   └── utils/             # exportExcel, exportPDF, geocode, offlineQueue
+│   │   └── stores/                # Zustand: auth, crops, weather, theme, notification, etc.
+│   ├── public/
 │   ├── Dockerfile
 │   └── nginx.conf
-├── server/                     # Backend Express
+├── server/                        # Backend Express
 │   ├── src/
-│   │   ├── db/                # Knex config, migrations
-│   │   ├── middleware/         # Auth, error handling
-│   │   └── routes/            # Endpoints REST
-│   ├── seed.ts                # Datos demo (7 parcelas, 16 cultivos, etc.)
-│   ├── Dockerfile
-│   └── entrypoint.sh
-├── shared/                     # Tipos compartidos
-├── openspec/                   # Artefactos SDD
-├── nginx.conf                  # Proxy reverso (raíz)
+│   │   ├── db/                    # Knex config + 14 migrations
+│   │   ├── middleware/            # auth, roles, audit, upload, error
+│   │   ├── routes/                # auth, parcels, crops, irrigations, fertilizer, pests, harvests, inventory, upload, users, telemetry, alerts
+│   │   └── services/              # Lógica de negocio por entidad
+│   ├── seed.ts                    # Datos demo (14 parcelas, 30 cultivos, 30 riegos, etc.)
+│   ├── entrypoint.sh              # Migrations → seed → server
+│   └── Dockerfile
+├── shared/                        # Tipos TypeScript compartidos
+├── openspec/                      # Artefactos SDD (8 cambios, 13 specs)
+├── docs/                          # Documentación
+│   ├── deploy-railway.md          # Guía de deploy
+│   └── er-diagram.md              # Diagrama entidad-relación
+├── design-system/                 # Design system Organic Biophilic
 ├── docker-compose.yml
 └── README.md
 ```
+
+---
+
+## 📝 Datos Demo
+
+El seed incluye **154 registros** con datos realistas de la región Ayacucho:
+
+| Entidad | Registros |
+|---|---|
+| Parcelas | 14 |
+| Cultivos | 30 |
+| Riegos | 30 |
+| Fertilizaciones | 25 |
+| Plagas | 15 |
+| Cosechas | 20 |
+| Inventario | 20 |
+
+---
+
+## 🎨 Design System
+
+- **Organic Biophilic + Earth palette** — tonos verde tierra con acentos dorados
+- **Sidebar profesional claro** con breadcrumbs
+- **Soporte dark/light mode** automático
+- **Diseño responsive** — mobile, tablet, desktop
+- **Framer Motion** para animaciones fluidas
+
+---
+
+## 👤 Para el Profesor
+
+| Requisito | Evidencia |
+|---|---|
+| **SDD** | [8 cambios documentados](openspec/changes/) con proposal → specs → design → tasks → verify → archive |
+| **Ciclo de vida** | Planning → Design → Implementation → Testing → Deploy — en cada archive |
+| **Tests unitarios** | 122 tests — Vitest + RTL + jsdom |
+| **Tests integración** | 231 tests — Supertest + SQLite en memoria |
+| **GitHub** | [github.com/kevinpariona27/agricultura](https://github.com/kevinpariona27/agricultura) |
+| **Deploy** | [Railway](https://agroex-production.up.railway.app) + Docker Compose |
+| **Roles** | Admin, Manager, Operator con middleware de autorización |
+| **Auditoría** | created_by / updated_by en todos los registros |
+| **IoT** | API de telemetría para sensores agrícolas |
+| **Offline** | Cola de cambios en localStorage + sincronización |
+| **Exportación** | Excel, PDF, Cuaderno de Campo legal |
+| **Mapa** | Leaflet con dibujo de polígonos + geolocalización Ayacucho |
+| **PWA** | Instalable como app nativa con service worker |
