@@ -6,6 +6,8 @@ import { authMiddleware } from "../middleware/auth.js";
 import { upload } from "../middleware/upload.js";
 import * as parcelsService from "../services/parcels.js";
 import * as pestsService from "../services/pests.js";
+import * as cropsService from "../services/crops.js";
+import * as inventoryService from "../services/inventory.js";
 import db from "../db/connection.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -17,14 +19,18 @@ router.use(authMiddleware);
 /** Allowed entity types */
 const VALID_ENTITIES = new Set([
   "parcels",
+  "crops",
   "pests",
+  "inventory",
   "users",
 ]);
 
 /** Map entity → db column name */
 const COLUMN_NAME: Record<string, string> = {
   parcels: "image_url",
+  crops: "image_url",
   pests: "image_url",
+  inventory: "image_url",
   users: "avatar_url",
 };
 
@@ -42,8 +48,16 @@ async function checkEntityOwnership(
       const row = await parcelsService.getById(id, userId);
       return row ?? null;
     }
+    case "crops": {
+      const row = await cropsService.getById(id, userId);
+      return row ?? null;
+    }
     case "pests": {
       const row = await pestsService.getById(id, userId);
+      return row ?? null;
+    }
+    case "inventory": {
+      const row = await inventoryService.getById(id, userId);
       return row ?? null;
     }
     case "users":
